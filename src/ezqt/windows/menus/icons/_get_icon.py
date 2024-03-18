@@ -1,0 +1,25 @@
+"""The getIcon function creates and returns a QIcon of the given name."""
+#  MIT Licence
+#  Copyright (c) 2024 Asger Jon Vistisen
+from __future__ import annotations
+
+import os
+from typing import Callable
+
+from PyQt5.QtGui import QIcon
+from icecream import ic
+
+ic.configureOutput(includeContext=True)
+
+
+def getIcon(name: str) -> str:
+  """Creates and returns a QIcon of the given name."""
+
+  name = name.lower().strip()
+  name = name.replace(' ', '_')
+  here = os.path.dirname(__file__)
+  baseName = name.split('.')[0]
+  iconPath = os.path.join(here, baseName + '.png')
+  if os.path.exists(iconPath):
+    if os.path.isfile(iconPath):
+      return iconPath
