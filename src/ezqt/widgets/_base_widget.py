@@ -6,11 +6,13 @@ for composite widgets directly but instead for the constituents. """
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QBrush, QPen, QColor, QFont, QPainter
+from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QWidget
-
 from attribox import AttriBox
+
 from ezqt.core import parseParent, NoWrap, Center, Pen, Font, Brush
+from ezqt.core import BevelJoin, FlatCap, SolidLine, SolidFill, DashLine
+from ezqt.core import DotLine, DashDot
 
 
 class BaseWidget(QWidget):
@@ -18,14 +20,13 @@ class BaseWidget(QWidget):
   provide brushes, pens and fonts as attributes. These widgets are not meant
   for composite widgets directly but instead for the constituents. """
 
-  solidBrush = AttriBox[Brush](Qt.BrushStyle.SolidPattern)
+  solidBrush = AttriBox[Brush](SolidFill)
   emptyBrush = AttriBox[Brush](QColor(0, 0, 0, 0))
-  solidLine = AttriBox[Pen](Qt.PenStyle.SolidLine)
-  dashedLine = AttriBox[Pen](Qt.PenStyle.DashLine)
-  dottedLine = AttriBox[Pen](Qt.PenStyle.DotLine)
-  dashDotLine = AttriBox[Pen](Qt.PenStyle.DashDotLine)
-  fontLine = AttriBox[Pen](Qt.PenStyle.SolidLine, 1, Qt.PenCapStyle.FlatCap,
-                           Qt.PenJoinStyle.BevelJoin)
+  solidLine = AttriBox[Pen](SolidLine)
+  dashedLine = AttriBox[Pen](DashLine)
+  dottedLine = AttriBox[Pen](DotLine)
+  dashDotLine = AttriBox[Pen](DashDot)
+  fontLine = AttriBox[Pen](SolidLine, 1, FlatCap, BevelJoin)
   emptyLine = AttriBox[Pen](Qt.PenStyle.NoPen)
   defaultFont = AttriBox[Font]('Montserrat', 16, )
 

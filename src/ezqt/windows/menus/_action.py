@@ -3,15 +3,13 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import os
-
-from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QAction, QKeySequence
 from icecream import ic
 from vistutils.waitaminute import typeMsg
 
-from ezqt.windows.menus.icons import getIcon
+from ezqt.windows.menus.icons import getIconPath
 from ezqt.windows.menus.shortcuts import getShortcut
+from settings import Icons
 
 ic.configureOutput(includeContext=True, )
 
@@ -43,10 +41,7 @@ class Action(QAction):
 
   def setupIcon(self) -> str:
     """Sets up the icon for the action."""
-    icon = getIcon(self._name)
-    if icon:
-      self.setIconPath(icon)
-      return icon
+    icon = Icons.
 
   def __str__(self, ) -> str:
     """Returns the name of the action."""

@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout
 
 from attribox import AttriBox
 from ezqt.widgets import TextLabel, BaseWidget, HorizontalPanel, DataView
+from settings import Default
 
 
 class DataWidget(BaseWidget):
@@ -22,7 +23,7 @@ class DataWidget(BaseWidget):
 
   verticalLayout = AttriBox[QVBoxLayout]()
   verticalWidget = AttriBox[BaseWidget]()
-  dataView = AttriBox[DataView](256)
+  dataView = AttriBox[DataView](Default.numPoints)
   baseWidget = AttriBox[BaseWidget]()
   baseLayout = AttriBox[QHBoxLayout]()
 

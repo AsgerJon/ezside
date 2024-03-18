@@ -20,7 +20,7 @@ class BorderRect(BaseWidget):
     repainted."""
     painter = QPainter()
     painter.begin(self)
-    painter.setPen(self.pen)
+    painter.setPen(self.solidLine)
     painter.setBrush(emptyBrush())
     painter.drawRect(self.rect())
     painter.end()

@@ -8,6 +8,8 @@ from PySide6.QtWidgets import QSlider
 from vistutils.parse import maybe
 from vistutils.text import stringList
 
+from settings import Default
+
 
 class VerticalSlider(QSlider):
   """VerticalSlider provides a vertical slider."""
@@ -58,10 +60,10 @@ class VerticalSlider(QSlider):
             pageStep = arg
           elif initVal is None:
             initVal = arg
-    minVal = maybe(minVal, 0)
-    maxVal = maybe(maxVal, 100)
-    singleStep = maybe(singleStep, 1)
-    pageStep = maybe(pageStep, 10)
+    minVal = maybe(minVal, Default.sliderMin)
+    maxVal = maybe(maxVal, Default.sliderMax)
+    singleStep = maybe(singleStep, Default.sliderSingleStep)
+    pageStep = maybe(pageStep, Default.sliderPageStep)
     QSlider.__init__(self, Qt.Orientation.Vertical)
     self.setRange(minVal, maxVal)
     self.setSingleStep(singleStep)

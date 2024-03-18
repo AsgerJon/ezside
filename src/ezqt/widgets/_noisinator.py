@@ -8,18 +8,18 @@ from math import sin
 
 from PySide6.QtCore import Slot, Signal
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QPushButton
-from icecream import ic
-
 from attribox import AttriBox
+
 from ezqt.core import Precise
 from ezqt.widgets import BaseWidget, VerticalSlider, Timer, TextLabel
+from settings import Default
 
 
 class Noisinator(BaseWidget):
   """Noisinator creates a noise signal."""
 
   baseLayout = AttriBox[QVBoxLayout]()
-  timer = AttriBox[Timer](10, Precise, False)
+  timer = AttriBox[Timer](Default.noiseTimer, Precise, False)
   sliderWidget = AttriBox[BaseWidget]()
   sliderLayout = AttriBox[QHBoxLayout]()
   f1 = AttriBox[VerticalSlider](0, 100, 1, 10, 50)

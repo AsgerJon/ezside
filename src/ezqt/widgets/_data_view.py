@@ -11,6 +11,7 @@ from icecream import ic
 
 from attribox import AttriBox
 from ezqt.widgets import DataRoll
+from settings import Default
 
 ic.configureOutput(includeContext=True, )
 
@@ -19,7 +20,7 @@ class DataView(QChartView):
   """DataView collects the functionality from QCharts to show data in a plot
   that is continuously updated."""
 
-  data = AttriBox[DataRoll](256)
+  data = AttriBox[DataRoll](Default.numPoints)
   series = AttriBox[QScatterSeries]()
   dataChart = AttriBox[QChart]()
 
@@ -48,39 +49,3 @@ class DataView(QChartView):
     """Returns the vertical range of the chart."""
     a = self.dataChart.axes()[1]
     return a.min(), a.max()
-
-  def min(self) -> float:
-    """Returns the minimum value of the vertical range."""
-    return self.getVerticalRange()[0]
-
-  def max(self) -> float:
-    """Returns the maximum value of the vertical range."""
-    return self.getVerticalRange()[1]
-
-  def decMin(self, ) -> None:
-    """Decreases the minimum value of the vertical range."""
-    a = self.dataChart.axes()[1]
-    newVal = a.min() * (0.9 if a.min() < 0 else 1.1)
-    self.minValChange.emit(newVal)
-    self.dataChart.axes()[1].setMin(newVal)
-
-  def incMin(self, ) -> None:
-    """Increases the minimum value of the vertical range."""
-    a = self.dataChart.axes()[1]
-    newVal = a.min() * (0.9 if a.min() < 0 else 1.1)
-    self.minValChange.emit(newVal)
-    self.dataChart.axes()[1].setMin(newVal)
-
-  def decMax(self, ) -> None:
-    """Decreases the maximum value of the vertical range."""
-    a = self.dataChart.axes()[1]
-    newVal = a.max() * (0.9 if a.max() < 0 else 1.1)
-    self.maxValChange.emit(newVal)
-    self.dataChart.axes()[1].setMax(newVal)
-
-  def incMax(self, ) -> None:
-    """Increases the maximum value of the vertical range."""
-    a = self.dataChart.axes()[1]
-    newVal = a.max() * (0.9 if a.max() > 0 else 1.1)
-    self.maxValChange.emit(newVal)
-    self.dataChart.axes()[1].setMax(newVal)

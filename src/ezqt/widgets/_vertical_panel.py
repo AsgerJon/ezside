@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from PySide6.QtGui import QColor
 from vistutils.parse import maybe
-from vistutils.waitaminute import typeMsg
 
 from ezqt.core import Fixed, Expand, LawnGreen
 from ezqt.widgets import FilledRect

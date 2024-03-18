@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor
 from vistutils.parse import maybe
 
 from ezqt.core import Fixed, Expand, LawnGreen
-from ezqt.widgets import VerticalPanel, FilledRect
+from ezqt.widgets import FilledRect
 
 
 class HorizontalPanel(FilledRect):

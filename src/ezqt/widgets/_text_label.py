@@ -7,8 +7,7 @@ from PySide6.QtGui import QPainter, QPaintEvent
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
-from attribox import AttriBox
-from ezqt.core import NoWrap, Center
+from ezqt.core import Center
 from ezqt.widgets import BaseWidget
 
 

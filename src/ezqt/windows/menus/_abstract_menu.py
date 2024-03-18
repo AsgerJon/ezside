@@ -40,12 +40,3 @@ class AbstractMenu(QMenu):
     self.appendActions()
     self.setupActions()
     self.applyParent()
-
-  def showEvent(self, event: QEvent) -> None:
-    """Shows the menu."""
-    QMenu.showEvent(self, event)
-    for action in self.actions():
-      if isinstance(action, Action):
-        icon = action.setupIcon()
-        if icon:
-          print(icon)

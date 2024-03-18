@@ -12,9 +12,9 @@ SolidFill = Qt.BrushStyle.SolidPattern
 BlankFill = Qt.BrushStyle.NoBrush
 
 SolidLine = Qt.PenStyle.SolidLine
-DashedLine = Qt.PenStyle.DashLine
-DottedLine = Qt.PenStyle.DotLine
-DashDotLine = Qt.PenStyle.DashDotLine
+DashLine = Qt.PenStyle.DashLine
+DotLine = Qt.PenStyle.DotLine
+DashDot = Qt.PenStyle.DashDotLine
 BlankLine = Qt.PenStyle.NoPen
 
 FlatCap = Qt.PenCapStyle.FlatCap

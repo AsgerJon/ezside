@@ -4,14 +4,14 @@ application business logic."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QApplication
 from icecream import ic
-
 from attribox import AttriBox
+
 from ezqt.core import Precise
 from ezqt.widgets import Timer
 from ezqt.windows import LayoutWindow
+from settings import Default
 
 ic.configureOutput(includeContext=True, )
 
@@ -20,7 +20,7 @@ class MainWindow(LayoutWindow):
   """MainWindow subclasses the LayoutWindow and provides the main
   application business logic."""
 
-  paintTimer = AttriBox[Timer](20, Precise, False)
+  paintTimer = AttriBox[Timer](Default.paintTimer, Precise, False)
 
   def __init__(self, *args, **kwargs) -> None:
     LayoutWindow.__init__(self, *args, **kwargs)

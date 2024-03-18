@@ -9,6 +9,8 @@ import sys
 from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 
+from ezqt import MainWindow
+
 
 def tester00() -> None:
   """Main Tester Script"""
@@ -19,10 +21,23 @@ def tester00() -> None:
 def tester01() -> None:
   """Main Tester Script"""
   app = QApplication(sys.argv)
-  window = QMainWindow()
+  window = MainWindow()
   window.show()
   app.exec()
 
 
+def tester02() -> None:
+  """Main Tester Script"""
+  here = os.path.dirname(__file__)
+  iconPath = os.path.join(here, 'windows', 'menus', 'icons', 'icons')
+  iconList = []
+  for icon in os.listdir(iconPath):
+    iconList.append(icon)
+  iconStrings = '\n'.join(iconList)
+  iconFile = os.path.join(here, 'icons.txt')
+  with open(iconFile, 'w') as f:
+    f.write(iconStrings)
+
+
 if __name__ == '__main__':
-  tester00()
+  tester01()
