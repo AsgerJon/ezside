@@ -7,7 +7,6 @@ from PySide6.QtGui import QAction, QKeySequence
 from icecream import ic
 from vistutils.waitaminute import typeMsg
 
-from ezqt.windows.menus.icons import getIconPath
 from ezqt.windows.menus.shortcuts import getShortcut
 from settings import Icons
 
@@ -38,10 +37,11 @@ class Action(QAction):
     shortcut = getShortcut(self._name)
     if isinstance(shortcut, QKeySequence):
       self.setShortcut(shortcut)
+    self.setupIcon()
 
-  def setupIcon(self) -> str:
+  def setupIcon(self) -> None:
     """Sets up the icon for the action."""
-    icon = Icons.
+    self.setIcon(Icons.load(self._name))
 
   def __str__(self, ) -> str:
     """Returns the name of the action."""

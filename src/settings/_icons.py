@@ -9,24 +9,12 @@ import os
 from typing import Any
 
 from PIL import Image
+from PIL import ImageQt
+from PySide6.QtGui import QIcon
 
 
-class _Icon:
-  __inner_image__ = None
-
-  def __init__(self, img: Any) -> None:
-    self.__inner_image__ = img
-
-  def __get__(self, instance: object, owner: Any) -> Image:
-    if instance is None:
-      return self.__inner_image__
-    raise AttributeError(
-      "Icon is a class attribute, not an instance attribute!")
-
-
-class IconMeta(type):
-  """The IconMeta metaclass is used to create the Icons class. The Icons
-  class is a dictionary of icon names and their respective paths."""
+class Icons:
+  """The icons class provides icons"""
 
   @staticmethod
   def _getIconPath() -> str:
@@ -36,21 +24,19 @@ class IconMeta(type):
     return os.path.normpath(iconPath)
 
   @classmethod
-  def __prepare__(mcls, name: str, bases: str, **kwargs):
-    """Creates the dictionary for the Icons class."""
-    iconPath = mcls._getIconPath()
-    iconList = os.listdir(iconPath)
-    namespace = {}
+  def _getIconList(cls, ) -> Image:
+    """Returns the icon with the given name."""
+    iconPath = cls._getIconPath()
+    return os.listdir(iconPath)
+
+  @classmethod
+  def load(cls, name: str) -> Any:
+    """Loads the icons from the icon folder."""
+    iconList = cls._getIconList()
     for icon in iconList:
-      if not icon.endswith('.png'):
-        continue
-      name, ext = os.path.splitext(icon)
-      im = Image.open(icon)
-      namespace[name] = Image.Image.load(im)
-    return namespace
-
-
-class Icons(IconMeta):
-  """The icons module provides a collection of icons for use in the
-  application. The icons are provided as a dictionary with the icon name
-  as the key and the icon path as the value."""
+      if name in icon:
+        iconFile = os.path.join(cls._getIconPath(), icon)
+        img = Image.open(iconFile)
+        return QIcon(ImageQt.toqpixmap(img))
+    else:
+      return cls.load('risitas')

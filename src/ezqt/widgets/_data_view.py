@@ -9,7 +9,7 @@ from PySide6.QtCharts import QChart, QChartView, QScatterSeries
 from PySide6.QtCore import Signal
 from icecream import ic
 
-from attribox import AttriBox
+from attribox import AttriBox, this
 from ezqt.widgets import DataRoll
 from settings import Default
 
@@ -20,7 +20,9 @@ class DataView(QChartView):
   """DataView collects the functionality from QCharts to show data in a plot
   that is continuously updated."""
 
-  data = AttriBox[DataRoll](Default.numPoints)
+  __fallback_num_points__ = Default.numPoints
+
+  data = AttriBox[DataRoll](this)
   series = AttriBox[QScatterSeries]()
   dataChart = AttriBox[QChart]()
 
@@ -38,6 +40,16 @@ class DataView(QChartView):
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the DataView."""
     QChartView.__init__(self, )
+    self._numPoints = None
+    for arg in args:
+      if hasattr(arg, 'getNumPoints'):
+        self._numPoints = arg.getNumPoints()
+        break
+      if isinstance(arg, int) and self._numPoints is None:
+        self._numPoints = arg
+        break
+    else:
+      self._numPoints = self.__fallback_num_points__
     self.setMinimumSize(640, 480)
     self.dataChart.addSeries(self.series)
     self.refresh()
@@ -49,3 +61,7 @@ class DataView(QChartView):
     """Returns the vertical range of the chart."""
     a = self.dataChart.axes()[1]
     return a.min(), a.max()
+
+  def getNumPoints(self) -> int:
+    """The getNumPoints method returns the number of points."""
+    return self._numPoints
