@@ -5,12 +5,11 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "ezqt"
-version = "0.1.28"
+version = "0.1.1"
 authors = [
   { name = "Asger Jon Vistisen", email = "asgerjon2@gmail.com" },
 ]
-description = "ezqt provides examples and utilities for developing Qt
-applications in Python."
+description = "ezqt provides examples and utilities for PySide6."
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
