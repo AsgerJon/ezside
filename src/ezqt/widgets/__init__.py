@@ -8,8 +8,13 @@ from ._timer import Timer
 from ._data_roll import DataRoll
 from ._data_series import DataSeries, LineSeries, ScatterSeries
 from ._base_widget import BaseWidget
+from ._spacer import VSpacer, HSpacer, Spacer, AbstractSpacer
+from ._control_widget import HorizontalAbstractControl, AbstractControl
+from ._control_widget import VerticalAbstractControl, PushButton
+from ._spinbox import SpinBox
 from ._data_view import DataView
-from ._control_widget import ControlWidget
+from ._control_widget import AbstractControl, PushButton
+from ._plot_envelope import PlotEnvelope
 from ._filled_rect import FilledRect
 from ._vertical_panel import VerticalPanel
 from ._horizontal_panel import HorizontalPanel

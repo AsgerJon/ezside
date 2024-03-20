@@ -38,9 +38,11 @@ class BaseWidget(QWidget):
     """BaseWidget provides a base class for the widgets. Using AttriBox they
     provide brushes, pens and fonts as attributes. These widgets are not
     meant for composite widgets directly but instead for the components."""
+    # ic('%s' % self.__class__.__name__)
     parent = parseParent(*args, **kwargs)
     QWidget.__init__(self, parent)
     self.setMinimumSize(QSize(64, 64))
+    # self.initUi()
 
   def painterPrint(self, painter: QPainter) -> QPainter:
     """The painterPrint method adjusts the given painter to print text."""
@@ -70,6 +72,7 @@ class BaseWidget(QWidget):
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setMinimumSize(self.baseSize)
+    self.connectActions()
 
   def connectActions(self) -> None:
     """The connectActions method connects the actions to the signals."""

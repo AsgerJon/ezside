@@ -5,10 +5,9 @@ panels."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize
-from vistutils.parse import maybe
 
-from ezqt.core import Fixed
 from ezqt.widgets import VerticalPanel
+from settings import Default
 
 
 class CornerPanel(VerticalPanel):
@@ -18,4 +17,4 @@ class CornerPanel(VerticalPanel):
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     m = Default.bannerMargin
-    self.setFixedSize(QSize())
+    self.setFixedSize(QSize(m, m))

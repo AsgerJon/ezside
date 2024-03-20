@@ -26,3 +26,4 @@ class Default:
   layoutPreference = 0  # 0: vertical, 1: horizontal
 
   bannerMargin = 32
+  sliderHeight = 192

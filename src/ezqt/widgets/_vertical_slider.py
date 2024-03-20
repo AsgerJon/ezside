@@ -7,12 +7,11 @@ from typing import Callable, Self
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QSlider
-from icecream import ic
 from vistutils.parse import maybe
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
-from ezqt.core import Tight, Expand
+from ezqt.core import Expand
 from settings import Default
 
 
@@ -97,6 +96,7 @@ class VerticalSlider(QSlider):
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setSizePolicy(Expand, Expand)
+    self.setMinimumHeight(Default.sliderHeight)
 
   def __abs__(self) -> int:
     """Return the absolute value of the slider."""

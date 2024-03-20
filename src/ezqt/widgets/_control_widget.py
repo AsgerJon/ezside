@@ -4,14 +4,18 @@ start/stop and timed behaviour."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from abc import abstractmethod
+
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout, \
+  QBoxLayout
 from attribox import AttriBox
+from icecream import ic
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
 from ezqt.core import Tight
-from ezqt.widgets import BaseWidget
+from ezqt.widgets import BaseWidget, VSpacer, HSpacer, AbstractSpacer
 
 
 class PushButton(QPushButton):
@@ -43,7 +47,7 @@ class PushButton(QPushButton):
     pass
 
 
-class ControlWidget(BaseWidget):
+class AbstractControl(BaseWidget):
   """ControlWidget provides a collection of buttons for controlling
   start/stop and timed behaviour."""
 
@@ -51,36 +55,65 @@ class ControlWidget(BaseWidget):
   stop = Signal()
   pause = Signal()
 
-  baseLayout = AttriBox[QVBoxLayout]()
   startButton = AttriBox[PushButton]('Start')
   pauseButton = AttriBox[PushButton]('Pause')
   stopButton = AttriBox[PushButton]('Stop')
 
+  horizontalSpacer = AttriBox[HSpacer]()
+  verticalSpacer = AttriBox[VSpacer]()
+  horizontalLayer = AttriBox[QHBoxLayout]()
+  verticalLayout = AttriBox[QVBoxLayout]()
+
   __layout_orientation__ = None
 
-  def __init__(self, *args, **kwargs) -> None:
-    BaseWidget.__init__(self, *args, **kwargs)
-    self.__layout_orientation__ = 'vertical'
-    if isinstance(args[0], str):
-      if args[0].lower() in ['vertical', 'horizontal']:
-        self.__layout_orientation__ = args[0]
+  @abstractmethod
+  def getSpacer(self) -> AbstractSpacer:
+    """The getSpacer method returns a spacer widget."""
 
-  def getLayoutOrientation(self) -> str:
-    """The getLayoutOrientation method returns the layout orientation."""
-    return self.__layout_orientation__
+  @abstractmethod
+  def getLayout(self) -> QBoxLayout:
+    """The getLayout method returns the layout type."""
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.startButton.initUi()
-    self.baseLayout.addWidget(self.startButton)
+    self.getLayout().addWidget(self.startButton)
     self.pauseButton.initUi()
-    self.baseLayout.addWidget(self.pauseButton)
+    self.getLayout().addWidget(self.pauseButton)
     self.stopButton.initUi()
-    self.baseLayout.addWidget(self.stopButton)
-    self.setLayout(self.baseLayout)
+    self.getLayout().addWidget(self.stopButton)
+    self.setLayout(self.getLayout())
+    self.getLayout().addWidget(self.getSpacer())
+    self.connectActions()
 
   def connectActions(self) -> None:
     """The connectActions method connects the actions of the window."""
-    self.startButton.clicked.connect(self.start)
-    self.pauseButton.clicked.connect(self.pause)
-    self.stopButton.clicked.connect(self.stop)
+    self.startButton.clicked.connect(self.start.emit)
+    self.pauseButton.clicked.connect(self.pause.emit)
+    self.stopButton.clicked.connect(self.stop.emit)
+
+
+class VerticalAbstractControl(AbstractControl):
+  """VerticalControl provides a collection of buttons for controlling
+  start/stop and timed behaviour."""
+
+  def getSpacer(self) -> AbstractSpacer:
+    """The getSpacer method returns a spacer widget."""
+    return self.verticalSpacer
+
+  def getLayout(self) -> QBoxLayout:
+    """The getLayout method returns the layout type."""
+    return self.verticalLayout
+
+
+class HorizontalAbstractControl(AbstractControl):
+  """HorizontalControl provides a collection of buttons for controlling
+  start/stop and timed behaviour."""
+
+  def getSpacer(self) -> AbstractSpacer:
+    """The getSpacer method returns a spacer widget."""
+    return self.horizontalSpacer
+
+  def getLayout(self) -> QBoxLayout:
+    """The getLayout method returns the layout type."""
+    return self.horizontalLayer

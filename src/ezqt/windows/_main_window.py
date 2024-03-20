@@ -5,13 +5,13 @@ application business logic."""
 from __future__ import annotations
 
 from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout
+from PySide6.QtWidgets import QMainWindow
 from icecream import ic
 from attribox import AttriBox
 
 from ezqt.core import Precise
 from ezqt.widgets import Timer
-from ezqt.windows import LayoutWindow, BaseWindow
+from ezqt.windows import LayoutWindow
 from settings import Default
 
 ic.configureOutput(includeContext=True, )
@@ -22,7 +22,6 @@ class MainWindow(LayoutWindow):
   application business logic."""
 
   paintTimer = AttriBox[Timer](Default.paintTimer, Precise, False)
-  baseLayout = AttriBox[QVBoxLayout]()
 
   def __init__(self, *args, **kwargs) -> None:
     LayoutWindow.__init__(self, *args, **kwargs)
@@ -56,7 +55,6 @@ class MainWindow(LayoutWindow):
 
   def show(self, ) -> None:
     """Shows the window."""
-    BaseWindow.show(self)
     self.initUi()
     self.connectActions()
     QMainWindow.show(self)

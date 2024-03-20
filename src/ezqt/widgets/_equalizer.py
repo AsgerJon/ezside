@@ -14,7 +14,8 @@ from vistutils.text import stringList, monoSpace
 from vistutils.waitaminute import typeMsg
 
 from ezqt.core import Tight, Center
-from ezqt.widgets import VerticalSlider, BaseWidget, TextLabel, FilledRect
+from ezqt.widgets import VerticalSlider, BaseWidget, TextLabel, FilledRect, \
+  HSpacer
 from settings import Default
 
 
@@ -26,6 +27,7 @@ class Equalizer(BaseWidget):
 
   baseWidget = AttriBox[BaseWidget]()
   baseLayout = AttriBox[QHBoxLayout]()
+  horizontalSpacer = AttriBox[HSpacer]()
 
   def __init__(self, *args, **kwargs) -> None:
     numSlidersKeys = stringList("""numSliders, num, sliders, numSliders""")
@@ -70,6 +72,7 @@ class Equalizer(BaseWidget):
       labelName = '__label_%02d__' % i
       slider = VerticalSlider.clone(self._refSlider)
       slider @= lambda val: val * sin(time.time() * 2 ** i)
+      slider.initUi()
       label = TextLabel('%d' % 2 ** i)
       label.setSizePolicy(Tight, Tight)
       label.setMinimumSize(QSize(32, 32))
@@ -81,7 +84,8 @@ class Equalizer(BaseWidget):
       vLayout.addWidget(label, alignment=Center)
       vLayout.addWidget(slider, alignment=Center)
       vWidget.setLayout(vLayout)
-      self.baseLayout.addWidget(vWidget)
+      self.baseLayout.addWidget(HSpacer)
+
     self.setLayout(self.baseLayout)
 
   def __setitem__(self, index: int, title: str) -> None:
