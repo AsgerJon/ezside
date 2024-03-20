@@ -1,0 +1,24 @@
+[build-system]
+requires = ['setuptools>=68.2']
+build-backend = 'setuptools.build_meta'
+
+
+[project]
+name = "ezqt"
+version = "0.1.28"
+authors = [
+  { name = "Asger Jon Vistisen", email = "asgerjon2@gmail.com" },
+]
+description = "ezqt provides examples and utilities for developing Qt
+applications in Python."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/AsgerJon/ezqt"
+"Bug Tracker" = "https://github.com/AsgerJon/ezqt"
