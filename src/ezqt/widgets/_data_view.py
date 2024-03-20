@@ -4,14 +4,18 @@ that is continuously updated."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import numpy as np
-from PySide6.QtCharts import QChart, QChartView, QScatterSeries
-from PySide6.QtCore import Signal
-from icecream import ic
+from typing import TYPE_CHECKING
 
-from attribox import AttriBox, this
-from ezqt.widgets import DataRoll
+from PySide6.QtCharts import QChart, QChartView
+from PySide6.QtCore import Slot
+from icecream import ic
+from attribox import AttriBox
+
+from ezqt.widgets import ScatterSeries, LineSeries
 from settings import Default
+
+if TYPE_CHECKING:
+  pass
 
 ic.configureOutput(includeContext=True, )
 
@@ -20,48 +24,40 @@ class DataView(QChartView):
   """DataView collects the functionality from QCharts to show data in a plot
   that is continuously updated."""
 
-  __fallback_num_points__ = Default.numPoints
+  innerChart = AttriBox[QChart]()
+  lineVals = AttriBox[LineSeries]()
+  scatter = AttriBox[ScatterSeries]()
 
-  data = AttriBox[DataRoll](this)
-  series = AttriBox[QScatterSeries]()
-  dataChart = AttriBox[QChart]()
+  def initUi(self) -> None:
+    """Sets up the view"""
+    self.setMinimumSize(Default.chartViewWidth, Default.chartViewHeight)
+    self.initScatter()
 
-  minValChange = Signal(float)
-  maxValChange = Signal(float)
+  def initScatter(self, ) -> None:
+    """Initializes the scatter series."""
+    self.setChart(self.innerChart)
+    self.innerChart.removeAllSeries()
+    self.innerChart.addSeries(self.scatter)
+    self.innerChart.createDefaultAxes()
+    self.update()
 
+  def initLine(self) -> None:
+    """Initializes the line series."""
+    self.setChart(self.innerChart)
+    self.innerChart.removeAllSeries()
+    self.innerChart.addSeries(self.lineVals)
+    self.innerChart.createDefaultAxes()
+    self.update()
+
+  @Slot(float)
+  def append(self, value: float) -> None:
+    """Appends a value to the series."""
+    self.scatter.appendValue(value)
+    self.lineVals.appendValue(value)
+
+  @Slot()
   def refresh(self) -> None:
-    """Refreshes the data in the chart."""
-    self.series.clear()
-    data = self.data.snapShot()
-    t = data.real
-    x = data.imag
-    self.series.appendNp(t.astype(np.float32), x.astype(np.float32))
-
-  def __init__(self, *args, **kwargs) -> None:
-    """Initializes the DataView."""
-    QChartView.__init__(self, )
-    self._numPoints = None
-    for arg in args:
-      if hasattr(arg, 'getNumPoints'):
-        self._numPoints = arg.getNumPoints()
-        break
-      if isinstance(arg, int) and self._numPoints is None:
-        self._numPoints = arg
-        break
-    else:
-      self._numPoints = self.__fallback_num_points__
-    self.setMinimumSize(640, 480)
-    self.dataChart.addSeries(self.series)
-    self.refresh()
-    self.dataChart.createDefaultAxes()
-    self.setChart(self.dataChart)
-    self.dataChart.setAnimationOptions(QChart.AnimationOption.NoAnimation)
-
-  def getVerticalRange(self) -> tuple[float, float]:
-    """Returns the vertical range of the chart."""
-    a = self.dataChart.axes()[1]
-    return a.min(), a.max()
-
-  def getNumPoints(self) -> int:
-    """The getNumPoints method returns the number of points."""
-    return self._numPoints
+    """Refreshes the data."""
+    self.scatter.updateValues()
+    self.lineVals.updateValues()
+    self.update()

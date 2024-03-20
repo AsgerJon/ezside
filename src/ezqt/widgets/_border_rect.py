@@ -12,9 +12,6 @@ from ezqt.widgets import BaseWidget
 class BorderRect(BaseWidget):
   """BorderRect provides a bordered rectangle with no fill."""
 
-  def __init__(self, *args, **kwargs) -> None:
-    BaseWidget.__init__(self, *args, **kwargs)
-
   def paintEvent(self, event: QPaintEvent) -> None:
     """The paintEvent method is called when the widget needs to be
     repainted."""

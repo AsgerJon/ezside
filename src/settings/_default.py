@@ -17,3 +17,12 @@ class Default:
   sliderSingleStep = 1
   sliderPageStep = 10
   sliderTickInterval = 10
+
+  numSliders = 8
+
+  chartViewWidth = 400
+  chartViewHeight = 300
+
+  layoutPreference = 0  # 0: vertical, 1: horizontal
+
+  bannerMargin = 32

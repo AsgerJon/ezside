@@ -6,7 +6,9 @@ from __future__ import annotations
 from PySide6.QtGui import QColor, QPaintEvent, QPainter
 
 from attribox import AttriBox
+
 from ezqt.core import parseColor, emptyPen
+
 from ezqt.widgets import BaseWidget
 
 

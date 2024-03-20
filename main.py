@@ -6,15 +6,15 @@ from __future__ import annotations
 import os
 import sys
 
-from PySide6.QtWidgets import QMainWindow, QApplication
+from PySide6.QtWidgets import QApplication
 from icecream import ic
 
-from ezqt import MainWindow
+from ezqt.windows import MainWindow, TestWindow
 
 
 def tester00() -> None:
   """Main Tester Script"""
-  stuff = [os, sys, ic, 'hello', 'world']
+  stuff = [os, sys, ic, 'hello', 'world', TestWindow, MainWindow]
   [print(x) for x in stuff]
 
 
@@ -23,7 +23,7 @@ def tester01() -> None:
   app = QApplication(sys.argv)
   window = MainWindow()
   window.show()
-  app.exec()
+  sys.exit(app.exec())
 
 
 def tester02() -> None:

@@ -9,10 +9,13 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
+from icecream import ic
 
 from ezqt.core import parseParent, NoWrap, Center, Pen, Font, Brush
 from ezqt.core import BevelJoin, FlatCap, SolidLine, SolidFill, DashLine
 from ezqt.core import DotLine, DashDot
+
+ic.configureOutput(includeContext=True, )
 
 
 class BaseWidget(QWidget):
@@ -20,6 +23,7 @@ class BaseWidget(QWidget):
   provide brushes, pens and fonts as attributes. These widgets are not meant
   for composite widgets directly but instead for the constituents. """
 
+  baseSize = AttriBox[QSize](32, 32)
   solidBrush = AttriBox[Brush](SolidFill)
   emptyBrush = AttriBox[Brush](QColor(0, 0, 0, 0))
   solidLine = AttriBox[Pen](SolidLine)
@@ -36,7 +40,7 @@ class BaseWidget(QWidget):
     meant for composite widgets directly but instead for the components."""
     parent = parseParent(*args, **kwargs)
     QWidget.__init__(self, parent)
-    self.setMinimumSize(QSize(32, 32))
+    self.setMinimumSize(QSize(64, 64))
 
   def painterPrint(self, painter: QPainter) -> QPainter:
     """The painterPrint method adjusts the given painter to print text."""
@@ -62,3 +66,10 @@ class BaseWidget(QWidget):
     rect, flags = self.geometry(), NoWrap | Center
     self.defaultFont.metrics().boundingRect(flags, flags, text)
     return rect.size()
+
+  def initUi(self) -> None:
+    """The initUi method initializes the user interface of the window."""
+    self.setMinimumSize(self.baseSize)
+
+  def connectActions(self) -> None:
+    """The connectActions method connects the actions to the signals."""

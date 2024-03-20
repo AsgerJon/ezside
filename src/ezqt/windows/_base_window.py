@@ -5,13 +5,10 @@ LayoutWindow class."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QApplication
 
 from attribox import AttriBox, this
 from ezqt.windows.bars import MenuBar, StatusBar
-
-setattr(type(QMainWindow), '__str__', lambda cls: cls.__qualname__)
-setattr(type(QMainWindow), '__repr__', lambda cls: cls.__qualname__)
 
 
 class BaseWindow(QMainWindow):
@@ -28,6 +25,7 @@ class BaseWindow(QMainWindow):
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
+    self.connectActions()
 
   def connectActions(self) -> None:
     """Connects the actions to the business logic."""
@@ -42,6 +40,8 @@ class BaseWindow(QMainWindow):
     self.mainMenuBar.debug.debug7.triggered.connect(self.debug7Func)
     self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
     self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
+    self.mainMenuBar.help.about_qt.triggered.connect(QApplication.aboutQt)
+    self.mainMenuBar.files.exit.triggered.connect(self.close)
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""

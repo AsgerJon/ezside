@@ -3,10 +3,11 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from PySide6.QtCore import Signal, Slot
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout
-from attribox import AttriBox, this
+from attribox import AttriBox
 
-from ezqt.widgets import BaseWidget, DataView
+from ezqt.widgets import BaseWidget, WhiteNoise, DataView
 from settings import Default
 
 
@@ -15,31 +16,21 @@ class DataWidget(BaseWidget):
 
   __fallback_num_points__ = Default.numPoints
 
-  verticalLayout = AttriBox[QVBoxLayout]()
-  verticalWidget = AttriBox[BaseWidget]()
-  dataView = AttriBox[DataView](this)
-  baseWidget = AttriBox[BaseWidget]()
-  baseLayout = AttriBox[QHBoxLayout]()
+  start = Signal()
+  stop = Signal()
+  pause = Signal()
 
-  def __init__(self, *args, **kwargs) -> None:
-    BaseWidget.__init__(self, *args, **kwargs)
-    self._numPoints = None
-    for arg in args:
-      if isinstance(arg, int):
-        self._numPoints = arg
-    self.initUi()
-    self.connectActions()
+  baseLayout = AttriBox[QVBoxLayout]()
+  dataView = AttriBox[DataView]()
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
+    self.setMinimumSize(64, 64)
+    self.dataView.initUi()
     self.baseLayout.addWidget(self.dataView)
-    self.verticalWidget.setLayout(self.verticalLayout)
-    self.baseLayout.addWidget(self.verticalWidget)
     self.setLayout(self.baseLayout)
 
-  def connectActions(self) -> None:
-    """The connectActions method connects the actions of the window."""
-
-  def getNumPoints(self) -> int:
-    """The getNumPoints method returns the number of points."""
-    return self._numPoints
+  @Slot()
+  def refresh(self) -> None:
+    """The refresh method refreshes the data."""
+    self.dataView.refresh()
