@@ -10,11 +10,15 @@ from PySide6.QtWidgets import QApplication
 from icecream import ic
 
 from ezqt.windows import MainWindow, TestWindow
+import msgs.msg as msg
+
+for item in sys.path:
+  print(item)
 
 
 def tester00() -> None:
   """Main Tester Script"""
-  stuff = [os, sys, ic, 'hello', 'world', TestWindow, MainWindow]
+  stuff = [os, sys, ic, 'hello', 'world', TestWindow, MainWindow, msg]
   [print(x) for x in stuff]
 
 
@@ -27,6 +31,19 @@ def tester01() -> None:
 
 
 def tester02() -> None:
+  """Main Tester Script"""
+  here = os.path.dirname(__file__)
+  iconPath = os.path.join(here, 'windows', 'menus', 'icons', 'icons')
+  iconList = []
+  for icon in os.listdir(iconPath):
+    iconList.append(icon)
+  iconStrings = '\n'.join(iconList)
+  iconFile = os.path.join(here, 'icons.txt')
+  with open(iconFile, 'w') as f:
+    f.write(iconStrings)
+
+
+def tester03() -> None:
   """Main Tester Script"""
   here = os.path.dirname(__file__)
   iconPath = os.path.join(here, 'windows', 'menus', 'icons', 'icons')

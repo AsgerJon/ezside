@@ -3,7 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QPainter, QPaintEvent
+from PySide6.QtGui import QPainter, QPaintEvent, QFontMetrics
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
@@ -43,6 +43,13 @@ class TextLabel(BaseWidget):
   def getText(self, ) -> str:
     """Returns the text of the label."""
     return self.__inner_text__
+
+  def initUi(self) -> None:
+    """The initUi method initializes the user interface of the widget."""
+    BaseWidget.initUi(self)
+    self.defaultFont.setPointSize(12)
+    rect = QFontMetrics(self.defaultFont).boundingRect(self.getText())
+    self.setMinimumSize(rect.size())
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """The paintEvent method is called when the widget needs to be

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Callable, Self
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import QSlider
 from vistutils.parse import maybe
 from vistutils.text import stringList
@@ -92,11 +92,33 @@ class VerticalSlider(QSlider):
     self.setPageStep(pageStep)
     self.setTickInterval(pageStep)
     self.setValue(maybe(initVal, minVal))
+    self.applyStyleSheet()
+
+  def applyStyleSheet(self) -> None:
+    """
+    Applies the stylesheet to the slider to make the handle larger
+    and potentially apply other custom styles.
+    """
+    self.setStyleSheet("""
+      QSlider::handle:horizontal {
+        background: #5c5c5c;
+        border: 1px solid #5c5c5c;
+        width: 20px;
+        margin: -10px 0; /* expand outside the container */
+      }
+
+      QSlider::handle:vertical {
+        background: #5c5c5c;
+        border: 1px solid #5c5c5c;
+        height: 20px;
+        margin: 0 -10px; /* expand outside the container */
+      }
+    """)
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setSizePolicy(Expand, Expand)
-    self.setMinimumHeight(Default.sliderHeight)
+    self.setMinimumSize(QSize(Default.sliderWidth, Default.sliderHeight))
 
   def __abs__(self) -> int:
     """Return the absolute value of the slider."""

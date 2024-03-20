@@ -21,20 +21,36 @@ class TestWindow(BaseWindow):
   wrapView = AttriBox[DataWidget]()
   testWidget = AttriBox[Equalizer]()
 
-  # button = AttriBox[RadioButton]()
+  def __init__(self, *args, **kwargs) -> None:
+    BaseWindow.__init__(self, *args, **kwargs)
+
+  def connectActions(self, ) -> None:
+    """Connects the actions to the slots."""
+    BaseWindow.connectActions(self)
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setMinimumSize(256, 256)
     # self.wrapView.initUi()
-    BaseWindow.initUi(self, )
     self.testWidget.initUi()
     self.baseLayout.addWidget(self.testWidget)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
+    BaseWindow.initUi(self, )
 
   def show(self, ) -> None:
     """Shows the window."""
     self.initUi()
     self.connectActions()
     QMainWindow.show(self)
+
+  def debug1Func(self, ) -> None:
+    """Debug function."""
+    print('Repaints the window')
+    self.testWidget.update()
+
+  def debug2Func(self, ) -> None:
+    """Debug function."""
+    print('Repaints the window')
+    self.update()
+    print(self.testWidget.geometry())

@@ -84,8 +84,9 @@ class Equalizer(BaseWidget):
       vLayout.addWidget(label, alignment=Center)
       vLayout.addWidget(slider, alignment=Center)
       vWidget.setLayout(vLayout)
-      self.baseLayout.addWidget(HSpacer)
+      self.baseLayout.addWidget(vWidget)
 
+    self.baseLayout.addWidget(self.horizontalSpacer)
     self.setLayout(self.baseLayout)
 
   def __setitem__(self, index: int, title: str) -> None:

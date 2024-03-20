@@ -27,3 +27,6 @@ class Default:
 
   bannerMargin = 32
   sliderHeight = 192
+  sliderWidth = 32
+
+  fontFamily = 'Montserrat'

@@ -11,6 +11,7 @@ from ._base_widget import BaseWidget
 from ._spacer import VSpacer, HSpacer, Spacer, AbstractSpacer
 from ._control_widget import HorizontalAbstractControl, AbstractControl
 from ._control_widget import VerticalAbstractControl, PushButton
+from ._text_label import TextLabel
 from ._spinbox import SpinBox
 from ._data_view import DataView
 from ._control_widget import AbstractControl, PushButton
@@ -19,7 +20,6 @@ from ._filled_rect import FilledRect
 from ._vertical_panel import VerticalPanel
 from ._horizontal_panel import HorizontalPanel
 from ._corner_panel import CornerPanel
-from ._text_label import TextLabel
 from ._client_info import ClientInfo
 from ._vertical_slider import VerticalSlider
 from ._equalizer import Equalizer

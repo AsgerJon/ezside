@@ -3,9 +3,10 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QPaintEvent, QPainter, QPen
+from PySide6.QtCore import QMargins
+from PySide6.QtGui import QPaintEvent, QPainter, QPen, QColor, QBrush
 
-from ezqt.core import Expand, Tight, DashLine, SkyBlue
+from ezqt.core import Expand, Tight, White, DashLine
 from ezqt.widgets import BaseWidget
 
 
@@ -22,13 +23,22 @@ class AbstractSpacer(BaseWidget):
     pass
 
   def paintEvent(self, event: QPaintEvent) -> None:
-    """The paintEvent method paints the widget."""
-    # painter = QPainter()
-    # painter.begin(self)
-    # painter.setBrush(self.emptyBrush())
-    # debugPen = QPen()
-    # # painter.setPen(DashLine, )  # For debug, the dash line
-    # painter.end()
+    """The paintEvent method is called when the widget needs to be
+    repainted."""
+    painter = QPainter()
+    painter.begin(self)
+    viewRect = painter.viewport()
+    paintRect = viewRect - QMargins(6, 6, 6, 6)
+    paintRect.moveCenter(viewRect.center())
+    debugBrush = QBrush()
+    debugBrush.setColor(QColor(255, 255, 255, 31))
+    debugPen = QPen()
+    debugPen.setColor(White)
+    debugPen.setStyle(DashLine)
+    painter.setBrush(debugBrush)
+    painter.setPen(debugPen)
+    painter.drawRoundedRect(painter.viewport(), 4, 4)
+    painter.end()
 
 
 class VSpacer(AbstractSpacer):
