@@ -34,7 +34,7 @@ class LayoutWindow(BaseWindow):
   bottomLeft = AttriBox[CornerPanel](LawnGreen)
   bottomRight = AttriBox[CornerPanel](LawnGreen)
 
-  titleBanner = AttriBox[TextLabel]('EZQt')
+  titleBanner = AttriBox[TextLabel]('EZside')
   whiteNoise = AttriBox[WhiteNoise]()
   clientInfo = AttriBox[ClientInfo]()
   dataWidget = AttriBox[DataWidget]()
