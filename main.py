@@ -8,12 +8,19 @@ import sys
 
 from PySide6.QtWidgets import QApplication
 from icecream import ic
+# import msgs.msg as msg
 
-from ezqt.windows import MainWindow, TestWindow
-import msgs.msg as msg
+from ezside.windows import MainWindow, TestWindow
 
 for item in sys.path:
   print(item)
+
+
+try :
+  from msgs.msg import msg
+except ModuleNotFoundError as moduleNotFoundError:
+  msg = 'ModuleNotFoundError: ' + str(moduleNotFoundError)
+
 
 
 def tester00() -> None:

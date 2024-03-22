@@ -20,7 +20,7 @@ class Icons:
   def _getIconPath() -> str:
     """Returns the path to the icon folder."""
     fileDir = os.path.join(os.path.dirname(__file__), '../')
-    iconPath = os.path.join(fileDir, 'ezqt', 'windows', 'menus', 'icons', )
+    iconPath = os.path.join(fileDir, 'ezside', 'windows', 'menus', 'icons', )
     return os.path.normpath(iconPath)
 
   @classmethod
