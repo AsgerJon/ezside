@@ -4,12 +4,12 @@ build-backend = 'setuptools.build_meta'
 
 
 [project]
-name = "ezqt"
+name = "ezside"
 version = "0.1.4"
 authors = [
   { name = "Asger Jon Vistisen", email = "asgerjon2@gmail.com" },
 ]
-description = "ezqt provides examples and utilities for PySide6."
+description = "ezside provides examples and utilities for PySide6."
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -19,5 +19,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/AsgerJon/ezqt"
-"Bug Tracker" = "https://github.com/AsgerJon/ezqt"
+"Homepage" = "https://github.com/AsgerJon/ezside"
+"Bug Tracker" = "https://github.com/AsgerJon/ezside"
