@@ -30,7 +30,7 @@ class MainWindow(LayoutWindow):
         self.titleBanner.setText(arg)
         break
     else:
-      self.titleBanner.setText('EZQt')
+      self.titleBanner.setText('EZSide')
 
   def connectActions(self, ) -> None:
     """Connects the actions to the slots."""
