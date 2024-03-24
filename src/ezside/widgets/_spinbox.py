@@ -45,6 +45,7 @@ class SpinBox(BaseWidget):
     """The __init__ method initializes the SpinBox widget."""
     BaseWidget.__init__(self, *args, **kwargs)
     self._name = name
+    self.label.innerText = name
     self.initUi()
     self.connectActions()
 
@@ -52,8 +53,8 @@ class SpinBox(BaseWidget):
     """The initUi method initializes the user interface of the widget."""
     self.innerBox.initUi()
     self.baseLayout.addWidget(self.innerBox, 0, 0, )
-    self.label.initUi()
     self.label.defaultFont.setPointSize(12)
+    self.label.initUi()
     self.baseLayout.addWidget(self.label, 1, 0, )
     # self.baseLayout.addWidget(self.hSpacer, 0, 1, 2, 1)
 

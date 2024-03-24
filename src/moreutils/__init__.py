@@ -5,3 +5,4 @@ functions. """
 from __future__ import annotations
 
 from ._int_field import IntField
+from ._str_field import StrField

@@ -16,16 +16,9 @@ for item in sys.path:
   print(item)
 
 
-try :
-  from msgs.msg import msg
-except ModuleNotFoundError as moduleNotFoundError:
-  msg = 'ModuleNotFoundError: ' + str(moduleNotFoundError)
-
-
-
 def tester00() -> None:
   """Main Tester Script"""
-  stuff = [os, sys, ic, 'hello', 'world', TestWindow, MainWindow, msg]
+  stuff = [os, sys, ic, 'hello', 'world', TestWindow, MainWindow, ]
   [print(x) for x in stuff]
 
 
