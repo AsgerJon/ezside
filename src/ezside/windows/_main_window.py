@@ -9,10 +9,11 @@ from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 from attribox import AttriBox
 
+from ezside.windows.bars import MenuBar, StatusBar
 from ezside.core import Precise
 from ezside.widgets import Timer
 from ezside.windows import LayoutWindow
-from settings import Default
+from ezside.settings import Default
 
 ic.configureOutput(includeContext=True, )
 
@@ -22,19 +23,6 @@ class MainWindow(LayoutWindow):
   application business logic."""
 
   paintTimer = AttriBox[Timer](Default.paintTimer, Precise, False)
-
-  def __init__(self, *args, **kwargs) -> None:
-    LayoutWindow.__init__(self, *args, **kwargs)
-    for arg in args:
-      if isinstance(arg, str):
-        self.titleBanner.setText(arg)
-        break
-    else:
-      self.titleBanner.setText('EZSide')
-    self.mainMenuBar.initUi()
-    self.setMenuBar(self.mainMenuBar)
-    self.mainStatusBar.initUi()
-    self.setStatusBar(self.mainStatusBar)
 
   @Slot()
   def stopHandle(self, ) -> None:
@@ -69,7 +57,6 @@ class MainWindow(LayoutWindow):
     # self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
     self.mainMenuBar.help.about_qt.triggered.connect(QApplication.aboutQt)
     self.mainMenuBar.files.exit.triggered.connect(self.close)
-
     self.whiteNoise.noise.connect(self.dataWidget.dataView.append)
     self.dataWidget.start.connect(self.startHandle)
     self.dataWidget.stop.connect(self.stopHandle)
@@ -79,7 +66,13 @@ class MainWindow(LayoutWindow):
 
   def show(self) -> None:
     """Show the window."""
-    self.initMenus()
     self.initUi()
+    self.mainMenuBar = MenuBar(self)
+    self.mainMenuBar.initUi()
+    self.setMenuBar(self.mainMenuBar)
+    ic(self.menuBar())
+    self.mainStatusBar = StatusBar(self)
+    self.mainStatusBar.initUi()
+    self.setStatusBar(self.mainStatusBar)
     self.connectActions()
     QMainWindow.show(self)

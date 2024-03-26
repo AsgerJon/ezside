@@ -14,9 +14,10 @@ from vistutils.text import stringList, monoSpace
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import Tight, Center
-from ezside.widgets import VerticalSlider, BaseWidget, TextLabel, FilledRect, \
-  HSpacer
-from settings import Default
+from ezside.widgets import (VerticalSlider, BaseWidget, TextLabel,
+                            FilledRect, \
+  HSpacer)
+from ezside.settings import Default
 
 
 class Equalizer(BaseWidget):

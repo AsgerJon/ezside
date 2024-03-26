@@ -5,10 +5,13 @@ LayoutWindow class."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QMainWindow, QApplication
-
+from PySide6.QtWidgets import QMainWindow
 from attribox import AttriBox, this
+from icecream import ic
+
 from ezside.windows.bars import MenuBar, StatusBar
+
+ic.configureOutput(includeContext=True, )
 
 
 class BaseWindow(QMainWindow):
@@ -16,15 +19,22 @@ class BaseWindow(QMainWindow):
   implements menus and actions for the application, leaving widgets for the
   LayoutWindow class."""
 
-  mainMenuBar = AttriBox[MenuBar](this)
-  mainStatusBar = AttriBox[StatusBar](this)
+  def __init__(self, ) -> None:
+    QMainWindow.__init__(self)
+    self.mainMenuBar = None
+    self.mainStatusBar = None
 
-  def initMenus(self, ) -> None:
-    """Initializes the user interface for the main window."""
-    self.mainMenuBar.initUi()
-    self.setMenuBar(self.mainMenuBar)
-    self.mainStatusBar.initUi()
-    self.setStatusBar(self.mainStatusBar)
+  # mainMenuBar = AttriBox[MenuBar](this)
+  # mainStatusBar = AttriBox[StatusBar](this)
+  #
+  # def initMenus(self, ) -> None:
+  #   """Initializes the user interface for the main window."""
+  #   ic('initMenus')
+  #   self.menuBar().clear()
+  #   self.mainMenuBar.initUi()
+  #   self.setMenuBar(self.mainMenuBar)
+  #   self.mainStatusBar.initUi()
+  #   self.setStatusBar(self.mainStatusBar)
   #
   # def debug1Func(self, ) -> None:
   #   """Debug1 function."""

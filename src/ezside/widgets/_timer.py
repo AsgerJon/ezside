@@ -8,7 +8,7 @@ from vistutils.parse import maybe
 from vistutils.text import stringList
 
 from ezside.core import Precise, TimerType
-from settings import Default
+from ezside.settings import Default
 
 
 class Timer(QTimer):

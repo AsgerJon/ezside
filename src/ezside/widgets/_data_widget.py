@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout
 from attribox import AttriBox
 
 from ezside.widgets import BaseWidget, WhiteNoise, DataView
-from settings import Default
+from ezside.settings import Default
 
 
 class DataWidget(BaseWidget):

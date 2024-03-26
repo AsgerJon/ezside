@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QDoubleSpinBox, QHBoxLayout, QGridLayout
 from attribox import AttriBox
 
 from ezside.widgets import BaseWidget, TextLabel, HSpacer, VSpacer
-from settings import Default
+from ezside.settings import Default
 
 
 class _Spinbox(QDoubleSpinBox):

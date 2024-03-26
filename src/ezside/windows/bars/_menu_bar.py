@@ -25,7 +25,6 @@ class MenuBar(QMenuBar):
 
   def initUi(self, ) -> None:
     """Initializes the user interface for the menu bar."""
-    ic()
     self.files.initUi()
     self.addMenu(self.files)
     self.edit.initUi()

@@ -12,7 +12,7 @@ from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import Expand
-from settings import Default
+from ezside.settings import Default
 
 
 class VerticalSlider(QSlider):

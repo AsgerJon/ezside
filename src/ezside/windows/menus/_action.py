@@ -8,7 +8,7 @@ from icecream import ic
 from vistutils.waitaminute import typeMsg
 
 from ezside.windows.menus.shortcuts import getShortcut
-from settings import Icons
+from ezside.settings import Icons
 
 ic.configureOutput(includeContext=True, )
 

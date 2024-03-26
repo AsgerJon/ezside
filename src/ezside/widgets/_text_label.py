@@ -10,7 +10,7 @@ from vistutils.waitaminute import typeMsg
 
 from ezside.core import Center
 from ezside.widgets import BaseWidget
-from moreutils import StrField
+from ezside.moreutils import StrField
 
 
 class TextLabel(BaseWidget):

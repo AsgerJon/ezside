@@ -9,12 +9,12 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout
 from attribox import AttriBox
 from icecream import ic
 
-from moreutils import IntField
+from ezside.moreutils import IntField
 from ezside.core import Precise, LawnGreen
 from ezside.widgets import TextLabel, Equalizer, BaseWidget, \
   VerticalAbstractControl
 from ezside.widgets import Timer
-from settings import Default
+from ezside.settings import Default
 
 
 class WhiteNoise(BaseWidget):

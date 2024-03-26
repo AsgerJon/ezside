@@ -12,7 +12,7 @@ from icecream import ic
 from attribox import AttriBox
 
 from ezside.widgets import ScatterSeries, LineSeries
-from settings import Default
+from ezside.settings import Default
 
 if TYPE_CHECKING:
   pass

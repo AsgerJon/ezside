@@ -23,7 +23,6 @@ class Icons:
   def _getIconPath() -> str:
     """Returns the path to the icon folder."""
     iconPath = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-    ic(iconPath)
     return os.path.normpath(iconPath)
 
   @classmethod

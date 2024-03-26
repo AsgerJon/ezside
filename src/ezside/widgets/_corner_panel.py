@@ -7,7 +7,7 @@ from __future__ import annotations
 from PySide6.QtCore import QSize
 
 from ezside.widgets import VerticalPanel
-from settings import Default
+from ezside.settings import Default
 
 
 class CornerPanel(VerticalPanel):
