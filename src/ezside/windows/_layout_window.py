@@ -74,4 +74,3 @@ class LayoutWindow(BaseWindow):
     self.baseLayout.addWidget(self.dataWidget, 1, 1, 2, 1)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
-    BaseWindow.initUi(self, )

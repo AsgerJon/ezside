@@ -11,6 +11,9 @@ from typing import Any
 from PIL import Image
 from PIL import ImageQt
 from PySide6.QtGui import QIcon
+from icecream import ic
+
+ic.configureOutput(includeContext=True, )
 
 
 class Icons:
@@ -19,8 +22,8 @@ class Icons:
   @staticmethod
   def _getIconPath() -> str:
     """Returns the path to the icon folder."""
-    fileDir = os.path.join(os.path.dirname(__file__), '../')
-    iconPath = os.path.join(fileDir, 'ezside', 'windows', 'menus', 'icons', )
+    iconPath = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    ic(iconPath)
     return os.path.normpath(iconPath)
 
   @classmethod

@@ -5,7 +5,7 @@ application business logic."""
 from __future__ import annotations
 
 from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 from attribox import AttriBox
 
@@ -31,16 +31,10 @@ class MainWindow(LayoutWindow):
         break
     else:
       self.titleBanner.setText('EZSide')
-
-  def connectActions(self, ) -> None:
-    """Connects the actions to the slots."""
-    LayoutWindow.connectActions(self)
-    self.whiteNoise.noise.connect(self.dataWidget.dataView.append)
-    self.dataWidget.start.connect(self.startHandle)
-    self.dataWidget.stop.connect(self.stopHandle)
-    self.paintTimer.timeout.connect(self.dataWidget.refresh)
-    self.plotEnvelope.newValues.connect(self.applyView)
-    self.paintTimer.start()
+    self.mainMenuBar.initUi()
+    self.setMenuBar(self.mainMenuBar)
+    self.mainStatusBar.initUi()
+    self.setStatusBar(self.mainStatusBar)
 
   @Slot()
   def stopHandle(self, ) -> None:
@@ -58,15 +52,34 @@ class MainWindow(LayoutWindow):
     self.dataWidget.dataView.chart().axisY().setMin(values.get('minV'))
     self.dataWidget.dataView.chart().axisX().setMax(values.get('maxH'))
     self.dataWidget.dataView.chart().axisY().setMax(values.get('maxV'))
-
     self.dataWidget.dataView.refresh()
 
-  def initUi(self) -> None:
-    """The initUi method initializes the user interface of the window."""
-    LayoutWindow.initUi(self, )
+  def connectActions(self, ) -> None:
+    """Connects the actions to the slots."""
+    # self.mainMenuBar.debug.debug1.triggered.connect(self.debug1Func)
+    # self.mainMenuBar.debug.debug2.triggered.connect(self.debug2Func)
+    # self.mainMenuBar.debug.debug3.triggered.connect(self.debug3Func)
+    # self.mainMenuBar.addSeparator()
+    # self.mainMenuBar.debug.debug4.triggered.connect(self.debug4Func)
+    # self.mainMenuBar.debug.debug5.triggered.connect(self.debug5Func)
+    # self.mainMenuBar.debug.debug6.triggered.connect(self.debug6Func)
+    # self.mainMenuBar.addSeparator()
+    # self.mainMenuBar.debug.debug7.triggered.connect(self.debug7Func)
+    # self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
+    # self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
+    self.mainMenuBar.help.about_qt.triggered.connect(QApplication.aboutQt)
+    self.mainMenuBar.files.exit.triggered.connect(self.close)
 
-  def show(self, ) -> None:
-    """Shows the window."""
+    self.whiteNoise.noise.connect(self.dataWidget.dataView.append)
+    self.dataWidget.start.connect(self.startHandle)
+    self.dataWidget.stop.connect(self.stopHandle)
+    self.paintTimer.timeout.connect(self.dataWidget.refresh)
+    self.plotEnvelope.newValues.connect(self.applyView)
+    self.paintTimer.start()
+
+  def show(self) -> None:
+    """Show the window."""
+    self.initMenus()
     self.initUi()
     self.connectActions()
     QMainWindow.show(self)
