@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 import sys
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 from icecream import ic
 # import msgs.msg as msg
@@ -25,6 +26,7 @@ def tester00() -> None:
 def tester01() -> None:
   """Main Tester Script"""
   app = QApplication(sys.argv)
+  app.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeMenuBar)
   window = MainWindow()
   window.show()
   sys.exit(app.exec())

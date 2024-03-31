@@ -4,16 +4,17 @@ widgets."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from abc import abstractmethod
+
 from PySide6.QtWidgets import QGridLayout
 from attribox import AttriBox
 from icecream import ic
 
 from ezside.core import LawnGreen
-from ezside.widgets import (HorizontalPanel, DataWidget, ClientInfo,
-                            BaseWidget, \
-                            WhiteNoise, PlotEnvelope)
-from ezside.widgets import TextLabel, CornerPanel, VerticalPanel
 from ezside.windows import BaseWindow
+from ezside.widgets import HorizontalPanel, DataWidget, ClientInfo
+from ezside.widgets import BaseWidget, WhiteNoise, PlotEnvelope
+from ezside.widgets import TextLabel, CornerPanel, VerticalPanel
 
 ic.configureOutput(includeContext=True, )
 
@@ -74,3 +75,7 @@ class LayoutWindow(BaseWindow):
     self.baseLayout.addWidget(self.dataWidget, 1, 1, 2, 1)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
+
+  @abstractmethod
+  def initActions(self) -> None:
+    """The initActions method initializes the actions of the window."""

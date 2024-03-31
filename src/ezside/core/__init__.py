@@ -14,4 +14,5 @@ from ._font_family import Font
 
 from ._color_factory import parseColor
 from ._pen_factory import parsePen, stylePen, emptyPen, solidPen
+from ._pen_factory import dashPen, dotPen, dashDotPen
 from ._brush_factory import parseBrush, emptyBrush, solidBrush
