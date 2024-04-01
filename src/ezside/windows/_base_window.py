@@ -50,6 +50,7 @@ class BaseWindow(QMainWindow):
     self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
     self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
     self.mainMenuBar.help.about_qt.triggered.connect(QApplication.aboutQt)
+    self.mainMenuBar.files.exit.triggered.connect(QApplication.quit)
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
