@@ -19,8 +19,8 @@ ic.configureOutput(includeContext=True, )
 class BaseWindow(QMainWindow):
   """BaseWindow class provides menus and actions for the application."""
 
-  menuBar = AttriBox[MenuBar](this)
-  statusBar = AttriBox[StatusBar](this)
+  mainMenuBar = AttriBox[MenuBar](this)
+  mainStatusBar = AttriBox[StatusBar](this)
 
   @abstractmethod
   def initUi(self) -> None:
@@ -36,9 +36,6 @@ class BaseWindow(QMainWindow):
     self.initUi()
     self.initActions()
     QMainWindow.show(self)
-
-  mainMenuBar = AttriBox[MenuBar](this)
-  mainStatusBar = AttriBox[StatusBar](this)
 
   def initMenus(self, ) -> None:
     """Initializes the user interface for the main window."""
