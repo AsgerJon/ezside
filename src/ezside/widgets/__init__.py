@@ -4,11 +4,12 @@ window. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from ._layouts import Grid, Vertical, Horizontal
 from ._timer import Timer
 from ._data_roll import DataRoll
 from ._data_series import DataSeries, LineSeries, ScatterSeries
 from ._base_widget import BaseWidget
-from ._spacer import VSpacer, HSpacer, Spacer, AbstractSpacer
+from ._spacers import HorizontalSpacer, VerticalSpacer, GridSpacer
 from ._control_widget import HorizontalAbstractControl, AbstractControl
 from ._control_widget import VerticalAbstractControl, PushButton
 from ._text_label import TextLabel

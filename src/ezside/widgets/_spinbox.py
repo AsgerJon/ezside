@@ -4,12 +4,11 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Signal
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QDoubleSpinBox, QHBoxLayout, QGridLayout
+from PySide6.QtWidgets import QDoubleSpinBox, QGridLayout
 from attribox import AttriBox
 
-from ezside.widgets import BaseWidget, TextLabel, HSpacer, VSpacer
-from ezside.settings import Default
+from ezside.widgets import BaseWidget, TextLabel
+from ezside.widgets import HorizontalSpacer, VerticalSpacer
 
 
 class _Spinbox(QDoubleSpinBox):
@@ -38,8 +37,8 @@ class SpinBox(BaseWidget):
   innerBox = AttriBox[_Spinbox](-5, 5, )
   label = AttriBox[TextLabel]()
   baseLayout = AttriBox[QGridLayout]()
-  vSpacer = AttriBox[VSpacer]()
-  hSpacer = AttriBox[HSpacer]()
+  vSpacer = AttriBox[VerticalSpacer]()
+  hSpacer = AttriBox[HorizontalSpacer]()
 
   def __init__(self, name: str = None, *args, **kwargs) -> None:
     """The __init__ method initializes the SpinBox widget."""

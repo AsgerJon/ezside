@@ -7,8 +7,6 @@ from __future__ import annotations
 from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QHBoxLayout
 from ezside.widgets import BaseWidget
 
-from ezros.defaults import Settings
-
 
 def addInit(cls: type) -> type:
   """Apply the extension to the class."""
@@ -29,7 +27,7 @@ def addInit(cls: type) -> type:
     """Initialize the class."""
     oldInit(this, *args, **kwargs)
     this.setSpacing(2)
-    this.setContentsMargins(Settings.getLabelMargins())
+    this.setContentsMargins(2, 2, 2, 2, )
 
   setattr(cls, 'addWidget', addWidget)
   setattr(cls, '__init__', newInit)

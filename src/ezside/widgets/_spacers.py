@@ -8,18 +8,11 @@ flag in the settings."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QSize
 from PySide6.QtGui import QPainter, QPaintEvent, QPen, QColor
-from ezside.core import solidBrush, \
-  Yellow, \
-  Expand, \
-  Tight, \
-  emptyBrush, \
-  DashLine
+
+from ezside.core import solidBrush, Yellow, Expand, Tight, SolidLine
 from ezside.core import dashPen
 from ezside.widgets import BaseWidget
-
-from ezros.defaults import Settings
 
 
 class AbstractSpacer(BaseWidget):
@@ -31,8 +24,6 @@ class AbstractSpacer(BaseWidget):
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Paint the spacer."""
-    if not Settings.spacerVisibility:
-      return
     painter = QPainter()
     painter.begin(self)
     viewRect = painter.viewport()
@@ -74,7 +65,11 @@ class HorizontalSeparator(HorizontalSpacer):
     painter = QPainter()
     painter.begin(self)
     viewRect = painter.viewport()
-    painter = Settings.applyVerticalSeperator(painter)
+    pen = QPen()
+    pen.setWidth(1)
+    pen.setStyle(SolidLine)
+    pen.setColor(QColor(0, 0, 0, 255))
+    painter.setPen(pen)
     y = viewRect.center().y()
     left, right = viewRect.left(), viewRect.right()
     painter.drawLine(left, y, right, y)
@@ -89,7 +84,11 @@ class VerticalSeparator(VerticalSpacer):
     painter = QPainter()
     painter.begin(self)
     viewRect = painter.viewport()
-    painter = Settings.applyVerticalSeperator(painter)
+    pen = QPen()
+    pen.setWidth(1)
+    pen.setStyle(SolidLine)
+    pen.setColor(QColor(0, 0, 0, 255))
+    painter.setPen(pen)
     x = viewRect.center().x()
     top, bottom = viewRect.top(), viewRect.bottom()
     painter.drawLine(x, top, x, bottom)
