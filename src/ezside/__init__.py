@@ -15,3 +15,5 @@ from ezside.windows.bars import StatusBar
 from ezside.windows import BaseWindow
 from ezside.windows import LayoutWindow
 from ezside.windows import MainWindow
+
+from ezside.defaults import Settings
