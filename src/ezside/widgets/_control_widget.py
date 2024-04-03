@@ -15,8 +15,7 @@ from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import Tight
-from ezside.widgets import BaseWidget, VSpacer, HSpacer, AbstractSpacer
-
+from ezside.widgets import BaseWidget, VerticalSpacer, HorizontalSpacer
 
 class PushButton(QPushButton):
   """PushButton provides a button with a signal."""
@@ -59,8 +58,8 @@ class AbstractControl(BaseWidget):
   pauseButton = AttriBox[PushButton]('Pause')
   stopButton = AttriBox[PushButton]('Stop')
 
-  horizontalSpacer = AttriBox[HSpacer]()
-  verticalSpacer = AttriBox[VSpacer]()
+  horizontalSpacer = AttriBox[HorizontalSpacer]()
+  verticalSpacer = AttriBox[VerticalSpacer]()
   horizontalLayer = AttriBox[QHBoxLayout]()
   verticalLayout = AttriBox[QVBoxLayout]()
 

@@ -15,8 +15,7 @@ from vistutils.waitaminute import typeMsg
 
 from ezside.core import Tight, Center
 from ezside.widgets import (VerticalSlider, BaseWidget, TextLabel,
-                            FilledRect, \
-  HSpacer)
+                            FilledRect, HorizontalSpacer)
 from ezside.settings import Default
 
 
@@ -28,7 +27,7 @@ class Equalizer(BaseWidget):
 
   baseWidget = AttriBox[BaseWidget]()
   baseLayout = AttriBox[QHBoxLayout]()
-  horizontalSpacer = AttriBox[HSpacer]()
+  horizontalSpacer = AttriBox[HorizontalSpacer]()
 
   def __init__(self, *args, **kwargs) -> None:
     numSlidersKeys = stringList("""numSliders, num, sliders, numSliders""")
