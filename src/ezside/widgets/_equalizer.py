@@ -3,10 +3,10 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+import sys
+
 import time
 from math import sin
-from typing import Any, Self
-
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 from attribox import AttriBox
@@ -17,6 +17,13 @@ from ezside.core import Tight, Center
 from ezside.widgets import (VerticalSlider, BaseWidget, TextLabel,
                             FilledRect, HorizontalSpacer)
 from ezside.settings import Defaults
+
+from typing import Any
+
+if sys.version_info.minor < 11:
+  from typing_extensions import Self
+else:
+  from typing import Self
 
 
 class Equalizer(BaseWidget):

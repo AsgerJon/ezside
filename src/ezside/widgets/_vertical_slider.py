@@ -2,8 +2,7 @@
 #  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
-
-from typing import Callable, Self
+import sys
 
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import QSlider
@@ -13,6 +12,13 @@ from vistutils.waitaminute import typeMsg
 
 from ezside.core import Expand
 from ezside.settings import Defaults
+
+from typing import Callable
+
+if sys.version_info.minor < 11:
+  from typing_extensions import Self
+else:
+  from typing import Self
 
 
 class VerticalSlider(QSlider):
