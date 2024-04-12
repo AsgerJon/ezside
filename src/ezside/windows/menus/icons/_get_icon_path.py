@@ -1,5 +1,5 @@
 """The getIcon function creates and returns a QIcon of the given name."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

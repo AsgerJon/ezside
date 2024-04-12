@@ -1,6 +1,6 @@
 """The quickFactories module contains a collection of factory functions for
 creating QBrush, QPen and QFont instances. """
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -10,29 +10,29 @@ from PySide6.QtGui import QColor
 from vistutils.waitaminute import typeMsg
 
 colorNames = {
-  'red'         : QColor(255, 0, 0, 255),
-  'green'       : QColor(0, 128, 0, 255),
-  'blue'        : QColor(0, 0, 255, 255),
-  'yellow'      : QColor(255, 255, 0, 255),
-  'cyan'        : QColor(0, 255, 255, 255),
-  'magenta'     : QColor(255, 0, 255, 255),
-  'white'       : QColor(255, 255, 255, 255),
-  'black'       : QColor(0, 0, 0, 255),
-  'gray'        : QColor(128, 128, 128, 255),
-  'lightgray'   : QColor(211, 211, 211, 255),
-  'darkgray'    : QColor(169, 169, 169, 255),
-  'lightred'    : QColor(255, 182, 193, 255),
-  'darkred'     : QColor(139, 0, 0, 255),
-  'lightgreen'  : QColor(144, 238, 144, 255),
-  'darkgreen'   : QColor(0, 100, 0, 255),
-  'lightblue'   : QColor(173, 216, 230, 255),
-  'darkblue'    : QColor(0, 0, 139, 255),
-  'lightyellow' : QColor(255, 255, 224, 255),
-  'darkyellow'  : QColor(204, 204, 0, 255),
-  'lightcyan'   : QColor(224, 255, 255, 255),
-  'darkcyan'    : QColor(0, 139, 139, 255),
+  'red': QColor(255, 0, 0, 255),
+  'green': QColor(0, 128, 0, 255),
+  'blue': QColor(0, 0, 255, 255),
+  'yellow': QColor(255, 255, 0, 255),
+  'cyan': QColor(0, 255, 255, 255),
+  'magenta': QColor(255, 0, 255, 255),
+  'white': QColor(255, 255, 255, 255),
+  'black': QColor(0, 0, 0, 255),
+  'gray': QColor(128, 128, 128, 255),
+  'lightgray': QColor(211, 211, 211, 255),
+  'darkgray': QColor(169, 169, 169, 255),
+  'lightred': QColor(255, 182, 193, 255),
+  'darkred': QColor(139, 0, 0, 255),
+  'lightgreen': QColor(144, 238, 144, 255),
+  'darkgreen': QColor(0, 100, 0, 255),
+  'lightblue': QColor(173, 216, 230, 255),
+  'darkblue': QColor(0, 0, 139, 255),
+  'lightyellow': QColor(255, 255, 224, 255),
+  'darkyellow': QColor(204, 204, 0, 255),
+  'lightcyan': QColor(224, 255, 255, 255),
+  'darkcyan': QColor(0, 139, 139, 255),
   'lightmagenta': QColor(255, 182, 193, 255),
-  'darkmagenta' : QColor(139, 0, 139, 255),
+  'darkmagenta': QColor(139, 0, 139, 255),
 }
 
 

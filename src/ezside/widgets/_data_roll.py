@@ -1,6 +1,6 @@
 """The DataEcho class provides a way to echo data from one object to
 another."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

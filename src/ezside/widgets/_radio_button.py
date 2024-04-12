@@ -1,6 +1,6 @@
 """RadioButton provides a button that can be turned on by a mouse click,
 but which require input from somewhere else to reactivate."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 
 from ezside.widgets import BaseWidget

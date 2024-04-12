@@ -1,6 +1,6 @@
 """ControlWidget provides a collection of buttons for controlling
 start/stop and timed behaviour."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

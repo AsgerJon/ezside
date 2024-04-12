@@ -1,6 +1,6 @@
 """The 'ezside.windows' package provides convenient function for working
 with the main application window when developing in pyside6."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

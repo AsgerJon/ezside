@@ -1,5 +1,5 @@
 """EnumMeta class for the EZNum base class"""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -41,11 +41,12 @@ class EZnumMeta(type):
   @staticmethod
   def getBaseNameSpace() -> dict:
     """Returns the base namespace."""
-    return {'name'                   : None, 'value': None,
-            '__annotations__'        : {'name': str, 'value': int},
-            '__members__'            : None,
-            '__allow_instantiation__': True,
-            '__iter_contents__'      : None, }
+    return {
+      'name': None, 'value': None,
+      '__annotations__': {'name': str, 'value': int},
+      '__members__': None,
+      '__allow_instantiation__': True,
+      '__iter_contents__': None, }
 
   @classmethod
   def _strFactory(mcls) -> Callable:

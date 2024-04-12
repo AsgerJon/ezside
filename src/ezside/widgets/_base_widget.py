@@ -1,7 +1,7 @@
 """BaseWidget provides a base class for the widgets. Using AttriBox they
 provide brushes, pens and fonts as attributes. These widgets are not meant
 for composite widgets directly but instead for the constituents. """
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

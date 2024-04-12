@@ -1,5 +1,5 @@
 """HelpMenu provides the help menu for the main application window."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

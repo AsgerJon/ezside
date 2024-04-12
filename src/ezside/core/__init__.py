@@ -1,6 +1,6 @@
 """The 'ezside.core' package provides a limited selection from the Qt
 namespace in much shorter named versions. """
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

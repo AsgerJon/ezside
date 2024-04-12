@@ -1,5 +1,5 @@
 """PlotEnvelope widget module."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -89,7 +89,8 @@ class PlotEnvelope(BaseWidget):
 
   def getValues(self) -> dict[str, float]:
     """The getValueDict method returns the values of the widget."""
-    return {'minH': self.minHorizontal.value(),
-            'maxH': self.maxHorizontal.value(),
-            'minV': self.minVertical.value(),
-            'maxV': self.maxVertical.value()}
+    return {
+      'minH': self.minHorizontal.value(),
+      'maxH': self.maxHorizontal.value(),
+      'minV': self.minVertical.value(),
+      'maxV': self.maxVertical.value()}

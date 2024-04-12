@@ -1,6 +1,6 @@
 """EmptyField provides a mostly empty constructor except for the field
 name and field owner filled out by the __set_name__ method.  """
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

@@ -4,7 +4,7 @@ HorizontalSpacer, VerticalSpacer, and GridSpacer, expanding in the
 horizontal, vertical, and both directions respectively. The spacers are
 intended to be invisible except for during development. Use the visibility
 flag in the settings."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

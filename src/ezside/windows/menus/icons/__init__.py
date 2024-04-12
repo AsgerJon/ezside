@@ -1,5 +1,5 @@
 """This package contains the icons used in the menu items."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

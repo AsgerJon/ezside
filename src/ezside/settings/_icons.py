@@ -1,7 +1,7 @@
 """The icons module provides a collection of icons for use in the
 application. The icons are provided as a dictionary with the icon name
 as the key and the icon path as the value."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

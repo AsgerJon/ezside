@@ -1,6 +1,6 @@
 """DataSeries wraps the QXYSeries, QScatterSeries and QLineSeries classes
 to provide a common interface for these classes."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
