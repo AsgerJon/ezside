@@ -14,7 +14,7 @@ from ezside.core import Precise, LawnGreen
 from ezside.widgets import TextLabel, Equalizer, BaseWidget, \
   VerticalAbstractControl
 from ezside.widgets import Timer
-from ezside.settings import Default
+from ezside.settings import Defaults
 
 
 class WhiteNoise(BaseWidget):
@@ -27,7 +27,7 @@ class WhiteNoise(BaseWidget):
 
   resumeTimer = IntField()
 
-  timer = AttriBox[Timer](Default.noiseTimer, Precise, False)
+  timer = AttriBox[Timer](Defaults.noiseTimer, Precise, False)
   baseLayout = AttriBox[QVBoxLayout]()
   horizontalWidget = AttriBox[BaseWidget]()
   horizontalLayout = AttriBox[QHBoxLayout]()
@@ -91,7 +91,7 @@ class WhiteNoise(BaseWidget):
     painter = QPainter()
     painter.begin(self)
     rect = painter.viewport()
-    painter.setRenderHint(QPainter.Antialiasing)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     self.solidBrush.setColor(LawnGreen)
     painter.setBrush(self.solidBrush)
     painter.setPen(self.emptyLine)

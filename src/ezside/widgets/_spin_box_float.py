@@ -6,13 +6,12 @@ from __future__ import annotations
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QDoubleSpinBox, QVBoxLayout, QHBoxLayout
 from attribox import AttriBox
+from ezside.moreutils import EmptyField
+
 from ezside.core import Tight, AlignCenter
-from ezside.widgets import BaseWidget
+from ezside.widgets import BaseWidget, Label
 from icecream import ic
 from vistutils.parse import maybe
-
-from ezros.rosutils import EmptyField
-from ezros.widgets import TightLabel, Label
 
 ic.configureOutput(includeContext=True, )
 

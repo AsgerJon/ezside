@@ -5,8 +5,8 @@ from __future__ import annotations
 
 from typing import Callable, Any
 
-from icecream import ic
 from vistutils.text import monoSpace
+
 from ezside.eznum import auto
 
 

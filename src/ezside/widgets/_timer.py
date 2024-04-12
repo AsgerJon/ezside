@@ -8,7 +8,7 @@ from vistutils.parse import maybe
 from vistutils.text import stringList
 
 from ezside.core import Precise, TimerType
-from ezside.settings import Default
+from ezside.settings import Defaults
 
 
 class Timer(QTimer):
@@ -46,7 +46,7 @@ class Timer(QTimer):
           singleShot = arg
         if isinstance(arg, TimerType):
           timerType = arg
-      interval = maybe(interval, Default.anyTimer)
+      interval = maybe(interval, Defaults.anyTimer)
       timerType = maybe(timerType, Precise)
       singleShot = maybe(singleShot, False)
     QTimer.__init__(self, )

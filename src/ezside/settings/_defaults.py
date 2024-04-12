@@ -1,23 +1,41 @@
-"""The defaults class provides a base class for all defaults classes in the
-application. During development values are placed in the class body. Once
-deployed values that should be configurable by the user are loaded from a
-file. When the users make defaults changes, this file is updated."""
+"""Provides defaults settings in the Default class"""
 #  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
-
 import os
 
 from PySide6.QtCore import QMargins
-from PySide6.QtGui import QFont, QColor, QPainter, QPen
+from PySide6.QtGui import QPainter, QColor, QPen, QFont
+
 from ezside.core import DashLine
 
 
-class Settings:
-  """The defaults class provides a base class for all defaults classes in the
-  application. During development values are placed in the class body. Once
-  deployed values that should be configurable by the user are loaded from a
-  file. When the users make defaults changes, this file is updated."""
+class Defaults:
+  """Provides defaults settings in the Default class"""
+
+  anyTimer = 25
+  paintTimer = 20
+  noiseTimer = 10
+  numPoints = 256
+
+  sliderMin = 0
+  sliderMax = 100
+  sliderSingleStep = 1
+  sliderPageStep = 10
+  sliderTickInterval = 10
+
+  numSliders = 8
+
+  chartViewWidth = 400
+  chartViewHeight = 300
+
+  layoutPreference = 0  # 0: vertical, 1: horizontal
+
+  bannerMargin = 32
+  sliderHeight = 192
+  sliderWidth = 32
+
+  fontFamily = 'Montserrat'
 
   @staticmethod
   def getButtonStyle() -> str:

@@ -12,7 +12,7 @@ from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import Expand
-from ezside.settings import Default
+from ezside.settings import Defaults
 
 
 class VerticalSlider(QSlider):
@@ -82,10 +82,10 @@ class VerticalSlider(QSlider):
             pageStep = arg
           elif initVal is None:
             initVal = arg
-    minVal = maybe(minVal, Default.sliderMin)
-    maxVal = maybe(maxVal, Default.sliderMax)
-    singleStep = maybe(singleStep, Default.sliderSingleStep)
-    pageStep = maybe(pageStep, Default.sliderPageStep)
+    minVal = maybe(minVal, Defaults.sliderMin)
+    maxVal = maybe(maxVal, Defaults.sliderMax)
+    singleStep = maybe(singleStep, Defaults.sliderSingleStep)
+    pageStep = maybe(pageStep, Defaults.sliderPageStep)
     QSlider.__init__(self, Qt.Orientation.Vertical)
     self.setRange(minVal, maxVal)
     self.setSingleStep(singleStep)
@@ -118,7 +118,7 @@ class VerticalSlider(QSlider):
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setSizePolicy(Expand, Expand)
-    self.setMinimumSize(QSize(Default.sliderWidth, Default.sliderHeight))
+    self.setMinimumSize(QSize(Defaults.sliderWidth, Defaults.sliderHeight))
 
   def __abs__(self) -> int:
     """Return the absolute value of the slider."""

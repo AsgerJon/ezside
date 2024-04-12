@@ -8,6 +8,9 @@ from ._timer import Timer
 from ._data_roll import DataRoll
 from ._data_series import DataSeries, LineSeries, ScatterSeries
 from ._base_widget import BaseWidget
+from ._label import Label
+from ._spin_box_float import SpinBoxFloat
+from ._spin_box_int import SpinBoxInt
 from ._layouts import Grid, Vertical, Horizontal
 from ._spacers import HorizontalSpacer, VerticalSpacer, GridSpacer
 from ._spacers import AbstractSpacer

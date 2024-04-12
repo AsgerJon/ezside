@@ -4,17 +4,17 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Signal, Slot
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import QVBoxLayout
 from attribox import AttriBox
 
-from ezside.widgets import BaseWidget, WhiteNoise, DataView
-from ezside.settings import Default
+from ezside.widgets import BaseWidget, DataView
+from ezside.settings import Defaults
 
 
 class DataWidget(BaseWidget):
   """DataWidget provides a place to put the DataView."""
 
-  __fallback_num_points__ = Default.numPoints
+  __fallback_num_points__ = Defaults.numPoints
 
   start = Signal()
   stop = Signal()

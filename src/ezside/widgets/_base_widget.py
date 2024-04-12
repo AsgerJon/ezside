@@ -62,7 +62,7 @@ class BaseWidget(QWidget):
     painter.setBrush(self.emptyBrush)
     return painter
 
-  def boundSize(self, text: str, ) -> None:
+  def boundSize(self, text: str, ) -> QSize:
     """The boundSize method returns the bounding rectangle of the given
     text."""
     rect, flags = self.geometry(), NoWrap | Center

@@ -5,7 +5,6 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from PySide6.QtCore import QEvent
 from PySide6.QtWidgets import QMenu, QMainWindow
 from icecream import ic
 

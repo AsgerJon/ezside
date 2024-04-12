@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QApplication
 from icecream import ic
 # import msgs.msg as msg
 
-from ezside.windows import MainWindow, TestWindow
+from ezside.windows import MainWindow
 
 for item in sys.path:
   print(item)
@@ -19,7 +19,7 @@ for item in sys.path:
 
 def tester00() -> None:
   """Main Tester Script"""
-  stuff = [os, sys, ic, 'hello', 'world', TestWindow, MainWindow, ]
+  stuff = [os, sys, ic, 'hello', 'world', MainWindow, ]
   [print(x) for x in stuff]
 
 

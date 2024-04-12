@@ -3,7 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QMainWindow, QStatusBar
+from PySide6.QtWidgets import QStatusBar
 
 
 class StatusBar(QStatusBar):

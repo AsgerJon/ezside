@@ -16,7 +16,7 @@ from vistutils.waitaminute import typeMsg
 from ezside.core import Tight, Center
 from ezside.widgets import (VerticalSlider, BaseWidget, TextLabel,
                             FilledRect, HorizontalSpacer)
-from ezside.settings import Default
+from ezside.settings import Defaults
 
 
 class Equalizer(BaseWidget):
@@ -36,7 +36,7 @@ class Equalizer(BaseWidget):
     names = stringList("""numSliders, templateSlider""")
     types = [int, QWidget]
     defaultValues = {
-      names[0]: Default.numSliders,
+      names[0]: Defaults.numSliders,
       names[1]: VerticalSlider.defaultInstance()
     }
     data = {}

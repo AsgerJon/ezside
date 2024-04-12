@@ -10,12 +10,13 @@ from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout, \
   QBoxLayout
 from attribox import AttriBox
-from icecream import ic
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import Tight
 from ezside.widgets import BaseWidget, VerticalSpacer, HorizontalSpacer
+from ezside.widgets import AbstractSpacer
+
 
 class PushButton(QPushButton):
   """PushButton provides a button with a signal."""

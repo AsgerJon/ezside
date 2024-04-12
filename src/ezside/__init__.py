@@ -4,7 +4,6 @@ the pyside6 framework."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ezside.defaults import Settings
 from ezside.windows.menus import Action
 from ezside.windows.menus import AbstractMenu
 from ezside.windows.menus import FilesMenu

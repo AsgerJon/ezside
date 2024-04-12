@@ -12,7 +12,7 @@ from icecream import ic
 from attribox import AttriBox
 
 from ezside.widgets import ScatterSeries, LineSeries
-from ezside.settings import Default
+from ezside.settings import Defaults
 
 if TYPE_CHECKING:
   pass
@@ -30,7 +30,7 @@ class DataView(QChartView):
 
   def initUi(self) -> None:
     """Sets up the view"""
-    self.setMinimumSize(Default.chartViewWidth, Default.chartViewHeight)
+    self.setMinimumSize(Defaults.chartViewWidth, Defaults.chartViewHeight)
     self.initScatter()
 
   def initScatter(self, ) -> None:

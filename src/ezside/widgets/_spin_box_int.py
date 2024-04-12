@@ -6,7 +6,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QSpinBox
 from attribox import AttriBox
 
-from ezros.widgets import SpinBoxFloat
+from ezside.widgets import SpinBoxFloat
 
 
 class SpinBoxInt(SpinBoxFloat):

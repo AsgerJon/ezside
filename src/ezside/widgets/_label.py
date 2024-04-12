@@ -1,24 +1,36 @@
-"""The TextLabel class provides a text labels"""
+"""Label prints centered text"""
 #  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QRect, QRectF
-from PySide6.QtGui import QPainter, QPen, QBrush, QFont, QPaintEvent
-from PySide6.QtGui import QFontMetrics
+from PySide6.QtGui import QPainter, \
+  QPen, \
+  QBrush, \
+  QFont, \
+  QPaintEvent, \
+  QFontMetrics
+from PySide6.QtWidgets import QSizePolicy
+from ezside.moreutils import EmptyField
+
+from ezside.core import SolidLine, \
+  SolidFill, \
+  emptyPen, \
+  emptyBrush, \
+  AlignLeft, \
+  Tight
+from ezside.core import AlignVCenter
+from ezside.widgets import BaseWidget
+from icecream import ic
 from vistutils.waitaminute import typeMsg
 
 from ezside.settings import Defaults
-from ezside.core import SolidFill, SolidLine
-from ezside.core import emptyPen, emptyBrush, AlignLeft, Tight
-from ezside.core import AlignVCenter
-from ezside.moreutils import EmptyField
-from ezside.widgets import BaseWidget
+
+ic.configureOutput(includeContext=True, )
 
 
-class TextLabel(BaseWidget):
-  """The TextLabel class provides a text labels"""
-
+class Label(BaseWidget):
+  """Label prints centered text"""
   __fallback_alignment__ = AlignLeft | AlignVCenter
   __alignment_flags__ = None
   __fallback_text__ = 'LMAO'

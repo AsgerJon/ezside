@@ -6,14 +6,13 @@ from __future__ import annotations
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QLineEdit
 from attribox import AttriBox, this
-from ezside.core import Tight
-from ezside.widgets import BaseWidget
-from icecream import ic
 from vistutils.parse import maybe
 from vistutils.waitaminute import typeMsg
+from ezside.moreutils import EmptyField
+from ezside.widgets import Horizontal, Label
 
-from ezros.rosutils import EmptyField
-from ezros.widgets import Horizontal, Label
+from ezside.core import Tight
+from ezside.widgets import BaseWidget
 
 
 class _LineEdit(QLineEdit):
