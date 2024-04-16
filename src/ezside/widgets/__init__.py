@@ -11,3 +11,4 @@ from ._spacers import HorizontalSpacer, VerticalSpacer, GridSpacer
 from ._label import Label
 from ._button import Button
 from ._line_edit import LineEdit
+from ._entry_form import EntryForm

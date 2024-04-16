@@ -17,8 +17,8 @@ class MainWindow(LayoutWindow):
 
   def initActions(self) -> None:
     """Initialize the actions."""
-    self.testButton.clicked.connect(self.testButtonFunc)
-    self.testLineEdit.textEdited.connect(self.testLineEditFunc)
+    self.testLineEdit.lineEdit.keyValue.connect(self.testKeyNum)
+    self.testLineEdit.lineEdit.keyName.connect(self.testKeyName)
 
   def testButtonFunc(self) -> None:
     """Test button function."""
@@ -27,3 +27,16 @@ class MainWindow(LayoutWindow):
   def testLineEditFunc(self, txt: str) -> None:
     """Test line edit function."""
     self.statusBar().showMessage(txt)
+
+  def testKeyFunc(self, key: str) -> None:
+    """Test key function."""
+    self.statusBar().showMessage('Key: %s' % key)
+
+  def testKeyNum(self, key: int) -> None:
+    """Test key number."""
+    title = self.windowTitle().split(' | ')[0]
+    self.setWindowTitle('%s | %d' % (title, key))
+
+  def testKeyName(self, key: str) -> None:
+    """Test key name."""
+    self.statusBar().showMessage('Key name: %s' % key)

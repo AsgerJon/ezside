@@ -31,7 +31,6 @@ class BaseWidget(QWidget):
     """BaseWidget provides a base class for the widgets. Using AttriBox they
     provide brushes, pens and fonts as attributes. These widgets are not
     meant for composite widgets directly but instead for the components."""
-    # ic('%s' % self.__class__.__name__)
     parent = parseParent(*args, **kwargs)
     QWidget.__init__(self, parent)
 
