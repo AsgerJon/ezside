@@ -1,5 +1,5 @@
 """Equalizer provides a collection of vertical sliders."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from vistutils.waitaminute import typeMsg
 from ezside.core import Tight, Center
 from ezside.widgets import (VerticalSlider, BaseWidget, TextLabel,
                             FilledRect, HorizontalSpacer)
-from ezside.settings import Defaults
+# from ezside.settings import Defaults
 
 from typing import Any
 
@@ -31,6 +31,7 @@ class Equalizer(BaseWidget):
 
   __vertical_sliders__ = None
   __iter_contents__ = None
+  __fallback_num_sliders__ = 6
 
   baseWidget = AttriBox[BaseWidget]()
   baseLayout = AttriBox[QHBoxLayout]()
@@ -43,7 +44,7 @@ class Equalizer(BaseWidget):
     names = stringList("""numSliders, templateSlider""")
     types = [int, QWidget]
     defaultValues = {
-      names[0]: Defaults.numSliders,
+      names[0]: self.__fallback_num_sliders__,
       names[1]: VerticalSlider.defaultInstance()
     }
     data = {}

@@ -1,145 +1,209 @@
 """Provides defaults settings in the Default class"""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
+
+import importlib
+import json
 import os
+from string import ascii_letters, digits, punctuation
+from typing import Any
 
-from PySide6.QtCore import QMargins
-from PySide6.QtGui import QPainter, QColor, QPen, QFont
+from PySide6.QtCore import QMargins, Qt
+from PySide6.QtGui import QPainter, QColor, QPen, QFont, QBrush
+from vistutils.metas import AbstractMetaclass, AbstractNamespace
+from vistutils.text import monoSpace
+from vistutils.waitaminute import typeMsg
 
-from ezside.core import DashLine
+from ezside.core import DashLine, SolidLine
 
 
 class Defaults:
   """Provides defaults settings in the Default class"""
 
-  anyTimer = 25
-  paintTimer = 20
-  noiseTimer = 10
-  numPoints = 256
-
-  sliderMin = 0
-  sliderMax = 100
-  sliderSingleStep = 1
-  sliderPageStep = 10
-  sliderTickInterval = 10
-
-  numSliders = 8
-
-  chartViewWidth = 400
-  chartViewHeight = 300
-
-  layoutPreference = 0  # 0: vertical, 1: horizontal
-
-  bannerMargin = 32
-  sliderHeight = 192
-  sliderWidth = 32
-
-  fontFamily = 'Montserrat'
+  __fallback_values__ = None
+  __custom_values__ = None
+  __custom_file__ = None
 
   @staticmethod
-  def getButtonStyle() -> str:
-    """Get the button style."""
-    cornerRadius = 4
-    borderWidth = 2
-    borderColor = '#000000'
-    here = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(here, '_button_style.qss')) as file:
-      print(file.read())
-      return file.read()
+  def _loadCustomValues(settingsFile: str) -> dict:
+    """Load custom settings from a file."""
+    with open(settingsFile, 'r') as settingsFile:
+      data = json.load(settingsFile)
+    return data
 
-  labelBackgroundColor = (255, 255, 192, 255)
-  labelBorderColor = (0, 0, 0, 255)
-  labelTextColor = (0, 0, 0, 255)
-  labelBorderWidth = 2
-  labelTopMargin = 2
-  labelBottomMargin = 2
-  labelLeftMargin = 4
-  labelRightMargin = 4
+  @staticmethod
+  def _loadColor(data: dict) -> QColor:
+    """Loads a color from data assuming channels are named red, green,
+    blue and alpha. All defaults to 255. """
+    red = data.get('red', 255)
+    green = data.get('green', 255)
+    blue = data.get('blue', 255)
+    alpha = data.get('alpha', 255)
+    return QColor(red, green, blue, alpha)
 
-  fontFamily = 'Montserrat'
-  buttonFontSize = 12
-  labelFontSize = 14
-  headerFontSize = 16
-
-  numPoints = 256
-
-  spacerVisibility = True
-
-  horizontalSeperatorColor = (192, 225, 255, 255)
-  horizontalSeperatorWidth = 2
-  horizontalSeperatorStyle = DashLine
-  verticalSeperatorColor = (192, 225, 255, 255)
-  verticalSeperatorWidth = 2
-  verticalSeperatorStyle = DashLine
-
-  layoutMargins = dict(left=2, top=2, right=2, bottom=2)
-
-  @classmethod
-  def getLayoutMargins(cls) -> QMargins:
-    """Get the layout margins."""
-    return QMargins(cls.layoutMargins['left'],
-                    cls.layoutMargins['top'],
-                    cls.layoutMargins['right'],
-                    cls.layoutMargins['bottom'], )
-
-  @classmethod
-  def applyHorizontalSeperator(cls, painter: QPainter) -> QPainter:
-    """Apply the horizontal seperator."""
-    color = QColor(*cls.horizontalSeperatorColor)
-    pen = QPen()
-    pen.setColor(color)
-    pen.setWidth(cls.horizontalSeperatorWidth)
-    pen.setStyle(cls.horizontalSeperatorStyle)
-    painter.setPen(pen)
-    return painter
-
-  @classmethod
-  def applyVerticalSeperator(cls, painter: QPainter) -> QPainter:
-    """Apply the vertical seperator."""
-    color = QColor(*cls.verticalSeperatorColor)
-    pen = QPen()
-    pen.setColor(color)
-    pen.setWidth(cls.verticalSeperatorWidth)
-    pen.setStyle(cls.verticalSeperatorStyle)
-    painter.setPen(pen)
-    return painter
-
-  @classmethod
-  def getButtonFont(cls) -> QFont:
-    """Get the button font."""
+  @staticmethod
+  def _loadFont(data: dict) -> QFont:
+    """Loads a QFont instance from data. The function supports:
+      'family' (str): The font family.
+      'size' (int): The font point size.
+      'weight' (str or int): The font weight. The name should match a QFont
+      weight:
+        QFont.Thin: 100
+        QFont.ExtraLight: 200
+        QFont.Light: 300
+        QFont.Normal: 400
+        QFont.Medium: 500
+        QFont.DemiBold: 600
+        QFont.Bold: 700
+        QFont.ExtraBold: 800
+        QFont.Black: 900"""
     font = QFont()
-    font.setFamily(cls.fontFamily)
-    font.setPointSize(cls.buttonFontSize)
+    font.setFamily(data.get('family', 'Monserrat'))
+    font.setPointSize(data.get('size', 16))
+    weightKey = data.get('weight', 'Normal')
+    for (name, weight) in QFont.Weight:
+      if name.lower() == weightKey.lower():
+        font.setWeight(weight)
+        break
+    else:
+      font.setWeight(QFont.Weight.Normal)
     return font
 
+  @staticmethod
+  def _loadMargins(data: dict) -> QMargins:
+    """Loads a QMargins instance from data. The function supports:
+      'left' (int): The left margin.
+      'top' (int): The top margin.
+      'right' (int): The right margin.
+      'bottom' (int): The bottom margin."""
+    return QMargins(data.get('left', 0),
+                    data.get('top', 0),
+                    data.get('right', 0),
+                    data.get('bottom', 0))
+
   @classmethod
-  def getLabelMargins(cls, ) -> QMargins:
+  def _loadPen(cls, data: dict) -> QPen:
+    """Loads a QPen instance from data. The function supports:
+      'color' (dict): The color of the pen.
+      'width' (int): The width of the pen.
+      'style' (str): The style of the pen. The name should match a QPen
+      style:
+        QPen.NoPen
+        QPen.SolidLine
+        QPen.DashLine
+        QPen.DotLine
+        QPen.DashDotLine
+        QPen.DashDotDotLine"""
+    pen = QPen()
+    pen.setColor(cls._loadColor(data.get('color', {})))
+    pen.setWidth(data.get('width', 1))
+    styleKey = data.get('style', 'SolidLine')
+    for (name, style) in Qt.PenStyle:
+      if name.lower() == styleKey.lower():
+        pen.setStyle(style)
+        break
+    else:
+      pen.setStyle(Qt.PenStyle.SolidLine)
+    return pen
+
+  @classmethod
+  def _loadBrush(cls, data: dict) -> QBrush:
+    """Loads a QBrush instance from data. The function supports:
+      'color' (dict): The color of the brush.
+      'style' (str): The style of the brush. The name should match a QBrush
+      style:
+        QBrush.NoBrush
+        QBrush.SolidPattern
+        QBrush.Dense1Pattern
+        QBrush.Dense2Pattern
+        QBrush.Dense3Pattern
+        QBrush.Dense4Pattern
+        QBrush.Dense5Pattern
+        QBrush.Dense6Pattern
+        QBrush.Dense7Pattern
+        QBrush.HorPattern
+        QBrush.VerPattern
+        QBrush.CrossPattern
+        QBrush.BDiagPattern
+        QBrush.FDiagPattern
+        QBrush.DiagCrossPattern"""
+    brush = QBrush()
+    brush.setColor(cls._loadColor(data.get('color', {})))
+    styleKey = data.get('style', 'SolidPattern')
+    for (name, style) in Qt.BrushStyle:
+      if name.lower() == styleKey.lower():
+        brush.setStyle(style)
+        break
+    else:
+      brush.setStyle(Qt.BrushStyle.SolidPattern)
+    return brush
+
+  def __init__(self, settingsFile: str = None) -> None:
+    self.__custom_file__ = settingsFile
+
+  def _getData(self, **kwargs) -> dict:
+    """Getter-function for data"""
+    if self.__custom_values__ is not None:
+      if isinstance(self.__custom_values__, dict):
+        return self.__custom_values__
+      e = typeMsg('self.__custom_values__', self.__custom_values__, dict)
+      raise TypeError(e)
+    if self.__custom_file__ is not None:
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      if isinstance(self.__custom_file__, str):
+        self.__custom_values__ = self._loadCustomValues(self.__custom_file__)
+        return self._getData(_recursion=True)
+      e = typeMsg('self.__custom_file__', self.__custom_file__, str)
+      raise TypeError(e)
+    if self.__fallback_values__ is not None:
+      if isinstance(self.__fallback_values__, dict):
+        return self.__fallback_values__
+      e = typeMsg('self.__fallback_values__', self.__fallback_values__, dict)
+      raise TypeError(e)
+    e = """Unable to load default fallback values!"""
+    raise ValueError(e)
+
+  def getLabelFont(self) -> QFont:
+    """Get the label font."""
+    data = self._getData()
+    font = QFont()
+    font.setFamily(data.get('fontFamily', 'Monserrat'))
+    font.setPointSize(data.get('fontSize', 12))
+    font.setWeight(data.get('fontWeight', QFont.Weight.Normal))
+    return font
+
+  def getHeaderFont(self) -> QFont:
+    """Get the header font"""
+    font = self.getLabelFont()
+    font.setPointSize(font.pointSize() + 4)
+    return font
+
+  def getLabelTextPen(self) -> QPen:
+    """Get the label pen."""
+    data = self._getData()
+    color = data.get('fontColor', {})
+    pen = QPen()
+    pen.setColor(self._loadColor(color))
+    pen.setWidth(1)
+    pen.setStyle(SolidLine)
+    return pen
+
+  def getLabelBorderPen(self) -> QPen:
+    """Get the label border pen."""
+    baseData = self._getData()
+    data = baseData.get('labelBorder', {})
+    return self._loadPen(data)
+
+  def getLabelBackgroundBrush(self) -> QBrush:
+    """Get the label background brush."""
+    baseData = self._getData()
+    data = baseData.get('labelBackground', {})
+    return self._loadBrush(data)
+
+  def getLabelMargins(self) -> QMargins:
     """Returns the margins of the label."""
-    return QMargins(cls.labelLeftMargin,
-                    cls.labelTopMargin,
-                    cls.labelRightMargin,
-                    cls.labelBottomMargin, )
-
-  @classmethod
-  def getHeaderFont(cls) -> QFont:
-    """Get the header font."""
-    font = QFont()
-    font.setFamily(cls.fontFamily)
-    font.setPointSize(cls.headerFontSize)
-    return font
-
-  @classmethod
-  def getLabelBackgroundColor(cls) -> QColor:
-    """Get the label background color."""
-    return QColor(*cls.labelBackgroundColor)
-
-  @classmethod
-  def getLabelBorderColor(cls) -> QColor:
-    """Get the label border color."""
-    return QColor(*cls.labelBorderColor)
-
-  @classmethod
-  def getLabelTextColor(cls) -> QColor:
-    """Get the label text color."""
-    return QColor(*cls.labelTextColor)
+    baseData = self._getData()
+    data = baseData.get('labelMargins', {})
+    return self._loadMargins(data)

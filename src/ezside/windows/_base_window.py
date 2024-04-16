@@ -1,12 +1,13 @@
 """BaseWindow provides the base class for the main application window. It
 implements menus and actions for the application, leaving widgets for the
 LayoutWindow class."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from abc import abstractmethod
 
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMainWindow, QApplication
 from attribox import AttriBox, this
 from icecream import ic
@@ -21,6 +22,8 @@ class BaseWindow(QMainWindow):
 
   mainMenuBar = AttriBox[MenuBar](this)
   mainStatusBar = AttriBox[StatusBar](this)
+
+  requestQuit = Signal()
 
   @abstractmethod
   def initUi(self) -> None:
@@ -50,7 +53,7 @@ class BaseWindow(QMainWindow):
     self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
     self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
     self.mainMenuBar.help.about_qt.triggered.connect(QApplication.aboutQt)
-    self.mainMenuBar.files.exit.triggered.connect(QApplication.quit)
+    self.mainMenuBar.files.exit.triggered.connect(self.requestQuit)
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
