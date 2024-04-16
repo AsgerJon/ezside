@@ -10,9 +10,6 @@ from icecream import ic
 
 from ezside.app import MainWindow, App
 
-for item in sys.path:
-  print(item)
-
 
 def tester00() -> None:
   """Main Tester Script"""

@@ -8,41 +8,41 @@ from PySide6.QtWidgets import QGridLayout, QVBoxLayout, QHBoxLayout, QWidget
 from icecream import ic
 
 from ezside.core import Tight, AlignTop, AlignLeft
-from ezside.widgets import BaseWidget
+from ezside.widgets import BaseWidget, AbstractSpacer
 
 from ezside.settings import Defaults
 
 ic.configureOutput(includeContext=True, )
 
 
-def addInit(cls: type) -> type:
-  """Apply the extension to the class."""
-
-  oldAddWidget = getattr(cls, 'addWidget', )
-  oldInit = getattr(cls, '__init__', )
-
-  def addWidget(this: cls, *args) -> None:
-    """Add a widget to the layout."""
-    for arg in args:
-      if isinstance(arg, BaseWidget):
-        arg.initUi()
-        arg.connectActions()
-        if 'spacer' not in type(arg).__qualname__.lower():
-          arg.setSizePolicy(Tight, Tight)
-        break
-    return oldAddWidget(this, *args)
-
-  def newInit(this: cls, *args, **kwargs) -> None:
-    """Initialize the class."""
-    oldInit(this, *args, **kwargs)
-    defaults = getattr(this, 'defaults', Defaults())
-    this.setSpacing(defaults.getLayoutSpacing())
-    this.setContentsMargins(defaults.getLayoutMargins())
-
-  setattr(cls, 'addWidget', addWidget)
-  # setattr(cls, '__init__', newInit)
-  return cls
-
+# def addInit(cls: type) -> type:
+#   """Apply the extension to the class."""
+#
+#   oldAddWidget = getattr(cls, 'addWidget', )
+#   oldInit = getattr(cls, '__init__', )
+#
+#   def addWidget(this: cls, *args) -> None:
+#     """Add a widget to the layout."""
+#     for arg in args:
+#       if isinstance(arg, BaseWidget):
+#         arg.initUi()
+#         arg.connectActions()
+#         if 'spacer' not in type(arg).__qualname__.lower():
+#           arg.setSizePolicy(Tight, Tight)
+#         break
+#     return oldAddWidget(this, *args)
+#
+#   def newInit(this: cls, *args, **kwargs) -> None:
+#     """Initialize the class."""
+#     oldInit(this, *args, **kwargs)
+#     defaults = getattr(this, 'defaults', Defaults())
+#     this.setSpacing(defaults.getLayoutSpacing())
+#     this.setContentsMargins(defaults.getLayoutMargins())
+#
+#   setattr(cls, 'addWidget', addWidget)
+#   # setattr(cls, '__init__', newInit)
+#   return cls
+#
 
 class Grid(QGridLayout):
   """GridLayout class provides a grid layout for the application."""
@@ -51,7 +51,6 @@ class Grid(QGridLayout):
     QGridLayout.__init__(self, *args, **kwargs)
     margins = Defaults.getLayoutMargins()
     spacing = Defaults.getLayoutSpacing()
-    ic(margins, spacing)
     self.setContentsMargins(Defaults.getLayoutMargins())
     self.setSpacing(Defaults.getLayoutSpacing())
 
@@ -60,7 +59,6 @@ class Grid(QGridLayout):
     if isinstance(widget, BaseWidget):
       widget.initUi()
       widget.connectActions()
-      widget.setSizePolicy(Tight, Tight)
     QGridLayout.addWidget(self, widget, *args, )
 
 
@@ -79,8 +77,8 @@ class Vertical(QVBoxLayout):
     if isinstance(widget, BaseWidget):
       widget.initUi()
       widget.connectActions()
-      widget.setSizePolicy(Tight, Tight)
-    QVBoxLayout.addWidget(self, widget, *args, alignment=AlignTop)
+    s = 1 if isinstance(widget, AbstractSpacer) else 0
+    QVBoxLayout.addWidget(self, widget, alignment=AlignTop, stretch=s)
 
 
 class Horizontal(QHBoxLayout):
@@ -90,7 +88,6 @@ class Horizontal(QHBoxLayout):
     QHBoxLayout.__init__(self, *args, **kwargs)
     margins = Defaults.getLayoutMargins()
     spacing = Defaults.getLayoutSpacing()
-    ic(margins, spacing)
     self.setContentsMargins(Defaults.getLayoutMargins())
     self.setSpacing(Defaults.getLayoutSpacing())
 
@@ -99,5 +96,5 @@ class Horizontal(QHBoxLayout):
     if isinstance(widget, BaseWidget):
       widget.initUi()
       widget.connectActions()
-      widget.setSizePolicy(Tight, Tight)
-    QVBoxLayout.addWidget(self, widget, *args, alignment=AlignLeft)
+    s = 1 if isinstance(widget, AbstractSpacer) else 0
+    QVBoxLayout.addWidget(self, widget, alignment=AlignLeft, stretch=s)

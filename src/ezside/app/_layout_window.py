@@ -39,6 +39,7 @@ class LayoutWindow(BaseWindow):
     self.baseLayout.addWidget(self.welcomeLabel)
     self.baseLayout.addWidget(self.testLineEdit)
     self.baseLayout.addWidget(self.testButton)
+    self.baseLayout.addWidget(self.spacer)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 

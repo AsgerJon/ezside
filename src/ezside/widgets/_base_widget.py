@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QWidget, QLayout
+from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
 from icecream import ic
 
@@ -40,8 +40,3 @@ class BaseWidget(QWidget):
 
   def connectActions(self) -> None:
     """The connectActions method connects the actions to the signals."""
-
-  def setLayout(self, layout: QLayout) -> None:
-    """Reimplementation of the setLayout method."""
-    layout.addStretch(1)
-    return QWidget.setLayout(self, layout)

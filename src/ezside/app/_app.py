@@ -7,6 +7,7 @@ from typing import Any
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow
+from vistutils.fields import EmptyField
 from vistutils.waitaminute import typeMsg
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
@@ -18,6 +19,8 @@ class App(QApplication):
   __caller_id__ = None
   __main_window_class__ = None
   __main_window_instance__ = None
+
+  mainWindow = EmptyField()
 
   def __init__(self, mainWindowClass: type) -> None:
     """Initializes the App instance."""
@@ -44,6 +47,7 @@ class App(QApplication):
     self.__main_window_instance__.show()
     self.__main_window_instance__.acceptQuit.connect(self.quit)
 
+  @mainWindow.GET
   def _getMainWindowInstance(self, **kwargs) -> Any:
     """Getter-function for the main window instance."""
     if self.__main_window_instance__ is None:
@@ -51,17 +55,19 @@ class App(QApplication):
         raise RecursionError
       self._createMainWindowInstance()
       return self._getMainWindowInstance(_recursion=True)
-    if isinstance(self.__main_window_instance__, self._getMainWindowClass()):
+    mainWindowClass = self._getMainWindowClass()
+    if isinstance(self.__main_window_instance__, mainWindowClass):
       return self.__main_window_instance__
     e = typeMsg('mainWindowInstance',
                 self.__main_window_instance__,
-                self._getMainWindowClass())
+                mainWindowClass)
     raise TypeError(e)
 
   def exec(self) -> int:
     """Executes the application."""
-    MainWindow = self._getMainWindowClass()
-    mainWindow = MainWindow()
-    mainWindow.show()
-    mainWindow.acceptQuit.connect(self.quit)
+    if isinstance(self.mainWindow, QMainWindow):
+      self.mainWindow.show()
+    else:
+      e = typeMsg('mainWindow', self.mainWindow, QMainWindow)
+      raise TypeError(e)
     return QApplication.exec_(self)

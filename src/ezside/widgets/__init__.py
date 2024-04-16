@@ -5,9 +5,9 @@ window. """
 from __future__ import annotations
 
 from ._base_widget import BaseWidget
+from ._spacers import AbstractSpacer
 from ._layouts import Grid, Vertical, Horizontal
 from ._spacers import HorizontalSpacer, VerticalSpacer, GridSpacer
-from ._spacers import AbstractSpacer
 from ._label import Label
 from ._button import Button
 from ._line_edit import LineEdit
