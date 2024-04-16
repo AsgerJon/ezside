@@ -3,8 +3,10 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Any
+
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMainWindow
 from vistutils.waitaminute import typeMsg
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
@@ -15,6 +17,7 @@ class App(QApplication):
 
   __caller_id__ = None
   __main_window_class__ = None
+  __main_window_instance__ = None
 
   def __init__(self, mainWindowClass: type) -> None:
     """Initializes the App instance."""
@@ -33,6 +36,27 @@ class App(QApplication):
   def _getMainWindowClass(self) -> type:
     """Get the main window class."""
     return self.__main_window_class__
+
+  def _createMainWindowInstance(self) -> None:
+    """Create the main window."""
+    MainWindow = self._getMainWindowClass()
+    self.__main_window_instance__ = MainWindow()
+    self.__main_window_instance__.show()
+    self.__main_window_instance__.acceptQuit.connect(self.quit)
+
+  def _getMainWindowInstance(self, **kwargs) -> Any:
+    """Getter-function for the main window instance."""
+    if self.__main_window_instance__ is None:
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      self._createMainWindowInstance()
+      return self._getMainWindowInstance(_recursion=True)
+    if isinstance(self.__main_window_instance__, self._getMainWindowClass()):
+      return self.__main_window_instance__
+    e = typeMsg('mainWindowInstance',
+                self.__main_window_instance__,
+                self._getMainWindowClass())
+    raise TypeError(e)
 
   def exec(self) -> int:
     """Executes the application."""
