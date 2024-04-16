@@ -1,13 +1,14 @@
 """BaseWindow provides the base class for the main application window. It
 implements menus and actions for the application, leaving widgets for the
 LayoutWindow class."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+import time
 from abc import abstractmethod
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, QTimer
 from PySide6.QtWidgets import QMainWindow, QApplication
 from attribox import AttriBox, this
 from icecream import ic
@@ -20,10 +21,13 @@ ic.configureOutput(includeContext=True, )
 class BaseWindow(QMainWindow):
   """BaseWindow class provides menus and actions for the application."""
 
+  _countDown = None
+
   mainMenuBar = AttriBox[MenuBar](this)
   mainStatusBar = AttriBox[StatusBar](this)
 
   requestQuit = Signal()
+  acceptQuit = Signal()
 
   @abstractmethod
   def initUi(self) -> None:
@@ -57,6 +61,12 @@ class BaseWindow(QMainWindow):
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
+    self.requestQuit.connect(self.prepareQuit)
+
+  def prepareQuit(self, ) -> None:
+    """Prepare to quit the application. Subclasses reimplementing this
+    method should call the acceptQuit signal when ready to quit."""
+    self.acceptQuit.emit()
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""

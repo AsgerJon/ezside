@@ -1,5 +1,5 @@
 """Provides defaults settings in the Default class"""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from ezside.core import DashLine, SolidLine
 
 class Defaults:
   """Provides defaults settings in the Default class"""
-
+  __fallback_file__ = '_defaults.json'
   __fallback_values__ = None
   __custom_values__ = None
   __custom_file__ = None
@@ -132,6 +132,8 @@ class Defaults:
     brush.setColor(cls._loadColor(data.get('color', {})))
     styleKey = data.get('style', 'SolidPattern')
     for (name, style) in Qt.BrushStyle:
+      if name == 'solid':
+        name = 'SolidPattern'
       if name.lower() == styleKey.lower():
         brush.setStyle(style)
         break
@@ -142,8 +144,24 @@ class Defaults:
   def __init__(self, settingsFile: str = None) -> None:
     self.__custom_file__ = settingsFile
 
-  def _getData(self, **kwargs) -> dict:
+  @classmethod
+  def _getFallbackData(cls, **kwargs) -> dict:
+    """Getter-function for fallback data"""
+    here = os.path.dirname(__file__)
+    fileName = cls.__fallback_file__
+    with open(os.path.join(here, fileName), 'r') as file:
+      data = json.load(file)
+    return data
+
+  @staticmethod
+  def _getData(*args, **kwargs) -> dict:
     """Getter-function for data"""
+    for arg in args:
+      if isinstance(arg, Defaults):
+        self = arg
+        break
+    else:
+      return Defaults._getFallbackData()
     if self.__custom_values__ is not None:
       if isinstance(self.__custom_values__, dict):
         return self.__custom_values__
@@ -155,21 +173,13 @@ class Defaults:
       if isinstance(self.__custom_file__, str):
         self.__custom_values__ = self._loadCustomValues(self.__custom_file__)
         return self._getData(_recursion=True)
-      e = typeMsg('self.__custom_file__', self.__custom_file__, str)
-      raise TypeError(e)
-    if self.__fallback_values__ is not None:
-      if isinstance(self.__fallback_values__, dict):
-        return self.__fallback_values__
-      e = typeMsg('self.__fallback_values__', self.__fallback_values__, dict)
-      raise TypeError(e)
-    e = """Unable to load default fallback values!"""
-    raise ValueError(e)
+    return self._getFallbackData()
 
   def getLabelFont(self) -> QFont:
     """Get the label font."""
     data = self._getData()
     font = QFont()
-    font.setFamily(data.get('fontFamily', 'Monserrat'))
+    font.setFamily(data.get('fontFamily', 'Montserrat'))
     font.setPointSize(data.get('fontSize', 12))
     font.setWeight(data.get('fontWeight', QFont.Weight.Normal))
     return font
@@ -207,3 +217,16 @@ class Defaults:
     baseData = self._getData()
     data = baseData.get('labelMargins', {})
     return self._loadMargins(data)
+
+  @classmethod
+  def getLayoutMargins(cls) -> QMargins:
+    """Returns the margins of the layout."""
+    baseData = cls._getFallbackData()
+    data = baseData.get('layoutMargins', {})
+    return cls._loadMargins(data)
+
+  @classmethod
+  def getLayoutSpacing(cls) -> int:
+    """Returns the spacing of the layout."""
+    baseData = cls._getFallbackData()
+    return baseData.get('layoutSpacing', 2)

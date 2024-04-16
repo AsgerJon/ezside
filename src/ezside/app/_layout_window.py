@@ -1,6 +1,6 @@
 """LayoutWindow subclasses BaseWindow and implements the layout of
 widgets."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -8,13 +8,16 @@ from abc import abstractmethod
 
 from PySide6.QtWidgets import QGridLayout
 from attribox import AttriBox
+from ezside.widgets import BaseWidget, \
+  Vertical, \
+  Label, \
+  LineEdit, \
+  Button, \
+  VerticalSpacer
 from icecream import ic
 
 from ezside.core import LawnGreen
 from ezside.app import BaseWindow
-from ezside.widgets import HorizontalPanel, DataWidget, ClientInfo
-from ezside.widgets import BaseWidget, WhiteNoise, PlotEnvelope
-from ezside.widgets import TextLabel, CornerPanel, VerticalPanel
 
 ic.configureOutput(includeContext=True, )
 
@@ -24,55 +27,18 @@ class LayoutWindow(BaseWindow):
   widgets."""
 
   baseWidget = AttriBox[BaseWidget]()
-  baseLayout = AttriBox[QGridLayout]()
-
-  left = AttriBox[VerticalPanel](LawnGreen)
-  top = AttriBox[HorizontalPanel](LawnGreen)
-  right = AttriBox[VerticalPanel](LawnGreen)
-  bottom = AttriBox[HorizontalPanel](LawnGreen)
-  topLeft = AttriBox[CornerPanel](LawnGreen)
-  topRight = AttriBox[CornerPanel](LawnGreen)
-  bottomLeft = AttriBox[CornerPanel](LawnGreen)
-  bottomRight = AttriBox[CornerPanel](LawnGreen)
-
-  titleBanner = AttriBox[TextLabel]('EZside')
-  whiteNoise = AttriBox[WhiteNoise]()
-  clientInfo = AttriBox[ClientInfo]()
-  dataWidget = AttriBox[DataWidget]()
-  plotEnvelope = AttriBox[PlotEnvelope]()
+  baseLayout = AttriBox[Vertical]()
+  welcomeLabel = AttriBox[Label]('Welcome to EZSide!')
+  testLineEdit = AttriBox[LineEdit]()
+  testButton = AttriBox[Button]('Test Button')
+  spacer = AttriBox[VerticalSpacer]()
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.setMinimumSize(400, 400)
-    rowCount = 2
-    colCount = 2
-
-    self.bottomRight.initUi()
-    self.bottomLeft.initUi()
-    self.topRight.initUi()
-    self.topLeft.initUi()
-    self.left.initUi()
-    self.top.initUi()
-    self.right.initUi()
-    self.bottom.initUi()
-
-    self.baseLayout.addWidget(self.bottomRight, rowCount + 1, 1 + colCount)
-    self.baseLayout.addWidget(self.bottom, rowCount + 1, 1, 1, colCount)
-    self.baseLayout.addWidget(self.bottomLeft, rowCount + 1, 0)
-
-    self.baseLayout.addWidget(self.left, 1, 0, rowCount, 1)
-    self.baseLayout.addWidget(self.right, 1, colCount + 1, rowCount, 1)
-
-    self.baseLayout.addWidget(self.topLeft, 0, 0)
-    self.baseLayout.addWidget(self.top, 0, 1, 1, colCount)
-    self.baseLayout.addWidget(self.topRight, 0, colCount + 1)
-
-    self.whiteNoise.initUi()
-    self.baseLayout.addWidget(self.whiteNoise, 1, 2)
-    self.plotEnvelope.initUi()
-    self.baseLayout.addWidget(self.plotEnvelope, 2, 2)
-    self.dataWidget.initUi()
-    self.baseLayout.addWidget(self.dataWidget, 1, 1, 2, 1)
+    # self.setMinimumSize(400, 400)
+    self.baseLayout.addWidget(self.welcomeLabel)
+    self.baseLayout.addWidget(self.testLineEdit)
+    self.baseLayout.addWidget(self.testButton)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 

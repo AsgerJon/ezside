@@ -25,10 +25,10 @@ def tester00() -> None:
 
 def tester01() -> None:
   """Main Tester Script"""
-  app = App(sys.argv)
-  app.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeMenuBar)
-  window = MainWindow()
-  window.show()
+  app = App(MainWindow)
+  # app.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeMenuBar)
+  # window = MainWindow()
+  # window.show()
   sys.exit(app.exec())
 
 

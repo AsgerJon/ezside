@@ -10,6 +10,7 @@ from PySide6.QtGui import QPainter, \
 from PySide6.QtWidgets import QLabel
 from attribox import AttriBox
 from icecream import ic
+from vistutils.fields import TextField
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import emptyPen, \
@@ -25,7 +26,7 @@ ic.configureOutput(includeContext=True, )
 class Label(BaseWidget):
   """Label prints centered text"""
 
-  text = AttriBox[str]('Label')
+  text = TextField()
   baseLayout = AttriBox[Vertical]()
   innerLabel = AttriBox[QLabel]()
 
@@ -39,3 +40,10 @@ class Label(BaseWidget):
     """The update method updates the user interface."""
     self.innerLabel.setText(self.text)
     BaseWidget.update(self)
+
+  def __init__(self, *args, **kwargs) -> None:
+    BaseWidget.__init__(self, *args, **kwargs)
+    for arg in args:
+      if isinstance(arg, str):
+        self.text = arg
+        break

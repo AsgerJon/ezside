@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QLayout
 from attribox import AttriBox
 from icecream import ic
 
@@ -34,11 +34,14 @@ class BaseWidget(QWidget):
     # ic('%s' % self.__class__.__name__)
     parent = parseParent(*args, **kwargs)
     QWidget.__init__(self, parent)
-    self.setMinimumSize(QSize(64, 64))
-    # self.initUi()
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
 
   def connectActions(self) -> None:
     """The connectActions method connects the actions to the signals."""
+
+  def setLayout(self, layout: QLayout) -> None:
+    """Reimplementation of the setLayout method."""
+    layout.addStretch(1)
+    return QWidget.setLayout(self, layout)
