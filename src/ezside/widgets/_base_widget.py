@@ -2,24 +2,19 @@
 BaseWidget provides a base class for the widgets. Using AttriBox they
 provide brushes, pens and fonts as attributes. These widgets are not meant
 for composite widgets directly but instead for the constituents. """
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 import os
 
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
-from ezside.settings import Defaults
-
-from ezside.moreutils import EmptyField
 from icecream import ic
 
-from ezside.core import parseParent, NoWrap, Center, Pen, Font, Brush
-from ezside.core import BevelJoin, FlatCap, SolidLine, SolidFill, DashLine
-from ezside.core import DotLine, DashDot
+from ezside.settings import Defaults
+from ezside.core import parseParent
 
 ic.configureOutput(includeContext=True, )
 
@@ -44,8 +39,6 @@ class BaseWidget(QWidget):
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.setMinimumSize(self.baseSize)
-    self.connectActions()
 
   def connectActions(self) -> None:
     """The connectActions method connects the actions to the signals."""

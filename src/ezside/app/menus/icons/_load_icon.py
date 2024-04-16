@@ -1,5 +1,5 @@
 """Attempts to load the icon"""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from PIL import Image
 from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
-from ezside.windows.menus.icons import getIconPath
+from ezside.app.menus.icons import getIconPath
 
 
 def loadIcon(name: str) -> Image:

@@ -1,5 +1,5 @@
 """MenuBar provides the menu bar for the main application window."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QMenuBar, QMainWindow
 from icecream import ic
 
 from attribox import AttriBox, this
-from ezside.windows.menus import FilesMenu, EditMenu, HelpMenu, DebugMenu
+from ezside.app.menus import FilesMenu, EditMenu, HelpMenu, DebugMenu
 
 ic.configureOutput(includeContext=True, )
 

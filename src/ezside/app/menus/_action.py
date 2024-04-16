@@ -1,5 +1,5 @@
 """Action subclasses QAction and customizes the instantiation process."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from PySide6.QtGui import QAction, QKeySequence
 from icecream import ic
 from vistutils.waitaminute import typeMsg
 
-from ezside.windows.menus.shortcuts import getShortcut
+from ezside.app.menus.shortcuts import getShortcut
 from ezside.settings import Icons
 
 ic.configureOutput(includeContext=True, )

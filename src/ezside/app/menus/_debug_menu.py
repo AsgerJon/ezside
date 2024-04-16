@@ -1,5 +1,5 @@
 """DebugMenu provides actions for debugging the main application."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QMainWindow
 from icecream import ic
 
 from attribox import AttriBox
-from ezside.windows.menus import AbstractMenu, Action
+from ezside.app.menus import AbstractMenu, Action
 
 ic.configureOutput(includeContext=True, )
 

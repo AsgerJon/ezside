@@ -1,12 +1,12 @@
 """EditMenu provides the edit menu for the main application window."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from PySide6.QtWidgets import QMainWindow
 
 from attribox import AttriBox
-from ezside.windows.menus import AbstractMenu, Action
+from ezside.app.menus import AbstractMenu, Action
 
 
 class EditMenu(AbstractMenu):

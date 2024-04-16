@@ -8,7 +8,6 @@ from PySide6.QtWidgets import QLineEdit
 from attribox import AttriBox, this
 from vistutils.parse import maybe
 from vistutils.waitaminute import typeMsg
-from ezside.moreutils import EmptyField
 from ezside.widgets import Horizontal, Label
 
 from ezside.core import Tight
@@ -17,7 +16,8 @@ from ezside.widgets import BaseWidget
 
 class _LineEdit(QLineEdit):
   """LineEdit wrapper.  """
-  __fallback_placeholder__ = 'Enter text here'
+
+  placeholder = AttriBox[str]()
 
   def __init__(self, *args, **kwargs) -> None:
     """Initialize the widget."""

@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QMainWindow, QApplication
 from attribox import AttriBox, this
 from icecream import ic
 
-from ezside.windows.bars import MenuBar, StatusBar
+from ezside.app.bars import MenuBar, StatusBar
 
 ic.configureOutput(includeContext=True, )
 

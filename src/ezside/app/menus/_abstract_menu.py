@@ -1,5 +1,5 @@
 """AbstractMenu provides the base class for the custom menus. """
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from abc import abstractmethod
 from PySide6.QtWidgets import QMenu, QMainWindow
 from icecream import ic
 
-from ezside.windows.menus import Action
+from ezside.app.menus import Action
 
 ic.configureOutput(includeContext=True, )
 

@@ -1,6 +1,6 @@
 """LayoutWindow subclasses BaseWindow and implements the layout of
 widgets."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from attribox import AttriBox
 from icecream import ic
 
 from ezside.core import LawnGreen
-from ezside.windows import BaseWindow
+from ezside.app import BaseWindow
 from ezside.widgets import HorizontalPanel, DataWidget, ClientInfo
 from ezside.widgets import BaseWidget, WhiteNoise, PlotEnvelope
 from ezside.widgets import TextLabel, CornerPanel, VerticalPanel

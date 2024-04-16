@@ -1,12 +1,12 @@
 """MainWindow subclasses the LayoutWindow and provides the main
 application business logic."""
-#  GPL-3.0 license
+#  MIT Licence
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from icecream import ic
 
-from ezside.windows import LayoutWindow
+from ezside.app import LayoutWindow
 
 ic.configureOutput(includeContext=True, )
 
