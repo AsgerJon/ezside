@@ -85,6 +85,8 @@ class EntryForm(BaseWidget):
   @value.GET
   def _getValue(self) -> Any:
     """Getter-function for value"""
+    if self.__variable_value__ is None:
+      return self.lineEdit.getText()
     return self.__variable_value__
 
   def _getTitle(self) -> str:
