@@ -17,20 +17,26 @@ from ezside.widgets import BaseWidget
 
 class AbstractSpacer(BaseWidget):
   """AbstractSpacer class provides a base class for the spacers."""
+  __debug_flag__ = None
 
   def __init__(self, *args, **kwargs) -> None:
     BaseWidget.__init__(self, *args, **kwargs)
     self.setContentsMargins(0, 0, 0, 0)
 
+  def setDebugFlag(self, flag: bool) -> None:
+    """Set the debug flag."""
+    self.__debug_flag__ = flag
+
   def paintEvent(self, event: QPaintEvent) -> None:
     """Paint the spacer."""
-    painter = QPainter()
-    painter.begin(self)
-    viewRect = painter.viewport()
-    painter.setPen(dashPen())
-    painter.setBrush(solidBrush(Yellow))
-    painter.drawRect(viewRect)
-    painter.end()
+    if self.__debug_flag__:
+      painter = QPainter()
+      painter.begin(self)
+      viewRect = painter.viewport()
+      painter.setPen(dashPen())
+      painter.setBrush(solidBrush(Yellow))
+      painter.drawRect(viewRect)
+      painter.end()
 
 
 class HorizontalSpacer(AbstractSpacer):
@@ -39,6 +45,7 @@ class HorizontalSpacer(AbstractSpacer):
   def __init__(self, *args, **kwargs) -> None:
     AbstractSpacer.__init__(self, *args, **kwargs)
     self.setSizePolicy(Expand, Tight)
+    self.setMinimumHeight(32)
 
 
 class VerticalSpacer(AbstractSpacer):
@@ -47,6 +54,7 @@ class VerticalSpacer(AbstractSpacer):
   def __init__(self, *args, **kwargs) -> None:
     AbstractSpacer.__init__(self, *args, **kwargs)
     self.setSizePolicy(Tight, Expand)
+    self.setMinimumWidth(32)
 
 
 class GridSpacer(AbstractSpacer):

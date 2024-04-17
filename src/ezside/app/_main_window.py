@@ -17,16 +17,16 @@ class MainWindow(LayoutWindow):
 
   def initActions(self) -> None:
     """Initialize the actions."""
-    self.testLineEdit.keyValue.connect(self.testKeyNum)
-    self.testLineEdit.keyName.connect(self.testKeyName)
+    self.testEntryForm.newTextFrom.connect(self.testLineEditFunc)
+
+  def testLineEditFunc(self, oldText: str, newText: str) -> None:
+    """Test line edit function."""
+    message = 'Old text: %s | New text: %s' % (oldText or 'N/A', newText)
+    self.statusBar().showMessage(message)
 
   def testButtonFunc(self) -> None:
     """Test button function."""
     self.statusBar().showMessage('Test button clicked!')
-
-  def testLineEditFunc(self, txt: str) -> None:
-    """Test line edit function."""
-    self.statusBar().showMessage(txt)
 
   def testKeyFunc(self, key: str) -> None:
     """Test key function."""

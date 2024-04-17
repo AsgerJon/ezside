@@ -29,17 +29,12 @@ class LayoutWindow(BaseWindow):
   baseWidget = AttriBox[BaseWidget]()
   baseLayout = AttriBox[Vertical]()
   welcomeLabel = AttriBox[Label]('Welcome to EZSide!')
-  testLineEdit = AttriBox[LineEdit]()
-  testButton = AttriBox[Button]('Test Button')
   testEntryForm = AttriBox[EntryForm](HORIZONTAL, 'lmao')
-  vSpacer = AttriBox[VerticalSpacer]()
-  hSpacer = AttriBox[HorizontalSpacer]()
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    # self.setMinimumSize(400, 400)
+    self.baseLayout.addWidget(self.welcomeLabel)
     self.baseLayout.addWidget(self.testEntryForm)
-    self.baseLayout.addWidget(self.hSpacer)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 

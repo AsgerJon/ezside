@@ -43,31 +43,35 @@ class Defaults:
     return QColor(red, green, blue, alpha)
 
   @staticmethod
-  def _loadFont(data: dict) -> QFont:
+  def _resolveFontWeight(weightName: str) -> QFont.Weight:
+    """Resolves the name of the QFont weight to the enum instance. """
+    for item in QFont.Weight:
+      if item.name.lower() == weightName.lower():
+        return item
+    else:
+      e = """Could not resolve name: '%s' to a font weight!"""
+      raise NameError(monoSpace(e % weightName))
+
+  @classmethod
+  def _loadFont(cls, data: dict) -> QFont:
     """Loads a QFont instance from data. The function supports:
       'family' (str): The font family.
       'size' (int): The font point size.
       'weight' (str or int): The font weight. The name should match a QFont
       weight:
-        QFont.Thin: 100
-        QFont.ExtraLight: 200
-        QFont.Light: 300
-        QFont.Normal: 400
-        QFont.Medium: 500
-        QFont.DemiBold: 600
-        QFont.Bold: 700
-        QFont.ExtraBold: 800
-        QFont.Black: 900"""
+        QFont.Weight.Thin: 100
+        QFont.Weight.ExtraLight: 200
+        QFont.Weight.Light: 300
+        QFont.Weight.Normal: 400
+        QFont.Weight.Medium: 500
+        QFont.Weight.DemiBold: 600
+        QFont.Weight.Bold: 700
+        QFont.Weight.ExtraBold: 800
+        QFont.Weight.Black: 900"""
     font = QFont()
     font.setFamily(data.get('family', 'Monserrat'))
     font.setPointSize(data.get('size', 16))
-    weightKey = data.get('weight', 'Normal')
-    for (name, weight) in QFont.Weight:
-      if name.lower() == weightKey.lower():
-        font.setWeight(weight)
-        break
-    else:
-      font.setWeight(QFont.Weight.Normal)
+    font.setWeight(cls._resolveFontWeight(data.get('weight', 'Normal')))
     return font
 
   @staticmethod
@@ -142,7 +146,8 @@ class Defaults:
     return brush
 
   def __init__(self, settingsFile: str = None) -> None:
-    self.__custom_file__ = settingsFile
+    cls = self.__class__
+    setattr(cls, '__custom_file__', settingsFile)
 
   @classmethod
   def _getFallbackData(cls, **kwargs) -> dict:
@@ -153,75 +158,95 @@ class Defaults:
       data = json.load(file)
     return data
 
-  @staticmethod
-  def _getData(*args, **kwargs) -> dict:
-    """Getter-function for data"""
-    for arg in args:
-      if isinstance(arg, Defaults):
-        self = arg
-        break
-    else:
-      return Defaults._getFallbackData()
-    if self.__custom_values__ is not None:
-      if isinstance(self.__custom_values__, dict):
-        return self.__custom_values__
-      e = typeMsg('self.__custom_values__', self.__custom_values__, dict)
-      raise TypeError(e)
-    if self.__custom_file__ is not None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      if isinstance(self.__custom_file__, str):
-        self.__custom_values__ = self._loadCustomValues(self.__custom_file__)
-        return self._getData(_recursion=True)
-    return self._getFallbackData()
+  @classmethod
+  def _getCustomFile(cls, **kwargs) -> str:
+    """Getter-function for custom file"""
+    return cls.__custom_file__
 
-  def getLabelFont(self) -> QFont:
+  @classmethod
+  def _getCustomData(cls) -> dict:
+    """Getter-function for custom data"""
+    settingsFile = cls._getCustomFile()
+    if settingsFile is None:
+      return {}
+    if not isinstance(settingsFile, str):
+      e = typeMsg('settingsFile', settingsFile, str)
+      raise TypeError(e)
+    if not os.path.exists(settingsFile):
+      return {}
+    if not os.path.isfile(settingsFile):
+      e = """The settings file must be a file, but received: '%s' which 
+      point to a folder!"""
+      raise IsADirectoryError(monoSpace(e % settingsFile))
+    with open(settingsFile, 'r') as file:
+      data = json.load(file)
+    return data
+
+  @classmethod
+  def _getData(cls, *args, **kwargs) -> dict:
+    """Getter-function for data"""
+    return cls._getCustomData() | cls._getFallbackData()
+
+  @classmethod
+  def getLabelFont(cls) -> QFont:
     """Get the label font."""
-    data = self._getData()
+    data = cls._getData()
     font = QFont()
     font.setFamily(data.get('fontFamily', 'Montserrat'))
     font.setPointSize(data.get('fontSize', 12))
-    font.setWeight(data.get('fontWeight', QFont.Weight.Normal))
+    font.setWeight(cls._resolveFontWeight(data.get('fontWeight', 'Normal')))
     return font
 
-  def getHeaderFont(self) -> QFont:
+  @classmethod
+  def getHeaderFont(cls) -> QFont:
     """Get the header font"""
-    font = self.getLabelFont()
-    font.setPointSize(font.pointSize() + 4)
+    data = cls._getData()
+    font = cls.getLabelFont()
+    fallbackSize = font.pointSize() + 4
+    font.setPointSize(data.get('headerFontSize', fallbackSize))
     return font
 
-  def getLabelTextPen(self) -> QPen:
+  @classmethod
+  def getTextPen(cls) -> QPen:
     """Get the label pen."""
-    data = self._getData()
+    data = cls._getData()
     color = data.get('fontColor', {})
     pen = QPen()
-    pen.setColor(self._loadColor(color))
+    pen.setColor(cls._loadColor(color))
     pen.setWidth(1)
     pen.setStyle(SolidLine)
     return pen
 
-  def getLabelBorderPen(self) -> QPen:
+  @classmethod
+  def getLabelBorderPen(cls) -> QPen:
     """Get the label border pen."""
-    baseData = self._getData()
+    baseData = cls._getData()
     data = baseData.get('labelBorder', {})
-    return self._loadPen(data)
+    return cls._loadPen(data)
 
-  def getLabelBackgroundBrush(self) -> QBrush:
+  @classmethod
+  def getLabelBackgroundBrush(cls) -> QBrush:
     """Get the label background brush."""
-    baseData = self._getData()
+    baseData = cls._getData()
     data = baseData.get('labelBackground', {})
-    return self._loadBrush(data)
+    return cls._loadBrush(data)
 
-  def getLabelMargins(self) -> QMargins:
+  @classmethod
+  def getLabelMargins(cls) -> QMargins:
     """Returns the margins of the label."""
-    baseData = self._getData()
+    baseData = cls._getData()
     data = baseData.get('labelMargins', {})
-    return self._loadMargins(data)
+    return cls._loadMargins(data)
+
+  @classmethod
+  def getLabelMargin(cls) -> int:
+    """Returns the margins of the layout."""
+    return cls._getData().get('labelMargin', 0)
 
   @classmethod
   def getLayoutMargins(cls) -> QMargins:
     """Returns the margins of the layout."""
-    baseData = cls._getFallbackData()
+    baseData = cls._getData()
     data = baseData.get('layoutMargins', {})
     return cls._loadMargins(data)
 

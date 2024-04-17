@@ -1,6 +1,7 @@
 {
   "fontFamily": "Montserrat",
   "fontSize": 16,
+  "headerFontSize": 20,
   "fontWeight": "normal",
   "fontColor": {
     "red": 0,

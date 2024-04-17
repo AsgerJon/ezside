@@ -54,12 +54,12 @@ class Grid(QGridLayout):
     self.setContentsMargins(Defaults.getLayoutMargins())
     self.setSpacing(Defaults.getLayoutSpacing())
 
-  def addWidget(self, widget: QWidget, *args) -> None:
+  def addWidget(self, widget: QWidget, *args, **kwargs) -> None:
     """Add a widget to the layout."""
     if isinstance(widget, BaseWidget):
       widget.initUi()
       widget.connectActions()
-    QGridLayout.addWidget(self, widget, *args, )
+    QGridLayout.addWidget(self, widget, *args, **kwargs)
 
 
 class Vertical(QVBoxLayout):
@@ -72,13 +72,13 @@ class Vertical(QVBoxLayout):
     self.setContentsMargins(Defaults.getLayoutMargins())
     self.setSpacing(Defaults.getLayoutSpacing())
 
-  def addWidget(self, widget: QWidget, *args) -> None:
+  def addWidget(self, widget: QWidget, *args, **kwargs) -> None:
     """Add a widget to the layout."""
     if isinstance(widget, BaseWidget):
       widget.initUi()
       widget.connectActions()
-    s = 1 if isinstance(widget, AbstractSpacer) else 0
-    QVBoxLayout.addWidget(self, widget, alignment=AlignTop, stretch=s)
+    # s = 1 if isinstance(widget, AbstractSpacer) else 0
+    QVBoxLayout.addWidget(self, widget, **kwargs)
 
 
 class Horizontal(QHBoxLayout):
@@ -91,10 +91,10 @@ class Horizontal(QHBoxLayout):
     self.setContentsMargins(Defaults.getLayoutMargins())
     self.setSpacing(Defaults.getLayoutSpacing())
 
-  def addWidget(self, widget: QWidget, *args) -> None:
+  def addWidget(self, widget: QWidget, *args, **kwargs) -> None:
     """Add a widget to the layout."""
     if isinstance(widget, BaseWidget):
       widget.initUi()
       widget.connectActions()
-    s = 1 if isinstance(widget, AbstractSpacer) else 0
-    QVBoxLayout.addWidget(self, widget, alignment=AlignLeft, stretch=s)
+    # s = 1 if isinstance(widget, AbstractSpacer) else 0
+    QVBoxLayout.addWidget(self, widget, **kwargs)

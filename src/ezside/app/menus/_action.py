@@ -1,5 +1,5 @@
 """Action subclasses QAction and customizes the instantiation process."""
-#  MIT Licence
+#  GPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ class Action(QAction):
       QAction.__init__(self, name)
       self._name = name
     elif isinstance(args[0], QAction):
-      self._name = args[0].text() or 'LOL'
+      self._name = str(args[0])
     else:
       e = typeMsg('action', args[0], QAction)
       raise TypeError(e)

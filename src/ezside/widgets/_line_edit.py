@@ -14,7 +14,7 @@ from vistutils.fields import TextField
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
-from ezside.core import SHIFT
+from ezside.core import SHIFT, Tight
 from ezside.widgets import Horizontal
 from ezside.widgets import BaseWidget
 
@@ -49,7 +49,7 @@ class LineEdit(QLineEdit):
     key = event.keyCombination().key()
     self.keyValue.emit(key.value)
     self.keyName.emit(key.name)
-    self.keyReleased.emit(event)
+    self.keyPressed.emit(event)
     if event.key() == Qt.Key.Key_Escape:
       self.escapePressed.emit()
     if event.modifiers() == SHIFT and event.key() == Qt.Key.Key_Return:
@@ -69,6 +69,17 @@ class LineEdit(QLineEdit):
       self.shiftEnterRelease.emit()
       return False
     return QLineEdit.keyReleaseEvent(self, event)
+
+  def initUi(self) -> None:
+    """Initialize the user interface."""
+    self.setSizePolicy(Tight, Tight)
+
+  def connectActions(self) -> None:
+    """Initialize the actions."""
+
+  def getText(self) -> str:
+    """Getter-function for the text field"""
+    return self.text()
 
 #
 # class LineEdit(BaseWidget):
