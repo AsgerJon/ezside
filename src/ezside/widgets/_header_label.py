@@ -61,6 +61,7 @@ class HeaderLabel(Label):
   def initUi(self) -> None:
     """Initializes the UI"""
     self.setFont(Defaults.getHeaderFont())
+    self.setText(self.title)
 
   def update(self, ) -> None:
     """Updates the label"""

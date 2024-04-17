@@ -163,7 +163,7 @@ class EntryForm(BaseWidget):
   def initUi(self) -> None:
     """Initializes the user interface"""
     self.headerLabel.initUi()
-    self.headerLabel.innerText = self._getTitle()
+    self.headerLabel.title = self._getTitle()
     self.headerLabel.setFrameShadow(QFrame.Shadow.Sunken)
     self.headerLabel.setFrameShape(QFrame.Shape.Panel)
     header = self.headerLabel
