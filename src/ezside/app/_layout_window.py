@@ -13,10 +13,10 @@ from ezside.widgets import BaseWidget, \
   Label, \
   LineEdit, \
   Button, \
-  VerticalSpacer
+  VerticalSpacer, EntryForm, HorizontalSpacer
 from icecream import ic
 
-from ezside.core import LawnGreen
+from ezside.core import LawnGreen, VERTICAL, HORIZONTAL
 from ezside.app import BaseWindow
 
 ic.configureOutput(includeContext=True, )
@@ -31,15 +31,15 @@ class LayoutWindow(BaseWindow):
   welcomeLabel = AttriBox[Label]('Welcome to EZSide!')
   testLineEdit = AttriBox[LineEdit]()
   testButton = AttriBox[Button]('Test Button')
-  spacer = AttriBox[VerticalSpacer]()
+  testEntryForm = AttriBox[EntryForm](HORIZONTAL, 'lmao')
+  vSpacer = AttriBox[VerticalSpacer]()
+  hSpacer = AttriBox[HorizontalSpacer]()
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     # self.setMinimumSize(400, 400)
-    self.baseLayout.addWidget(self.welcomeLabel)
-    self.baseLayout.addWidget(self.testLineEdit)
-    self.baseLayout.addWidget(self.testButton)
-    self.baseLayout.addWidget(self.spacer)
+    self.baseLayout.addWidget(self.testEntryForm)
+    self.baseLayout.addWidget(self.hSpacer)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 

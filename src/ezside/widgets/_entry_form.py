@@ -5,12 +5,21 @@ may be vertical or horizontal. """
 from __future__ import annotations
 
 from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
+from icecream import ic
 from vistutils.fields import TextField
 from vistutils.text import stringList, joinWords, monoSpace
 from vistutils.waitaminute import typeMsg
 
-from ezside.widgets import BaseWidget, Grid, Label, LineEdit, Button
+from ezside.widgets import BaseWidget, \
+  Grid, \
+  Label, \
+  LineEdit, \
+  Button, \
+  HorizontalSpacer, VerticalSpacer
+
+ic.configureOutput(includeContext=True, )
 
 
 class EntryForm(BaseWidget):
@@ -27,6 +36,8 @@ class EntryForm(BaseWidget):
   headerLabel = AttriBox[Label]()
   lineEdit = AttriBox[LineEdit]()
   submitButton = AttriBox[Button]()
+  hSpacer = AttriBox[HorizontalSpacer]()
+  vSpacer = AttriBox[VerticalSpacer]()
 
   textApplied = Signal(str, str)  # oldText, newText
   newText = Signal(str)  # newText
@@ -94,8 +105,8 @@ class EntryForm(BaseWidget):
       return self._getInnerWidgets(_recursion=True)
     if isinstance(self.__inner_widgets__, list):
       for widget in self.__inner_widgets__:
-        if not isinstance(widget, BaseWidget):
-          e = typeMsg('innerWidget', widget, BaseWidget)
+        if not isinstance(widget, QWidget):
+          e = typeMsg('innerWidget', widget, QWidget)
           raise TypeError(e)
       return self.__inner_widgets__
     e = typeMsg('inner_widgets', self.__inner_widgets__, list)
@@ -106,7 +117,7 @@ class EntryForm(BaseWidget):
 
   def initUi(self) -> None:
     """Initializes the user interface"""
-    self.headerLabel.setText(self._getTitle())
+    self.headerLabel.text = self._getTitle()
     self.lineEdit.setPlaceholderText('Enter text here')
     self.submitButton.setText('Submit')
     row, col = self._row * len(self), self._col * len(self)
@@ -118,6 +129,11 @@ class EntryForm(BaseWidget):
     row, col = self._row * len(self), self._col * len(self)
     self.baseLayout.addWidget(self.submitButton, row, col)
     self._getInnerWidgets().append(self.submitButton)
+    row, col = self._row * len(self), self._col * len(self)
+    if row:
+      self.baseLayout.addWidget(self.vSpacer, row, col)
+    if col:
+      self.baseLayout.addWidget(self.hSpacer, row, col)
     self.setLayout(self.baseLayout)
 
   def connectActions(self) -> None:
@@ -150,11 +166,11 @@ class EntryForm(BaseWidget):
   def _applyText(self, *_) -> None:
     """Changes the current value to the text in the line-edit"""
     oldText = self.text
-    self.text = self.lineEdit.text()
+    self.text = self.lineEdit.displayText()
     self.textApplied.emit(oldText, self.text)
 
   def _updateLabel(self) -> None:
     """Updates the label with the current value"""
     if self.__unsaved_changes__:
-      self.headerLabel.setText('%s*' % self._getTitle())
-    self.headerLabel.setText(self._getTitle())
+      self.headerLabel.text = ('%s*' % self._getTitle())
+    self.headerLabel.text = self._getTitle()

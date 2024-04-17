@@ -30,3 +30,7 @@ class Button(BaseWidget):
   def connectActions(self) -> None:
     """Connects the actions to the signals"""
     self.baseButton.clicked.connect(self.clicked)
+
+  def setText(self, text: str) -> None:
+    """Sets the text of the button"""
+    self.baseButton.setText(text)

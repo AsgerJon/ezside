@@ -17,8 +17,8 @@ class MainWindow(LayoutWindow):
 
   def initActions(self) -> None:
     """Initialize the actions."""
-    self.testLineEdit.lineEdit.keyValue.connect(self.testKeyNum)
-    self.testLineEdit.lineEdit.keyName.connect(self.testKeyName)
+    self.testLineEdit.keyValue.connect(self.testKeyNum)
+    self.testLineEdit.keyName.connect(self.testKeyName)
 
   def testButtonFunc(self) -> None:
     """Test button function."""
