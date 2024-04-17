@@ -3,19 +3,15 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import importlib
 import json
 import os
-from string import ascii_letters, digits, punctuation
-from typing import Any
 
 from PySide6.QtCore import QMargins, Qt
-from PySide6.QtGui import QPainter, QColor, QPen, QFont, QBrush
-from vistutils.metas import AbstractMetaclass, AbstractNamespace
+from PySide6.QtGui import QColor, QPen, QFont, QBrush
 from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
-from ezside.core import DashLine, SolidLine
+from ezside.core import SolidLine
 
 
 class Defaults:
@@ -204,6 +200,15 @@ class Defaults:
     font = cls.getLabelFont()
     fallbackSize = font.pointSize() + 4
     font.setPointSize(data.get('headerFontSize', fallbackSize))
+    return font
+
+  @classmethod
+  def getMonospacedFont(cls) -> QFont:
+    """Getter-function for the monospaced font variant. """
+    font = QFont()
+    data = cls._getData()
+    font.setFamily(data.get('monoSpaceFamily', 'Roboto Mono'))
+    font.setPointSize(data.get('monoSpaceSize', 12))
     return font
 
   @classmethod

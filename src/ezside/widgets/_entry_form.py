@@ -26,11 +26,13 @@ ic.configureOutput(includeContext=True, )
 class EntryForm(BaseWidget):
   """EntryForm provides a header, a line-edit and a submit button. Instances
   may be vertical or horizontal. """
-
   __variable_title__ = None
+  __variable_value__ = None
   __unsaved_changes__ = False
   __inner_widgets__ = None
   __debug_flag__ = None
+
+  value = EmptyField()
 
   baseLayout = AttriBox[Grid]()
   headerLabel = AttriBox[HeaderLabel]()
@@ -47,7 +49,6 @@ class EntryForm(BaseWidget):
 
   def __init__(self, *args, **kwargs) -> None:
     BaseWidget.__init__(self, *args, **kwargs)
-    self.text = ''
     self._ori = None
     types = dict(title=str, orientation=ORI, debug=bool, )
     values = dict(title=None, orientation=None, debug=None, )
@@ -75,6 +76,16 @@ class EntryForm(BaseWidget):
     self.__variable_title__ = values['title']
     self._ori = values['orientation']
     self.__debug_flag__ = values['debug']
+
+  @value.SET
+  def _setValue(self, value: Any) -> None:
+    """Setter-function for value"""
+    self.__variable_value__ = value
+
+  @value.GET
+  def _getValue(self) -> Any:
+    """Getter-function for value"""
+    return self.__variable_value__
 
   def _getTitle(self) -> str:
     if self.__variable_title__ is None:
@@ -176,6 +187,7 @@ class EntryForm(BaseWidget):
     self.headerLabel.setFrameShape(QFrame.Shape.Panel)
     header = self.headerLabel
     self.lineEdit.initUi()
+    self.lineEdit.setFont(Defaults.getMonospacedFont())
     self.lineEdit.setPlaceholderText('Enter text here')
     lineEdit = self.lineEdit
     self.submitButton.initUi()
@@ -215,14 +227,14 @@ class EntryForm(BaseWidget):
     if text:
       self.lineEdit.setText('')
     else:
-      self.lineEdit.setText(self.text)
+      self.lineEdit.setText(self.value)
 
   def _updateTextFunc(self) -> None:
     """This method updates the text field on the EntryForm instance to
     that of the lineEdit field."""
-    oldText = self.text
+    oldText = self.value
     newText = self.lineEdit.getText()
-    self.text = newText
+    self.value = newText
     self.newTextFrom.emit(oldText, newText)
     self.newText.emit(newText)
     self.updated.emit()
@@ -230,8 +242,7 @@ class EntryForm(BaseWidget):
 
   def _updateUnsavedChanges(self, *_) -> None:
     """Updates the unsaved changes state"""
-    unsavedFlag = self.text != self.lineEdit.displayText()
-    ic(unsavedFlag)
+    unsavedFlag = self.value != self.lineEdit.displayText()
     self.headerLabel.setUnsavedState(unsavedFlag)
     self.headerLabel.update()
     self.submitButton.setEnabled(unsavedFlag)

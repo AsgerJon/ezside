@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
+from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtWidgets import QGridLayout
 from attribox import AttriBox
 from ezside.widgets import BaseWidget, \
@@ -41,3 +42,11 @@ class LayoutWindow(BaseWindow):
   @abstractmethod
   def initActions(self) -> None:
     """The initActions method initializes the actions of the window."""
+
+  def debug2Func(self, ) -> None:
+    """Debug2Func prints a debug message to the console."""
+    BaseWindow.debug2Func(self)
+    fontDatabase = QFontDatabase()
+    allFonts = fontDatabase.families()
+    for font in allFonts:
+      print(font)

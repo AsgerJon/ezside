@@ -1,5 +1,6 @@
 {
   "fontFamily": "Montserrat",
+  "monoSpaceFamily": "Source Code Pro",
   "fontSize": 16,
   "headerFontSize": 20,
   "fontWeight": "normal",
