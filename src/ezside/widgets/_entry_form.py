@@ -32,7 +32,7 @@ class EntryForm(BaseWidget):
   __inner_widgets__ = None
 
   baseLayout = AttriBox[Grid]()
-  headerLabel = AttriBox[HeaderLabel]('LMAO')
+  headerLabel = AttriBox[HeaderLabel]()
   lineEdit = AttriBox[LineEdit]()
   submitButton = AttriBox[Button]('Submit')
   hSpacer = AttriBox[HorizontalSpacer]()

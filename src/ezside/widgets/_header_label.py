@@ -46,9 +46,6 @@ class HeaderLabel(Label):
       if isinstance(title, str):
         self.title = title
         break
-    else:
-      e = """Missing required argument: 'title'!"""
-      raise ValueError(e)
 
   def getUnsavedState(self) -> bool:
     """Returns the unsaved state"""
