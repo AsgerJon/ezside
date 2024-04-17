@@ -30,6 +30,7 @@ class EntryForm(BaseWidget):
   __variable_title__ = None
   __unsaved_changes__ = False
   __inner_widgets__ = None
+  __debug_flag__ = None
 
   baseLayout = AttriBox[Grid]()
   headerLabel = AttriBox[HeaderLabel]()
@@ -48,25 +49,32 @@ class EntryForm(BaseWidget):
     BaseWidget.__init__(self, *args, **kwargs)
     self.text = ''
     self._ori = None
-    for arg in args:
-      if isinstance(arg, ORI):
-        self._ori = arg
-      if isinstance(arg, str):
-        if self.__variable_title__ is None:
-          self.__variable_title__ = arg
-        if arg.lower() == 'vertical':
-          self._ori = VERTICAL
-        if arg.lower() == 'horizontal':
-          self._ori = HORIZONTAL
-      if isinstance(self._ori, ORI):
-        if isinstance(self.__variable_title__, str):
-          break
-    else:
-      if self.__variable_title__ is None:
-        e = """Required argument: 'variable title' not received!"""
-        raise ValueError(e)
-      if self._ori is None:
-        self._ori = HORIZONTAL
+    types = dict(title=str, orientation=ORI, debug=bool, )
+    values = dict(title=None, orientation=None, debug=None, )
+    defVals = dict(title=None, orientation=HORIZONTAL, debug=False, )
+    titleKeys = stringList("""title, header, name, variable""")
+    oriKeys = stringList("""orientation, ori, direction, dir""")
+    debugKeys = stringList("""debug, dbg, debugFlag, dbgFlag""")
+    KEYS = [titleKeys, oriKeys, debugKeys, ]
+    for ((name, type_), Keys) in zip(types.items(), KEYS):
+      for key in Keys:
+        if key in kwargs:
+          val = kwargs.get(key)
+          if isinstance(val, type_):
+            values[name] = val
+            break
+          e = typeMsg(name, val, type_)
+          raise TypeError(e)
+      else:
+        for arg in args:
+          if isinstance(arg, type_):
+            values[name] = arg
+            break
+        else:
+          values[name] = defVals[name]
+    self.__variable_title__ = values['title']
+    self._ori = values['orientation']
+    self.__debug_flag__ = values['debug']
 
   def _getTitle(self) -> str:
     if self.__variable_title__ is None:
@@ -174,9 +182,9 @@ class EntryForm(BaseWidget):
     self.submitButton.setText('Submit')
     button = self.submitButton
     spacer = self._getSpacer()
-    spacer.setDebugFlag(True)
+    spacer.setDebugFlag(self.__debug_flag__)
     strut = self._getStrut()
-    strut.setDebugFlag(True)
+    strut.setDebugFlag(self.__debug_flag__)
     self.setMinimumSize(self._getSizeSum())
     self.baseLayout.addWidget(header, *self._getRowCol(header))
     self.baseLayout.addWidget(lineEdit, *self._getRowCol(lineEdit))
