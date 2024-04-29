@@ -4,6 +4,7 @@ namespace in much shorter named versions. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from ._ez_timer import EZTimer
 from ._qt_names import *
 from ._colors import *
 
