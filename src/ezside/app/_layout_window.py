@@ -14,7 +14,7 @@ from ezside.widgets import BaseWidget, \
   Label, \
   LineEdit, \
   Button, \
-  VerticalSpacer, EntryForm, HorizontalSpacer
+  VerticalSpacer, EntryForm, HorizontalSpacer, Horizontal, VerticalSlider
 from icecream import ic
 
 from ezside.core import LawnGreen, VERTICAL, HORIZONTAL
@@ -28,15 +28,21 @@ class LayoutWindow(BaseWindow):
   widgets."""
 
   baseWidget = AttriBox[BaseWidget]()
-  baseLayout = AttriBox[Vertical]()
+  vLayout = AttriBox[Vertical]()
+  hLayout = AttriBox[Horizontal]()
+  hWidget = AttriBox[BaseWidget]()
   welcomeLabel = AttriBox[Label]('Welcome to EZSide!')
-  testEntryForm = AttriBox[EntryForm](HORIZONTAL, 'lmao')
+  vSlider1 = AttriBox[VerticalSlider]('low')
+  vSlider2 = AttriBox[VerticalSlider]('high')
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.baseLayout.addWidget(self.welcomeLabel)
-    self.baseLayout.addWidget(self.testEntryForm)
-    self.baseWidget.setLayout(self.baseLayout)
+    self.hLayout.addWidget(self.vSlider1)
+    self.hLayout.addWidget(self.vSlider2)
+    self.hWidget.setLayout(self.hLayout)
+    self.vLayout.addWidget(self.welcomeLabel)
+    self.vLayout.addWidget(self.hWidget)
+    self.baseWidget.setLayout(self.vLayout)
     self.setCentralWidget(self.baseWidget)
 
   @abstractmethod

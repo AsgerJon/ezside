@@ -45,8 +45,6 @@ class App(QApplication):
     """Create the main window."""
     MainWindow = self._getMainWindowClass()
     self.__main_window_instance__ = MainWindow()
-    self.__main_window_instance__.acceptQuit.connect(self.quit)
-    # self.__main_window_instance__.show()
 
   @mainWindow.GET
   def _getMainWindowInstance(self, **kwargs) -> Any:

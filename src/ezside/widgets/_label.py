@@ -59,6 +59,8 @@ class Label(QLabel):
           alignArg |= arg
     self.__inner_text__ = maybe(textArg, self.__fallback_text__)
     self.__alignment_flags__ = maybe(alignArg, self.__fallback_alignment__)
+    self.setText(self.__inner_text__)
+    self.setAlignment(self.__alignment_flags__)
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface."""
