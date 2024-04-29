@@ -22,7 +22,7 @@ class HorizontalSlider(BaseWidget):
   slider = AttriBox[QSlider]()
   indicator = AttriBox[Label]('')
 
-  valueChanged = Signal()
+  valueChanged = Signal(float)
   sliderPressed = Signal()
   sliderReleased = Signal()
 
