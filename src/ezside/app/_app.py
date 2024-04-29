@@ -8,6 +8,7 @@ from typing import Any
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow
 from vistutils.fields import EmptyField
+from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
@@ -44,8 +45,8 @@ class App(QApplication):
     """Create the main window."""
     MainWindow = self._getMainWindowClass()
     self.__main_window_instance__ = MainWindow()
-    self.__main_window_instance__.show()
     self.__main_window_instance__.acceptQuit.connect(self.quit)
+    # self.__main_window_instance__.show()
 
   @mainWindow.GET
   def _getMainWindowInstance(self, **kwargs) -> Any:
@@ -65,9 +66,15 @@ class App(QApplication):
 
   def exec(self) -> int:
     """Executes the application."""
-    if isinstance(self.mainWindow, QMainWindow):
-      self.mainWindow.show()
+    MainWindowClass = self._getMainWindowClass()
+    if issubclass(MainWindowClass, QMainWindow):
+      if isinstance(self.mainWindow, MainWindowClass):
+        self.mainWindow.show()
+      else:
+        e = typeMsg('mainWindow', self.mainWindow, MainWindowClass)
+        raise TypeError(e)
     else:
-      e = typeMsg('mainWindow', self.mainWindow, QMainWindow)
-      raise TypeError(e)
+      e = """Expected MainWindowClass to be a subclass of QMainWindow, but
+      received: '%s'!""" % str(MainWindowClass)
+      raise TypeError(monoSpace(e))
     return QApplication.exec_(self)

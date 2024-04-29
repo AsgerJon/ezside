@@ -27,7 +27,6 @@ class BaseWindow(QMainWindow):
   mainStatusBar = AttriBox[StatusBar](this)
 
   requestQuit = Signal()
-  acceptQuit = Signal()
 
   @abstractmethod
   def initUi(self) -> None:
@@ -63,12 +62,6 @@ class BaseWindow(QMainWindow):
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
-    self.requestQuit.connect(self.prepareQuit)
-
-  def prepareQuit(self, ) -> None:
-    """Prepare to quit the application. Subclasses reimplementing this
-    method should call the acceptQuit signal when ready to quit."""
-    self.acceptQuit.emit()
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""

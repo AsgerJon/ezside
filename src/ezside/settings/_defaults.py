@@ -260,3 +260,9 @@ class Defaults:
     """Returns the spacing of the layout."""
     baseData = cls._getFallbackData()
     return baseData.get('layoutSpacing', 2)
+
+  @classmethod
+  def getThreadTimeLimit(cls, ) -> int:
+    """Returns the time limit for the thread."""
+    data = cls._getData()
+    return data.get('threadTimeLimit', -1)

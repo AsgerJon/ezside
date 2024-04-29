@@ -41,5 +41,6 @@
     "bottom": 0,
     "right": 0
   },
-  "layoutSpacing": 0
+  "layoutSpacing": 0,
+  "threadTimeLimit": 2000
 }

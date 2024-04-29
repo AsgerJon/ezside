@@ -4,13 +4,13 @@ may be vertical or horizontal. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from PySide6.QtCore import Signal, Qt, QSize
 from PySide6.QtWidgets import QWidget, QFrame
 from attribox import AttriBox
 from icecream import ic
-from vistutils.fields import TextField, EmptyField
+from vistutils.fields import EmptyField
 from vistutils.text import stringList, joinWords, monoSpace
 from vistutils.waitaminute import typeMsg
 
