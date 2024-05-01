@@ -6,18 +6,11 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from PySide6.QtGui import QFont, QFontDatabase
-from PySide6.QtWidgets import QGridLayout
+from PySide6.QtGui import QFontDatabase
 from attribox import AttriBox
-from ezside.widgets import BaseWidget, \
-  Vertical, \
-  Label, \
-  LineEdit, \
-  Button, \
-  VerticalSpacer, EntryForm, HorizontalSpacer, Horizontal, VerticalSlider
 from icecream import ic
 
-from ezside.core import LawnGreen, VERTICAL, HORIZONTAL
+from ezside.widgets import BaseWidget, Grid, Vertical, Horizontal, BaseLabel
 from ezside.app import BaseWindow
 
 ic.configureOutput(includeContext=True, )
@@ -27,22 +20,14 @@ class LayoutWindow(BaseWindow):
   """LayoutWindow subclasses BaseWindow and implements the layout of
   widgets."""
 
+  baseLayout = AttriBox[Vertical]()
   baseWidget = AttriBox[BaseWidget]()
-  vLayout = AttriBox[Vertical]()
-  hLayout = AttriBox[Horizontal]()
-  hWidget = AttriBox[BaseWidget]()
-  welcomeLabel = AttriBox[Label]('Welcome to EZSide!')
-  vSlider1 = AttriBox[VerticalSlider]('low')
-  vSlider2 = AttriBox[VerticalSlider]('high')
+  welcomeLabel = AttriBox[BaseLabel]('YOLO')
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.hLayout.addWidget(self.vSlider1)
-    self.hLayout.addWidget(self.vSlider2)
-    self.hWidget.setLayout(self.hLayout)
-    self.vLayout.addWidget(self.welcomeLabel)
-    self.vLayout.addWidget(self.hWidget)
-    self.baseWidget.setLayout(self.vLayout)
+    self.baseLayout.addWidget(self.welcomeLabel)
+    self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
   @abstractmethod

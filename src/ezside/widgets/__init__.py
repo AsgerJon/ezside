@@ -5,3 +5,5 @@ window. """
 from __future__ import annotations
 
 from ._base_widget import BaseWidget
+from ._layouts import Grid, Vertical, Horizontal
+from ._base_label import BaseLabel

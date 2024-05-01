@@ -4,4 +4,6 @@ core primitives and provides views into higher abstractions."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ._base_style import BaseStyle
+from ._rgb_color import RGB
+from ._text_font import TextFont
+from ._text_pen import TextPen

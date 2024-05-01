@@ -24,15 +24,15 @@ class BaseWidget(QWidget):
   provide brushes, pens and fonts as attributes. These widgets are not meant
   for composite widgets directly but instead for the constituents. """
 
-  defaults = AttriBox[Defaults](os.environ.get('SETTINGS_FILE', None))
-  baseSize = AttriBox[QSize](32, 32)
-
   def __init__(self, *args, **kwargs) -> None:
     """BaseWidget provides a base class for the widgets. Using AttriBox they
     provide brushes, pens and fonts as attributes. These widgets are not
     meant for composite widgets directly but instead for the components."""
     parent = parseParent(*args, **kwargs)
     QWidget.__init__(self, parent)
+
+  def generalInit(self) -> None:
+    """Generalized initiator shared by all widgets before running initUi."""
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
