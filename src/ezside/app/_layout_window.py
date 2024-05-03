@@ -7,6 +7,7 @@ from __future__ import annotations
 from abc import abstractmethod
 
 from PySide6.QtGui import QFontDatabase
+from PySide6.QtWidgets import QVBoxLayout
 from attribox import AttriBox
 from icecream import ic
 
@@ -20,7 +21,7 @@ class LayoutWindow(BaseWindow):
   """LayoutWindow subclasses BaseWindow and implements the layout of
   widgets."""
 
-  baseLayout = AttriBox[Vertical]()
+  baseLayout = AttriBox[QVBoxLayout]()
   baseWidget = AttriBox[BaseWidget]()
   welcomeLabel = AttriBox[BaseLabel]('YOLO')
 
