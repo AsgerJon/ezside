@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Optional
 
 from PySide6.QtCore import QCoreApplication
-from PySide6.QtWidgets import QWidget, QMainWindow, QBoxLayout, QLayout
+from PySide6.QtWidgets import QWidget, QBoxLayout, QLayout
 from PySide6.QtWidgets import QGridLayout
 from attribox import AttriBox
 from icecream import ic
