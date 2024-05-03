@@ -5,43 +5,43 @@ LayoutWindow class."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import time
-from abc import abstractmethod
-
-from PySide6.QtCore import Signal, QTimer
+from PySide6.QtCore import Signal, QCoreApplication
 from PySide6.QtWidgets import QMainWindow, QApplication
-from attribox import AttriBox, this
+from attribox import AttriBox, this, AttriClass
 from icecream import ic
 
 from ezside.app.bars import MenuBar, StatusBar
+from ezside.widgets import BaseWidget
 
 ic.configureOutput(includeContext=True, )
 
 
-class BaseWindow(QMainWindow):
+class BaseWindow(QMainWindow, AttriClass):
   """BaseWindow class provides menus and actions for the application."""
 
+  def __init__(self, *args, **kwargs) -> None:
+    QMainWindow.__init__(self, *args, **kwargs)
+
   __is_initialized__ = None
+  __running_app__ = None
 
   mainMenuBar = AttriBox[MenuBar](this)
   mainStatusBar = AttriBox[StatusBar](this)
 
   requestQuit = Signal()
+  requestHelp = Signal()
 
-  @abstractmethod
-  def initUi(self) -> None:
-    """Initialize the user interface."""
-
-  @abstractmethod
-  def initActions(self) -> None:
-    """Initialize the actions."""
+  def getApp(self) -> QCoreApplication:
+    """Getter-function for running application"""
+    return self.__running_app__
 
   def show(self) -> None:
     """Show the window."""
     if self.__is_initialized__ is None:
       self.initMenus()
+      self.initStyle()
       self.initUi()
-      self.initActions()
+      self.initSignalSlot()
       self.__is_initialized__ = True
     QMainWindow.show(self)
 
@@ -62,6 +62,15 @@ class BaseWindow(QMainWindow):
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
+
+  def initStyle(self, ) -> None:
+    """Initializes the style of the main window."""
+
+  def initUi(self, ) -> None:
+    """Initializes the user interface for the main window."""
+
+  def initSignalSlot(self, ) -> None:
+    """Initializes the signal slot for the main window."""
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""

@@ -18,17 +18,12 @@ class MainWindow(LayoutWindow):
   def initActions(self) -> None:
     """Initialize the actions."""
 
-  def testLineEditFunc(self, oldText: str, newText: str) -> None:
-    """Test line edit function."""
+  def debug1Func(self, ) -> None:
+    """Debug Function 1"""
+    self.statusBar().showMessage('Debug Function 1')
+    self.welcomeLabel.innerText += '*'
+    self.welcomeLabel.update()
 
-  def testButtonFunc(self) -> None:
-    """Test button function."""
-
-  def testKeyFunc(self, key: str) -> None:
-    """Test key function."""
-
-  def testKeyNum(self, key: int) -> None:
-    """Test key number."""
-
-  def testKeyName(self, key: str) -> None:
-    """Test key name."""
+  def debug2Func(self) -> None:
+    """Debug Function 2"""
+    self.statusBar().showMessage(self.welcomeLabel.innerText)

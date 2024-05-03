@@ -4,6 +4,7 @@ with the main application window when developing in pyside6."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from ._app_settings import AppSettings
 from ._app import App
 from ._base_window import BaseWindow
 from ._layout_window import LayoutWindow

@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import os
 import sys
+import time
+from typing import Callable
 
 from icecream import ic
 
 from ezside.app import MainWindow, App
 from ezside.style import RGB
-from tester_class_01 import Point
+from tester_class_02 import SomeClass, AnotherClass
 
 
 def tester00() -> None:
@@ -19,10 +21,13 @@ def tester00() -> None:
   [print(x) for x in stuff]
 
 
-def tester01() -> None:
+def tester01() -> int:
   """Main Tester Script"""
   app = App(MainWindow)
-  sys.exit(app.exec())
+  retCode = app.exec()
+  for name in app.getMissingNames():
+    print('--%s' % name)
+  return retCode
 
 
 def tester02() -> None:
@@ -31,5 +36,25 @@ def tester02() -> None:
   print(lime)
 
 
+def tester03() -> None:
+  """Main Tester Script"""
+  someObj = SomeClass()
+  anotherObj = AnotherClass()
+  print(anotherObj.urMom)
+  print(object.__getattribute__(anotherObj, 'urMom'))
+
+
+def main(callMeMaybe: Callable) -> None:
+  """Main Tester Script"""
+  tic = time.time()
+  print('Running python script located at: \n%s' % sys.argv[0])
+  print('Started at: %s' % time.ctime())
+  print(77 * '-')
+  retCode = callMeMaybe()
+  print(77 * '-')
+  print('Return Code: %s' % retCode)
+  print('Runtime: %.3f seconds' % (time.time() - tic))
+
+
 if __name__ == '__main__':
-  tester01()
+  main(tester01)

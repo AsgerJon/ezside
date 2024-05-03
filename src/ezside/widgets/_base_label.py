@@ -53,3 +53,11 @@ class BaseLabel(BaseWidget):
     """Initialize the user interface."""
     self.baseLayout.addWidget(self._getLabel())
     self.setLayout(self.baseLayout)
+
+  @innerText.ONSET
+  def _newText(self, oldText: str, newText: str) -> None:
+    """Notified when value of innerText changes. """
+    if oldText != newText:
+      self._getLabel().setText(newText)
+      self._getLabel().update()
+ 

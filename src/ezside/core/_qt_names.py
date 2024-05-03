@@ -44,6 +44,16 @@ Center = Qt.AlignmentFlag.AlignCenter
 AlignTop = Qt.AlignmentFlag.AlignTop
 AlignBottom = Qt.AlignmentFlag.AlignBottom
 
+alignDict = {
+  'left': AlignLeft,
+  'right': AlignRight,
+  'center': Center,
+  'hcenter': AlignHCenter,
+  'vcenter': AlignVCenter,
+  'top': AlignTop,
+  'bottom': AlignBottom
+}
+
 Expand = QSizePolicy.Policy.MinimumExpanding
 Tight = QSizePolicy.Policy.Maximum
 Fixed = QSizePolicy.Policy.Fixed
@@ -77,5 +87,5 @@ __all__ = [
   'AlignBottom', 'Expand', 'Tight', 'Fixed', 'TimerType', 'Precise',
   'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
   'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
-  'VERTICAL', 'HORIZONTAL'
+  'VERTICAL', 'HORIZONTAL', 'alignDict'
 ]
