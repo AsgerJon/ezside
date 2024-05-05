@@ -6,13 +6,13 @@ from __future__ import annotations
 
 from abc import abstractmethod
 
-from PySide6.QtGui import QFontDatabase
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QVBoxLayout
 from attribox import AttriBox
 from icecream import ic
 
-from ezside.widgets import BaseWidget, Grid, Vertical, Horizontal, BaseLabel
 from ezside.app import BaseWindow
+from ezside.widgets import BaseWidget, BaseLabel
 
 ic.configureOutput(includeContext=True, )
 
@@ -27,18 +27,11 @@ class LayoutWindow(BaseWindow):
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.baseLayout.addWidget(self.welcomeLabel)
+    self.setMinimumSize(QSize(320, 240))
+    self.welcomeLabel.layIn(self.baseLayout)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
   @abstractmethod
-  def initActions(self) -> None:
+  def initSignalSlot(self) -> None:
     """The initActions method initializes the actions of the window."""
-
-  def debug2Func(self, ) -> None:
-    """Debug2Func prints a debug message to the console."""
-    BaseWindow.debug2Func(self)
-    fontDatabase = QFontDatabase()
-    allFonts = fontDatabase.families()
-    for font in allFonts:
-      print(font)

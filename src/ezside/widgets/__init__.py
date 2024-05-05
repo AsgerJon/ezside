@@ -4,6 +4,5 @@ window. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ._base_widget import BaseWidget
-from ._layouts import Grid, Vertical, Horizontal
-from ._OLD_base_label import BaseLabel
+from ._OLD_base_widget import BaseWidget
+from ._base_label import BaseLabel

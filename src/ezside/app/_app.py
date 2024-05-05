@@ -4,16 +4,13 @@
 from __future__ import annotations
 
 import os
-import sys
-from abc import abstractmethod
-
 from typing import Any, Callable
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget
+from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow
 from attribox import AttriBox
 from icecream import ic
-from vistutils.fields import EmptyField
 from vistutils.text import monoSpace, stringList
 from vistutils.waitaminute import typeMsg
 
@@ -27,9 +24,37 @@ MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
 class App(QApplication):
   """App is a subclass of QApplication."""
 
+  __main_app__ = True
+
   __missing_names__ = None
   __main_window_class__ = None
   __main_window_instance__ = None
+  __icon_path__ = None
+
+  @classmethod
+  def _getIconPath(cls) -> str:
+    """Getter-function for path to icon folder"""
+    if cls.__icon_path__ is None:
+      here = os.path.dirname(os.path.abspath(__file__))
+      cls.__icon_path__ = os.path.join(here, 'icons')
+    return cls.__icon_path__
+
+  @classmethod
+  def getIcon(cls, name: str) -> QIcon:
+    """Getter-function for path to icon"""
+
+    def cleanName(name2: str) -> str:
+      """Removes spaces and .png from the given name and returns in lower
+      case."""
+      return str(name2).replace('.png', '').replace(' ', '').lower()
+
+    iconPath = cls._getIconPath()
+    icons = os.listdir(iconPath)
+    for fileName in icons:
+      if cleanName(fileName) == cleanName(name):
+        return QIcon(QPixmap(os.path.join(iconPath, fileName)))
+    else:
+      return QIcon(QPixmap(os.path.join(iconPath, 'risitas.png')))
 
   settings = AttriBox[AppSettings]()
   quitRequested = Signal()
@@ -65,7 +90,6 @@ class App(QApplication):
     """Initializes the App instance."""
     QApplication.__init__(self, )
     self.setAttribute(MenuFlag, True)
-    self.__main_window_instance__ = mainWindowClass()
     if isinstance(mainWindowClass, type):
       self._setMainWindowClass(mainWindowClass)
     else:
@@ -123,19 +147,24 @@ class App(QApplication):
   def _createMainWindowInstance(self) -> None:
     """Create the main window."""
     mainWindow = self._getMainWindowClass()()
-    mainWindow.__running_app__ = self
+    setattr(mainWindow, '__running_app__', self)
+    if not mainWindow.getApp() is self:
+      e = """The main window instance is unable to recognize the running 
+      application!"""
+      raise RuntimeError(e)
     mainWindow.requestQuit.connect(self.quitRequested)
-    ic(mainWindow)
     setattr(self, '__main_window_instance__', mainWindow)
 
   def getMainWindowInstance(self, **kwargs) -> Any:
     """Getter-function for the main window instance."""
+
     if self.__main_window_instance__ is None:
       if kwargs.get('_recursion', False):
         raise RecursionError
       self._createMainWindowInstance()
       return self.getMainWindowInstance(_recursion=True)
     mainWindowClass = self._getMainWindowClass()
+    setattr(self.__main_window_instance__, '__running_app__', self)
     if isinstance(self.__main_window_instance__, mainWindowClass):
       return self.__main_window_instance__
     e = typeMsg('mainWindowInstance',
@@ -143,8 +172,13 @@ class App(QApplication):
                 mainWindowClass)
     raise TypeError(e)
 
+  def getMain(self, **kwargs) -> Any:
+    """Getter-function for the main window instance."""
+    return self.getMainWindowInstance(**kwargs)
+
   def exec(self) -> int:
     """Executes the application."""
-    print('fuck you')
-    self.getMainWindowInstance().show()
+    mainWindow = self.getMainWindowInstance()
+    setattr(mainWindow, '__running_app__', self)
+    mainWindow.show()
     return QApplication.exec_(self)

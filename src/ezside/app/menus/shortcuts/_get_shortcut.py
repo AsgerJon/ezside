@@ -10,6 +10,8 @@ from PySide6.QtGui import QKeySequence
 from icecream import ic
 from vistutils.text import monoSpace
 
+from morevistutils.casenames import Name
+
 ic.configureOutput(includeContext=True, )
 
 
@@ -35,20 +37,14 @@ def _getKeyboardShortcuts() -> dict:
   }
 
 
-def getShortcut(name: str) -> QKeySequence:
+def getShortcut(actionName: str) -> QKeySequence:
   """
   Returns a QKeySequence for the given name.
   """
-  name = name.lower().strip()
-  name = name.replace(' ', '_')
-  if 'debug' in name:
-    for char in name:
-      if char.isnumeric():
-        return QKeySequence('F%s' % char)
-  base = _getKeyboardShortcuts()
-  shortcut = base.get(name, '')
-  sequence = QKeySequence.fromString(shortcut)
-  if not sequence:
-    warn(f'No keyboard shortcut found for {monoSpace(name)}')
-    return QKeySequence()
-  return sequence
+  name = Name(actionName)
+  shortcuts = _getKeyboardShortcuts()
+  for NameCase in Name.getNameCases():
+    key = name @ NameCase
+    if key in shortcuts:
+      return QKeySequence(shortcuts[key])
+  return QKeySequence()

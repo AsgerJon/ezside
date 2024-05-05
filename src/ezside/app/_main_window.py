@@ -4,6 +4,7 @@ application business logic."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from PySide6.QtCore import QRect, QPoint, QPointF
 from icecream import ic
 
 from ezside.app import LayoutWindow
@@ -15,15 +16,10 @@ class MainWindow(LayoutWindow):
   """MainWindow subclasses the LayoutWindow and provides the main
   application business logic."""
 
-  def initActions(self) -> None:
+  def initSignalSlot(self) -> None:
     """Initialize the actions."""
 
   def debug1Func(self, ) -> None:
-    """Debug Function 1"""
-    self.statusBar().showMessage('Debug Function 1')
-    self.welcomeLabel.innerText += '*'
-    self.welcomeLabel.update()
-
-  def debug2Func(self) -> None:
-    """Debug Function 2"""
-    self.statusBar().showMessage(self.welcomeLabel.innerText)
+    """Debug1Func provides a function for debugging."""
+    ic('Debug1Func')
+    self.statusBar().showMessage(str(self.menuBar()))

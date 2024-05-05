@@ -6,12 +6,11 @@ LayoutWindow class."""
 from __future__ import annotations
 
 from PySide6.QtCore import Signal, QCoreApplication
-from PySide6.QtWidgets import QMainWindow, QApplication
+from PySide6.QtWidgets import QMainWindow
 from attribox import AttriBox, this, AttriClass
 from icecream import ic
 
-from ezside.app.bars import MenuBar, StatusBar
-from ezside.widgets import BaseWidget
+from ezside.app.menus import MainMenuBar, MainStatusBar
 
 ic.configureOutput(includeContext=True, )
 
@@ -19,14 +18,13 @@ ic.configureOutput(includeContext=True, )
 class BaseWindow(QMainWindow, AttriClass):
   """BaseWindow class provides menus and actions for the application."""
 
-  def __init__(self, *args, **kwargs) -> None:
-    QMainWindow.__init__(self, *args, **kwargs)
+  __main_window__ = True
 
   __is_initialized__ = None
   __running_app__ = None
 
-  mainMenuBar = AttriBox[MenuBar](this)
-  mainStatusBar = AttriBox[StatusBar](this)
+  mainMenuBar = AttriBox[MainMenuBar](this)
+  mainStatusBar = AttriBox[MainStatusBar](this)
 
   requestQuit = Signal()
   requestHelp = Signal()
@@ -41,27 +39,60 @@ class BaseWindow(QMainWindow, AttriClass):
       self.initMenus()
       self.initStyle()
       self.initUi()
+
       self.initSignalSlot()
       self.__is_initialized__ = True
     QMainWindow.show(self)
 
   def initMenus(self, ) -> None:
     """Initializes the user interface for the main window."""
-    self.mainMenuBar.initUi()
-    self.mainMenuBar.debug.debug1.triggered.connect(self.debug1Func)
-    self.mainMenuBar.debug.debug2.triggered.connect(self.debug2Func)
-    self.mainMenuBar.debug.debug3.triggered.connect(self.debug3Func)
-    self.mainMenuBar.debug.debug4.triggered.connect(self.debug4Func)
-    self.mainMenuBar.debug.debug5.triggered.connect(self.debug5Func)
-    self.mainMenuBar.debug.debug6.triggered.connect(self.debug6Func)
-    self.mainMenuBar.debug.debug7.triggered.connect(self.debug7Func)
-    self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
-    self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
-    self.mainMenuBar.help.about_qt.triggered.connect(QApplication.aboutQt)
-    self.mainMenuBar.files.exit.triggered.connect(self.requestQuit)
+    # self.mainMenuBar.debug.debug1.triggered.connect(self.debug1Func)
+    # self.mainMenuBar.debug.debug2.triggered.connect(self.debug2Func)
+    # self.mainMenuBar.debug.debug3.triggered.connect(self.debug3Func)
+    # self.mainMenuBar.debug.debug4.triggered.connect(self.debug4Func)
+    # self.mainMenuBar.debug.debug5.triggered.connect(self.debug5Func)
+    # self.mainMenuBar.debug.debug6.triggered.connect(self.debug6Func)
+    # self.mainMenuBar.debug.debug7.triggered.connect(self.debug7Func)
+    # self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
+    # self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
+    self.mainMenuBar.fileMenu.connectAction('new', self.newFunc)
+    self.mainMenuBar.fileMenu.connectAction('open', self.openFunc)
+    self.mainMenuBar.fileMenu.connectAction('save', self.saveFunc)
+    self.mainMenuBar.fileMenu.connectAction('saveAs', self.saveAsFunc)
+    self.mainMenuBar.fileMenu.connectAction('exit', self.exitFunc)
     self.setMenuBar(self.mainMenuBar)
     self.mainStatusBar.initUi()
     self.setStatusBar(self.mainStatusBar)
+
+  def newFunc(self, ) -> None:
+    """New function."""
+    note = 'New function called'
+    print(note)
+    self.statusBar().showMessage(note)
+
+  def openFunc(self, ) -> None:
+    """Open function."""
+    note = 'Open function called'
+    print(note)
+    self.statusBar().showMessage(note)
+
+  def saveFunc(self, ) -> None:
+    """Save function."""
+    note = 'Save function called'
+    print(note)
+    self.statusBar().showMessage(note)
+
+  def saveAsFunc(self, ) -> None:
+    """Save as function."""
+    note = 'Save as function called'
+    print(note)
+    self.statusBar().showMessage(note)
+
+  def exitFunc(self, ) -> None:
+    """Exit function."""
+    note = 'Exit function called'
+    print(note)
+    self.statusBar().showMessage(note)
 
   def initStyle(self, ) -> None:
     """Initializes the style of the main window."""
