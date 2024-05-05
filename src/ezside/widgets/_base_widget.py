@@ -12,15 +12,16 @@ from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
 from vistutils.waitaminute import typeMsg
 
-from ezside import BaseWindow
-from ezside.app import App
 from ezside.core import parseParent
 from ezside.widgets import _AttriWidget
 from morevistutils.metadec import WhoDat
 
+if TYPE_CHECKING:
+  from ezside.app import BaseWindow, App
+
 
 @WhoDat()
-class BaseWidget(_AttriWidget):
+class _BaseWidget(_AttriWidget):
   """BaseWidget provides a common base class for all widgets in the
   application."""
 
@@ -37,7 +38,7 @@ class BaseWidget(_AttriWidget):
         e = typeMsg('styleId', styleId, str)
         raise TypeError(e)
 
-  def __init__(self: BaseWidget, *args, **kwargs) -> None:
+  def __init__(self: _BaseWidget, *args, **kwargs) -> None:
     """Subclasses that wish to allow __init__ to set the value of the
     'styleId' and other subclass specific primitive attributes, must apply
     these before invoking the parent __init__ method. This is because
@@ -111,3 +112,11 @@ class BaseWidget(_AttriWidget):
     if TYPE_CHECKING:
       assert isinstance(app, App)
     return app.getMain()
+
+
+class BaseWidget(_BaseWidget):
+  """BaseWidget provides a common base class for all widgets in the
+  application."""
+
+  def __init__(self, *args, **kwargs) -> None:
+    super().__init__(*args, **kwargs)

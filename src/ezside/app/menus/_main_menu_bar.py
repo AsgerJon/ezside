@@ -10,6 +10,8 @@ from PySide6.QtWidgets import QMenuBar, QMenu
 from attribox import AttriClass, AttriBox, this
 from icecream import ic
 
+from morevistutils.metadec import WhoDat
+
 if TYPE_CHECKING:
   from ezside import BaseWindow
 from ezside.app.menus import Menu
@@ -17,7 +19,7 @@ from ezside.app.menus import Menu
 ic.configureOutput(includeContext=True, )
 
 
-# @WhoDat()
+@WhoDat()
 class MainMenuBar(QMenuBar, AttriClass):
   """MainMenuBar subclasses QMenuBar and brings common menus with common
   actions. """

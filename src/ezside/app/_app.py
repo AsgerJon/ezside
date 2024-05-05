@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Callable
+from typing import Any, Callable, TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal, QSettings
 from PySide6.QtGui import QPixmap, QIcon
@@ -14,12 +14,14 @@ from icecream import ic
 from vistutils.text import monoSpace, stringList
 from vistutils.waitaminute import typeMsg
 
-from ezside.app import AppSettings
-from ezside.widgets import BaseWidget
+from ezside.app import StyleSettings
 
 ic.configureOutput(includeContext=True, )
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
+
+if TYPE_CHECKING:
+  from ezside.widgets import BaseWidget
 
 
 class App(QApplication):
@@ -84,7 +86,7 @@ class App(QApplication):
     else:
       return QIcon(QPixmap(os.path.join(iconPath, 'risitas.png')))
 
-  settings = AttriBox[AppSettings]()
+  styleSettings = AttriBox[StyleSettings]()
   quitRequested = Signal()
 
   @staticmethod

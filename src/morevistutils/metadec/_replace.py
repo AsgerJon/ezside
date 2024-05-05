@@ -20,10 +20,6 @@ class Replace:
   __attribute_name__ = None
   __replacement_method__ = None
 
-  def __init__(self, name: str, callMeMaybe: Callable, **kwargs) -> None:
-    self._setAttributeName(name)
-    self._setReplacementMethod(callMeMaybe)
-
   def _setAttributeName(self, attributeName: str) -> None:
     """Set the attribute name of the StrName object."""
     self.__attribute_name__ = attributeName

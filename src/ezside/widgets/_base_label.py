@@ -4,37 +4,43 @@
 from __future__ import annotations
 
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QLabel, QVBoxLayout
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QFrame
 from attribox import AttriBox
 
+from ezside.core import Center
 from ezside.widgets import BaseWidget
 
 
 class BaseLabel(BaseWidget):
   """BaseLabel provides a widget holding a label"""
 
-  __inner_label__ = None
-
   text = AttriBox[str]('yolo')
+  baseLayout = AttriBox[QVBoxLayout]()
+  innerLabel = AttriBox[QLabel]()
 
-  def __init__(self, *args, **kwargs) -> None:
+  def __init__(self, text: str = 'yolo', *args, **kwargs) -> None:
+    self.text = text
     BaseWidget.__init__(self, *args, **kwargs)
-    self.__inner_label__ = QLabel()
-    self.__inner_label__.setText(self.text)
 
   @text.ONSET
   def updateText(self, oldText: str, newText: str) -> None:
     """Updates the text of the label."""
-    self.text = newText
-    self.__inner_label__.setText(self.text)
-    self.__inner_label__.update()
+    self.innerLabel.setText(newText)
+    self.innerLabel.update()
 
   def initStyle(self, ) -> None:
     """Initializes the style for the label."""
+    font = QFont()
+    font.setFamily('Montserrat')
+    font.setPointSize(24)
+    font.setCapitalization(QFont.Capitalization.SmallCaps)
+    self.innerLabel.setFont(font)
+    self.innerLabel.setAlignment(Center)
+    self.innerLabel.setFrameStyle(QFrame.Shape.Box)
 
   def initUi(self, ) -> None:
     """Initializes the user interface for the label."""
-    self.baseLayout.addWidget(self.__inner_label__)
+    self.baseLayout.addWidget(self.innerLabel)
     self.setLayout(self.baseLayout)
 
   def initSignalSlot(self) -> None:

@@ -12,7 +12,6 @@ from icecream import ic
 from vistutils.text import stringList
 
 from ezside.app import MainWindow, App
-from ezside.style import RGB
 from morevistutils.casenames import Name, CamelCase, SnakeCase, TitleCase, \
   PascalCase, SentenceCase
 from tester_class_02 import SomeClass, AnotherClass
@@ -35,8 +34,6 @@ def tester01() -> int:
 
 def tester02() -> None:
   """Main Tester Script"""
-  lime = RGB(144, 255, 0)
-  print(lime)
 
 
 def tester03() -> None:
@@ -49,10 +46,6 @@ def tester03() -> None:
 
 def tester04() -> None:
   """LMAO"""
-  camelCases = ['urMom', 'helloWorld', 'fuckYou']
-  snakeCases = ['ur_mom', 'hello_world', 'fuck_you']
-  for camel, snake in zip(camelCases, snakeCases):
-    print(camel, snake, resolveCaseNames(camel))
 
 
 def tester05() -> None:

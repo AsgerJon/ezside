@@ -28,7 +28,7 @@ class LayoutWindow(BaseWindow):
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setMinimumSize(QSize(320, 240))
-    self.welcomeLabel.layIn(self.baseLayout)
+    self.baseLayout.addWidget(self.welcomeLabel)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 

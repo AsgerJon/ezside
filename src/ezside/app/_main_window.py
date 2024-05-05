@@ -4,7 +4,6 @@ application business logic."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QRect, QPoint, QPointF
 from icecream import ic
 
 from ezside.app import LayoutWindow
@@ -21,5 +20,4 @@ class MainWindow(LayoutWindow):
 
   def debug1Func(self, ) -> None:
     """Debug1Func provides a function for debugging."""
-    ic('Debug1Func')
     self.statusBar().showMessage(str(self.menuBar()))
