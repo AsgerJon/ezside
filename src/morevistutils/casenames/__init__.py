@@ -7,16 +7,14 @@ cases. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from types import MethodType
-
 from ._abstract_case import AbstractCase
 from ._camel_case import CamelCase
-from ._snake_case import SnakeCase
-from ._pascal_case import PascalCase
 from ._kebab_case import KebabCase
-from ._sentence_case import SentenceCase
-from ._title_case import TitleCase
 from ._name import Name
+from ._pascal_case import PascalCase
+from ._sentence_case import SentenceCase
+from ._snake_case import SnakeCase
+from ._title_case import TitleCase
 
 if __name__ != '__main__':
   Name.addCase(CamelCase)

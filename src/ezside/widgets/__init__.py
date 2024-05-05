@@ -4,5 +4,6 @@ window. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ._OLD_base_widget import BaseWidget
+from ._attri_widget import _AttriWidget
+from ._base_widget import BaseWidget
 from ._base_label import BaseLabel

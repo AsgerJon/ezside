@@ -16,7 +16,6 @@ class BaseLabel(BaseWidget):
   __inner_label__ = None
 
   text = AttriBox[str]('yolo')
-  baseLayout = AttriBox[QVBoxLayout]()
 
   def __init__(self, *args, **kwargs) -> None:
     BaseWidget.__init__(self, *args, **kwargs)

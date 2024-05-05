@@ -6,15 +6,16 @@ of the threads."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import Any
-
-from PySide6.QtCore import QThread
 from threading import Lock
 
+from typing import TYPE_CHECKING
+
+from PySide6.QtCore import QThread, QSettings, QCoreApplication
 from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
-from ezside.settings import Defaults
+if TYPE_CHECKING:
+  from ezside.app import App
 
 
 class BaseThread(QThread):
@@ -25,6 +26,20 @@ class BaseThread(QThread):
   __all_threads__ = []
   __thread_lock__ = Lock()
   __fallback_timelimit__ = 1000
+
+  @staticmethod
+  def getApp() -> App:
+    """Getter-function for the running application"""
+    app = QCoreApplication.instance()
+    if TYPE_CHECKING:
+      assert isinstance(app, App)
+    return app
+
+  @classmethod
+  def getSettings(cls) -> QSettings:
+    """Getter-function for the settings"""
+    app = cls.getApp()
+    return app.getSettings()
 
   @classmethod
   def _getTimeLimit(cls) -> int:

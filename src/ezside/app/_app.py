@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 from typing import Any, Callable
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QSettings
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow
 from attribox import AttriBox
@@ -15,6 +15,7 @@ from vistutils.text import monoSpace, stringList
 from vistutils.waitaminute import typeMsg
 
 from ezside.app import AppSettings
+from ezside.widgets import BaseWidget
 
 ic.configureOutput(includeContext=True, )
 
@@ -30,6 +31,33 @@ class App(QApplication):
   __main_window_class__ = None
   __main_window_instance__ = None
   __icon_path__ = None
+
+  @classmethod
+  def getSettings(cls) -> QSettings:
+    """Getter-function for settings."""
+    appName = cls.applicationName()
+    orgName = cls.organizationName()
+    return QSettings(orgName, appName)
+
+  @classmethod
+  def getStyle(cls, widget: BaseWidget) -> Any:
+    """Applies style changes to the widget received based on its class and
+    style ID from the application settings."""
+    clsName = str(type(widget))
+    styleId = widget.styleId
+    styleDict = {}
+    fallbacks = widget.getStyleFallbacks()
+    schema = widget.getStyleSchema()
+    settings = cls.getSettings()
+    for (key, fallback) in widget.getStyleFallbacks():
+      styleKey = '%s/%s/%s' % (clsName, styleId, key)
+      styleType = schema[key]
+      styleValue = settings.value(styleKey, fallback)
+      if not isinstance(styleValue, styleType):
+        e = typeMsg('styleValue', styleValue, styleType)
+        raise TypeError(e)
+      styleDict[key] = styleValue
+    return styleDict
 
   @classmethod
   def _getIconPath(cls) -> str:
@@ -89,6 +117,8 @@ class App(QApplication):
   def __init__(self, mainWindowClass: type) -> None:
     """Initializes the App instance."""
     QApplication.__init__(self, )
+    self.setApplicationName('EZSide')
+    self.setOrganizationName('EZ')
     self.setAttribute(MenuFlag, True)
     if isinstance(mainWindowClass, type):
       self._setMainWindowClass(mainWindowClass)

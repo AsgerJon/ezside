@@ -5,31 +5,55 @@ application."""
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
-from attribox import AttriClass, AttriBox
+from attribox import AttriBox
+from vistutils.waitaminute import typeMsg
 
 from ezside import BaseWindow
 from ezside.app import App
 from ezside.core import parseParent
+from ezside.widgets import _AttriWidget
 from morevistutils.metadec import WhoDat
 
 
 @WhoDat()
-class BaseWidget(QWidget, AttriClass):
+class BaseWidget(_AttriWidget):
   """BaseWidget provides a common base class for all widgets in the
   application."""
 
   styleId = AttriBox[str]('base')
 
-  def __init__(self, *args, **kwargs) -> None:
+  @staticmethod
+  def _parseStyleId(**kwargs) -> Optional[str]:
+    """Parses the styleId from the keyword arguments."""
+    for key in ['styleId', 'style', 'id', '__fb']:
+      if key in kwargs:
+        styleId = kwargs[key]
+        if isinstance(styleId, str):
+          return styleId
+        e = typeMsg('styleId', styleId, str)
+        raise TypeError(e)
+
+  def __init__(self: BaseWidget, *args, **kwargs) -> None:
+    """Subclasses that wish to allow __init__ to set the value of the
+    'styleId' and other subclass specific primitive attributes, must apply
+    these before invoking the parent __init__ method. This is because
+    the __init__ automatically triggers the rest of the 'init' methods.
+    Please note that BaseWidget will look for keyword arguments to set the
+    styleId, at the following names:
+      - 'styleId'
+      - 'style'
+      - 'id'
+    defaulting to 'base' if none are found. """
     parent = parseParent(args)
     if parent is None:
       QWidget.__init__(self)
     else:
       QWidget.__init__(self, parent)
+    self.styleId = self._parseStyleId(**kwargs, __fb='base')
     self.initStyle()
     self._universalInit()
     self.initUi()

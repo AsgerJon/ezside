@@ -4,11 +4,8 @@ application."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from warnings import warn
-
 from PySide6.QtGui import QKeySequence
 from icecream import ic
-from vistutils.text import monoSpace
 
 from morevistutils.casenames import Name
 
@@ -21,19 +18,19 @@ def _getKeyboardShortcuts() -> dict:
   categorized by Files, Edit, View, and Help actions.
   """
   return {
-    "new": "CTRL+N",
-    "open": "CTRL+O",
-    "save": "CTRL+S",
-    "save_as": "CTRL+SHIFT+S",
-    "close": "CTRL+W",
-    "undo": "CTRL+Z",
-    "redo": "CTRL+Y",
-    "cut": "CTRL+X",
-    "copy": "CTRL+C",
-    "paste": "CTRL+V",
+    "new"       : "CTRL+N",
+    "open"      : "CTRL+O",
+    "save"      : "CTRL+S",
+    "save_as"   : "CTRL+SHIFT+S",
+    "close"     : "CTRL+W",
+    "undo"      : "CTRL+Z",
+    "redo"      : "CTRL+Y",
+    "cut"       : "CTRL+X",
+    "copy"      : "CTRL+C",
+    "paste"     : "CTRL+V",
     "select_all": "CTRL+A",
-    "about_qt": "F12",
-    "exit": "ALT+F4",
+    "about_qt"  : "F12",
+    "exit"      : "ALT+F4",
   }
 
 
