@@ -47,6 +47,11 @@ def tester03() -> None:
 def tester04() -> None:
   """LMAO"""
 
+  red, green, blue = 144, 255, 0
+  colNum = red * 2 ** 16 + green * 2 ** 8 + blue
+
+  print(colNum)
+
 
 def tester05() -> None:
   """YOLO"""
@@ -82,4 +87,4 @@ def main(callMeMaybe: Callable) -> None:
 
 
 if __name__ == '__main__':
-  main(tester01)
+  main(tester04)
