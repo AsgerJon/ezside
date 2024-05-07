@@ -11,6 +11,7 @@ from ._abstract_case import AbstractCase
 from ._camel_case import CamelCase
 from ._kebab_case import KebabCase
 from ._name import Name
+from ._key import Key
 from ._pascal_case import PascalCase
 from ._sentence_case import SentenceCase
 from ._snake_case import SnakeCase
@@ -24,5 +25,8 @@ if __name__ != '__main__':
   Name.addCase(SentenceCase)
   Name.addCase(TitleCase)
 
+from ._smart_map import SmartMap
+
 __all__ = ['AbstractCase', 'CamelCase', 'SnakeCase', 'PascalCase',
-           'KebabCase', 'SentenceCase', 'TitleCase', 'Name']
+           'KebabCase', 'SentenceCase', 'TitleCase', 'Name', 'Key',
+           'SmartMap']

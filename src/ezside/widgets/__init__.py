@@ -7,3 +7,4 @@ from __future__ import annotations
 from ._attri_widget import _AttriWidget
 from ._base_widget import BaseWidget
 from ._base_label import BaseLabel
+from ._label import Label

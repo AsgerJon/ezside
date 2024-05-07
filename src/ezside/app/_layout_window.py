@@ -12,7 +12,7 @@ from attribox import AttriBox
 from icecream import ic
 
 from ezside.app import BaseWindow
-from ezside.widgets import BaseWidget, BaseLabel
+from ezside.widgets import BaseWidget, Label
 
 ic.configureOutput(includeContext=True, )
 
@@ -23,7 +23,11 @@ class LayoutWindow(BaseWindow):
 
   baseLayout = AttriBox[QVBoxLayout]()
   baseWidget = AttriBox[BaseWidget]()
-  welcomeLabel = AttriBox[BaseLabel]('YOLO')
+  welcomeLabel = AttriBox[Label]('YOLO')
+
+  def initStyle(self) -> None:
+    """The initStyle method initializes the style of the window and the
+    widgets on it, before 'initUi' sets up the layout. """
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
@@ -32,6 +36,6 @@ class LayoutWindow(BaseWindow):
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
-  @abstractmethod
+  @abstractmethod  # MainWindow
   def initSignalSlot(self) -> None:
     """The initActions method initializes the actions of the window."""

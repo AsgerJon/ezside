@@ -10,22 +10,26 @@ from typing import TYPE_CHECKING, Any, Optional
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
+from vistutils.fields import EmptyField
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import parseParent
+from ezside.app import AppSettings
 from ezside.widgets import _AttriWidget
-from morevistutils.metadec import WhoDat
 
 if TYPE_CHECKING:
   from ezside.app import BaseWindow, App
 
 
-@WhoDat()
-class _BaseWidget(_AttriWidget):
+class BaseWidget(_AttriWidget):
   """BaseWidget provides a common base class for all widgets in the
   application."""
 
+  __app_settings__ = None
+
   styleId = AttriBox[str]('base')
+  state = EmptyField()
+  prefix = EmptyField()
 
   @staticmethod
   def _parseStyleId(**kwargs) -> Optional[str]:
@@ -38,7 +42,46 @@ class _BaseWidget(_AttriWidget):
         e = typeMsg('styleId', styleId, str)
         raise TypeError(e)
 
-  def __init__(self: _BaseWidget, *args, **kwargs) -> None:
+  def _getStyleFallback(self, key: str) -> dict | None:
+    """Getter-function for the style fallback at the given key. Please
+    note, that this is the local key not including any prefixes.
+    Subclasses may implement this method to provide fallback values for
+    styles. This method is expected to remain empty or to return a
+    dictionary object. """
+
+  def _getSettings(self) -> AppSettings:
+    """Getter-function for the application settings."""
+    if self.__app_settings__ is None:
+      self.__app_settings__ = AppSettings()
+    return self.__app_settings__
+
+  @state.GET
+  def _getState(self, ) -> str:
+    """This private method provides a default value used when a subclass
+    does not implement the 'getState' method."""
+    return self.getState() or 'normal'
+
+  @prefix.GET
+  def _getPrefix(self, ) -> str:
+    """This private method creates the style key for the widget. """
+    clsName = self.__class__.__name__.lower()
+    return '%s/%s/%s' % (clsName, self.styleId, self.state)
+
+  def getStyle(self, key: str, fb: Any = None) -> Any:
+    """Getter-function for the style at the given key for the widget in
+    its current state and style id. """
+    styleKey = '%s/%s' % (self.prefix, key)
+    if fb is None:
+      fb = self._getStyleFallback(key)
+    if fb is None:
+      return self._getSettings().value(styleKey, )
+    return self._getSettings().value(styleKey, fb)
+
+  def getState(self, ) -> str:
+    """Getter-function for the current state of the widget. Subclasses
+    may implement this method to provide the widget with state awareness."""
+
+  def __init__(self: BaseWidget, *args, **kwargs) -> None:
     """Subclasses that wish to allow __init__ to set the value of the
     'styleId' and other subclass specific primitive attributes, must apply
     these before invoking the parent __init__ method. This is because
@@ -96,27 +139,9 @@ class _BaseWidget(_AttriWidget):
     subclasses to implement."""
 
   @staticmethod
-  def getApp() -> QCoreApplication:
-    """Returns the application."""
-    app = QCoreApplication.instance()
-    if getattr(app, '__main_app__', None) is not None:
-      return app
-    e = """Expected application instance to have set the '__main_app__'
-    attribute."""
-    raise TypeError(e)
-
-  @staticmethod
   def getMain() -> BaseWindow:
     """Getter-function for the owning main window"""
     app = QCoreApplication.instance()
     if TYPE_CHECKING:
       assert isinstance(app, App)
-    return app.getMain()
-
-
-class BaseWidget(_BaseWidget):
-  """BaseWidget provides a common base class for all widgets in the
-  application."""
-
-  def __init__(self, *args, **kwargs) -> None:
-    super().__init__(*args, **kwargs)
+    return app.mainWindow

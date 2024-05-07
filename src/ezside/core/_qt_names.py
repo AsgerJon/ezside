@@ -45,13 +45,13 @@ AlignTop = Qt.AlignmentFlag.AlignTop
 AlignBottom = Qt.AlignmentFlag.AlignBottom
 
 alignDict = {
-  'left': AlignLeft,
-  'right': AlignRight,
-  'center': Center,
+  'left'   : AlignLeft,
+  'right'  : AlignRight,
+  'center' : Center,
   'hcenter': AlignHCenter,
   'vcenter': AlignVCenter,
-  'top': AlignTop,
-  'bottom': AlignBottom
+  'top'    : AlignTop,
+  'bottom' : AlignBottom
 }
 
 Expand = QSizePolicy.Policy.MinimumExpanding

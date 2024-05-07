@@ -4,6 +4,14 @@ application window."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ._menu import Menu
+from ._attri_menu import _AttriMenu
+from ._attri_menu_bar import _AttriMenuBar
+from ._attri_status_bar import _AttriStatusBar
+from ._abstract_menu import AbstractMenu
+from ._file_menu import FileMenu
+from ._edit_menu import EditMenu
+from ._help_menu import HelpMenu
+from ._debug_menu import DebugMenu
+
 from ._main_menu_bar import MainMenuBar
 from ._main_status_bar import MainStatusBar

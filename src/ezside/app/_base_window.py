@@ -5,154 +5,129 @@ LayoutWindow class."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import Signal, QCoreApplication
-from PySide6.QtWidgets import QMainWindow
-from attribox import AttriBox, this, AttriClass
+from abc import abstractmethod
+from typing import Any, Callable
+
+from PySide6.QtCore import Signal, QUrl
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 
+from ezside.app import _AttriWindow
 from ezside.app.menus import MainMenuBar, MainStatusBar
 
 ic.configureOutput(includeContext=True, )
 
 
-class BaseWindow(QMainWindow, AttriClass):
+class BaseWindow(_AttriWindow):
   """BaseWindow class provides menus and actions for the application."""
 
-  __main_window__ = True
+  mainMenuBar: MainMenuBar
+  mainStatusBar: MainStatusBar
+
+  __debug_flag__ = None
 
   __is_initialized__ = None
-  __running_app__ = None
-
-  mainMenuBar = AttriBox[MainMenuBar](this)
-  mainStatusBar = AttriBox[MainStatusBar](this)
 
   requestQuit = Signal()
   requestHelp = Signal()
+  hoverText = Signal(str)
 
-  def getApp(self) -> QCoreApplication:
-    """Getter-function for running application"""
-    return self.__running_app__
+  @staticmethod
+  def link(url: Any) -> Callable:
+    """Link to a URL."""
+    if isinstance(url, str):
+      url = QUrl(url)
+
+    def go() -> bool:
+      """Opens link in external browser."""
+      return QDesktopServices.openUrl(url)
+
+    return go
+
+  def __init__(self, *args, **kwargs) -> None:
+    """Initialize the BaseWindow object."""
+    QMainWindow.__init__(self, )
+    if kwargs.get('debug', False):
+      setattr(self, '__debug_flag__', True)
 
   def show(self) -> None:
     """Show the window."""
-    if self.__is_initialized__ is None:
-      self.initMenus()
+    if self.__is_initialized__ is None:  # Initialize the menu bar
+      self.menuBar()
+      self.statusBar()
+      self._initCoreConnections()
       self.initStyle()
       self.initUi()
-
       self.initSignalSlot()
       self.__is_initialized__ = True
     QMainWindow.show(self)
 
-  def initMenus(self, ) -> None:
-    """Initializes the user interface for the main window."""
-    # self.mainMenuBar.debug.debug1.triggered.connect(self.debug1Func)
-    # self.mainMenuBar.debug.debug2.triggered.connect(self.debug2Func)
-    # self.mainMenuBar.debug.debug3.triggered.connect(self.debug3Func)
-    # self.mainMenuBar.debug.debug4.triggered.connect(self.debug4Func)
-    # self.mainMenuBar.debug.debug5.triggered.connect(self.debug5Func)
-    # self.mainMenuBar.debug.debug6.triggered.connect(self.debug6Func)
-    # self.mainMenuBar.debug.debug7.triggered.connect(self.debug7Func)
-    # self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
-    # self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
-    self.mainMenuBar.fileMenu.connectAction('new', self.newFunc)
-    self.mainMenuBar.fileMenu.connectAction('open', self.openFunc)
-    self.mainMenuBar.fileMenu.connectAction('save', self.saveFunc)
-    self.mainMenuBar.fileMenu.connectAction('saveAs', self.saveAsFunc)
-    self.mainMenuBar.fileMenu.connectAction('exit', self.exitFunc)
-    self.setMenuBar(self.mainMenuBar)
-    self.mainStatusBar.initUi()
-    self.setStatusBar(self.mainStatusBar)
+  def _initCoreConnections(self) -> None:
+    """Initialize the core actions for the main window."""
+    self.menuBar().file.exit.triggered.connect(self.requestQuit)
+    self.menuBar().help.help.triggered.connect(self.requestHelp)
+    self.menuBar().help.aboutQt.triggered.connect(QApplication.aboutQt)
+    condaLink = self.link('https://conda.io')
+    pythonLink = self.link('https://python.org')
+    pysideLink = self.link('https://doc.qt.io/qtforpython/')
+    helpLink = self.link('https://www.youtube.com/watch?v=l60MnDJklnM')
+    self.menuBar().help.aboutConda.triggered.connect(condaLink)
+    self.menuBar().help.aboutPython.triggered.connect(pythonLink)
+    self.menuBar().help.aboutPySide6.triggered.connect(pysideLink)
+    self.menuBar().help.help.triggered.connect(helpLink)
 
-  def newFunc(self, ) -> None:
-    """New function."""
-    note = 'New function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def openFunc(self, ) -> None:
-    """Open function."""
-    note = 'Open function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def saveFunc(self, ) -> None:
-    """Save function."""
-    note = 'Save function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def saveAsFunc(self, ) -> None:
-    """Save as function."""
-    note = 'Save as function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def exitFunc(self, ) -> None:
-    """Exit function."""
-    note = 'Exit function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
+  @abstractmethod  # LayoutWindow
   def initStyle(self, ) -> None:
     """Initializes the style of the main window."""
 
+  @abstractmethod  # LayoutWindow
   def initUi(self, ) -> None:
     """Initializes the user interface for the main window."""
 
+  @abstractmethod  # MainWindow
   def initSignalSlot(self, ) -> None:
     """Initializes the signal slot for the main window."""
 
-  def debug1Func(self, ) -> None:
-    """Debug1 function."""
-    note = 'Debug1 function called'
-    print(note)
-    self.statusBar().showMessage(note)
+  def menuBar(self, **kwargs) -> MainMenuBar:
+    """Getter-function for the menu bar."""
+    try:
+      return self.mainMenuBar
+    except AttributeError as attributeError:
+      if kwargs.get('_recursion', False):
+        raise RecursionError from attributeError
+      self.setMenuBar(MainMenuBar())
+      return self.menuBar(_recursion=True)
 
-  def debug2Func(self, ) -> None:
-    """Debug2 function."""
-    note = 'Debug2 function called'
-    print(note)
-    self.statusBar().showMessage(note)
+  def setMenuBar(self, mainMenuBar: MainMenuBar) -> None:
+    """Set the menu bar for the main window."""
+    mainMenuBar.initStyle()
+    mainMenuBar.initUi()
+    if getattr(self, '__debug_flag__', None) is not None:
+      mainMenuBar.initDebug()
+    mainMenuBar.initSignalSlot()
+    self.mainMenuBar = mainMenuBar
+    QMainWindow.setMenuBar(self, mainMenuBar)
 
-  def debug3Func(self, ) -> None:
-    """Debug3 function."""
-    note = 'Debug3 function called'
-    print(note)
-    self.statusBar().showMessage(note)
+  def statusBar(self, **kwargs) -> MainStatusBar:
+    """Getter-function for the status bar."""
+    try:
+      return self.mainStatusBar
+    except AttributeError as attributeError:
+      if kwargs.get('_recursion', False):
+        raise RecursionError from attributeError
+      self.setStatusBar(MainStatusBar(self))
+      return self.statusBar(_recursion=True)
 
-  def debug4Func(self, ) -> None:
-    """Debug4 function."""
-    note = 'Debug4 function called'
-    print(note)
-    self.statusBar().showMessage(note)
+  def setStatusBar(self, mainStatusBar: MainStatusBar) -> None:
+    """Set the status bar for the main window."""
+    mainStatusBar.initStyle()
+    mainStatusBar.initUi()
+    mainStatusBar.initSignalSlot()
+    self.mainStatusBar = mainStatusBar
+    QMainWindow.setStatusBar(self, mainStatusBar)
 
-  def debug5Func(self, ) -> None:
-    """Debug5 function."""
-    note = 'Debug5 function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def debug6Func(self, ) -> None:
-    """Debug6 function."""
-    note = 'Debug6 function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def debug7Func(self, ) -> None:
-    """Debug7 function."""
-    note = 'Debug7 function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def debug8Func(self, ) -> None:
-    """Debug8 function."""
-    note = 'Debug8 function called'
-    print(note)
-    self.statusBar().showMessage(note)
-
-  def debug9Func(self, ) -> None:
-    """Debug9 function."""
-    note = 'Debug9 function called'
-    print(note)
-    self.statusBar().showMessage(note)
+  def showEvent(self, *args) -> None:
+    """Show the window."""
+    QMainWindow.showEvent(self, *args)
+    self.statusBar().showMessage('Ready')

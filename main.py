@@ -4,17 +4,40 @@
 from __future__ import annotations
 
 import os
+from random import randint
 import sys
 import time
+from types import FunctionType
 from typing import Callable
 
 from icecream import ic
 from vistutils.text import stringList
 
 from ezside.app import MainWindow, App
-from morevistutils.casenames import Name, CamelCase, SnakeCase, TitleCase, \
-  PascalCase, SentenceCase
+from ezside.app.menus import MainMenuBar
+from morevistutils.casenames import Name, \
+  CamelCase, \
+  SnakeCase, \
+  TitleCase, \
+  SmartMap
+from morevistutils.casenames import PascalCase, SentenceCase
 from tester_class_02 import SomeClass, AnotherClass
+
+lmaoPrint = print
+
+
+def yolo(*items) -> str:
+  for item in items:
+    if isinstance(item, type):
+      lmaoPrint(item.__qualname__)
+    elif isinstance(item, FunctionType):
+      lmaoPrint(item.__name__)
+    else:
+      lmaoPrint(item, end=' ')
+  lmaoPrint()
+
+
+print = yolo
 
 
 def tester00() -> None:
@@ -25,11 +48,7 @@ def tester00() -> None:
 
 def tester01() -> int:
   """Main Tester Script"""
-  app = App(MainWindow)
-  retCode = app.exec()
-  for name in app.getMissingNames():
-    print('--%s' % name)
-  return retCode
+  return App().exec()
 
 
 def tester02() -> None:
@@ -74,6 +93,27 @@ def tester05() -> None:
     print(name @ NameCase)
 
 
+def tester06() -> None:
+  """YOLO"""
+  lmao = SmartMap()
+  yolo = {**globals()}
+  for (key, val) in yolo.items():
+    if isinstance(val, dict):
+      lmao[key] = SmartMap(**val)
+    else:
+      lmao[key] = val
+
+  for (key, val) in lmao.items():
+    print(key, val)
+
+
+F = lambda x: F(str(sum([int(c) for c in str(x)]))) if int(x) > 9 else int(x)
+
+
+def tester07() -> None:
+  """LMAO"""
+
+
 def main(callMeMaybe: Callable) -> None:
   """Main Tester Script"""
   tic = time.time()
@@ -87,4 +127,4 @@ def main(callMeMaybe: Callable) -> None:
 
 
 if __name__ == '__main__':
-  main(tester04)
+  main(tester01)

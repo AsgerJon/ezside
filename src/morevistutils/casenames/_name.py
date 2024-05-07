@@ -5,7 +5,7 @@ subclass of AbstractCase."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import Self, Type
+from typing import Self, Type, Any
 
 from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
@@ -65,6 +65,18 @@ class Name:
       e = """Could not resolve the case of the name: '%s'""" % name
       raise ValueError(monoSpace(e))
 
+  @classmethod
+  def lookUp(cls, data: dict, key: str) -> Any:
+    """Uses the different cases to search the given dictionary for the key"""
+    if key in data:
+      return data[key]
+    words = cls(key)._getInnerWords()
+    for NameCase in cls.getNameCases():
+      name = NameCase.joinWords(*words, )
+      if name in data:
+        return data[name]
+    return dict.__getitem__(data, key)  # Raises default KeyError
+
   def __init__(self, *args, **kwargs) -> None:
     self.__inner_words__ = None
     self.__iter_contents__ = None
@@ -89,6 +101,12 @@ class Name:
         if not isinstance(word, str):
           e = typeMsg('word', word, str)
           raise TypeError(e)
+    if not all(self.__inner_words__):
+      words = self.__inner_words__
+      self.__inner_words__ = []
+      for word in words:
+        if word:
+          self.__inner_words__.append(word)
     return self.__inner_words__
 
   def _appendInnerWord(self, word: str) -> None:
@@ -125,17 +143,11 @@ class Name:
     """Return the number of words in the name."""
     return len(self._getInnerWords())
 
-  def __str__(self, ) -> str:
-    """The string representation is determined by the case of the name."""
-    return '(%s)' % ', '.join(self._getInnerWords())
-
-  def __matmul__(self, NameCase: type) -> str:
+  def __matmul__(self, other: type) -> str:
     """Syntactic sugar for setting the instance case."""
-    if not isinstance(NameCase, type):
-      return NotImplemented
-    if not issubclass(NameCase, AbstractCase):
-      return NotImplemented
-    return NameCase.joinWords(*self._getInnerWords())
+    if isinstance(other, type):
+      if issubclass(other, AbstractCase):
+        return other.joinWords(*self._getInnerWords())
 
   def __getitem__(self, index: int) -> str:
     """Return the word at the given index."""
@@ -149,7 +161,32 @@ class Name:
     """Delete the word at the given index."""
     self._getInnerWords().pop(index)
 
+  def __str__(self, ) -> str:
+    """The string representation is determined by the case of the name."""
+    out = '(%s)' % ', '.join(self._getInnerWords())
+    if out.startswith('(,'):
+      for word in self._getInnerWords():
+        print('|%s|' % word)
+      raise ValueError
+    return out
+
   def __repr__(self, ) -> str:
     """Representation of code instantiating the Name instance to its
     present state."""
     return 'Name(%s)' % ', '.join(self._getInnerWords())
+
+  def currentHash(self) -> int:
+    """Returns the hash of the current state of the name. Please note,
+    that this is not the same as the hash of this name instance."""
+    return hash(self.__str__())
+
+  def __eq__(self, other: Any) -> bool:
+    """Check if the name is equal to the other object."""
+    if isinstance(other, Name):
+      for (this, that) in zip(self._getInnerWords(), other._getInnerWords()):
+        if this != that:
+          return False
+      return True
+    if isinstance(other, str):
+      return self == Name(other)
+    return NotImplemented

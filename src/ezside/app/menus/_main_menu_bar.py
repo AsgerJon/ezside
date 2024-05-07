@@ -4,95 +4,109 @@ actions. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from abc import abstractmethod
+from typing import TYPE_CHECKING, Callable
 
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenuBar, QMenu
-from attribox import AttriClass, AttriBox, this
 from icecream import ic
 
-from morevistutils.metadec import WhoDat
-
 if TYPE_CHECKING:
-  from ezside import BaseWindow
-from ezside.app.menus import Menu
+  pass
+from ezside.app.menus import _AttriMenuBar, \
+  FileMenu, \
+  EditMenu, \
+  HelpMenu, \
+  DebugMenu, AbstractMenu
 
 ic.configureOutput(includeContext=True, )
 
 
-@WhoDat()
-class MainMenuBar(QMenuBar, AttriClass):
+class MainMenuBar(_AttriMenuBar):
   """MainMenuBar subclasses QMenuBar and brings common menus with common
   actions. """
 
-  __main_menu_bar__ = True
-  __main_window__ = None
+  __iter_contents__ = None
+  __added_menus__ = None
 
-  fileMenu = AttriBox[Menu]('File', this, )
-  editMenu = AttriBox[Menu]('Edit', this, )
-  helpMenu = AttriBox[Menu]('Help', this, )
-  debugMenu = AttriBox[Menu]('Debug', this, )
+  file: FileMenu
+  fileAction: QAction
+  edit: EditMenu
+  editAction: QAction
+  help: HelpMenu
+  debug: DebugMenu
 
-  @staticmethod
-  def getFileActions() -> list[str]:
-    """Getter-function for file actions."""
-    return ['new', 'open', 'save', 'save_as', '', 'exit']
+  hoverText = Signal(str)
 
-  @staticmethod
-  def getEditActions() -> list[str]:
-    """Getter-function for edit actions."""
-    return ['undo', 'redo', '', 'cut', 'copy', 'paste', '', 'select_all']
-
-  @staticmethod
-  def getHelpActions() -> list[str]:
-    """Getter-function for help actions."""
-    return ['aboutQt', 'aboutConda', 'aboutPython']
-
-  @staticmethod
-  def getDebugActions() -> list[str]:
-    """Getter-function for debug actions."""
-    return ['debug%d' % i for i in range(1, 10)]
-
-  @classmethod
-  def _getMenuDicts(cls) -> dict[str, list[str]]:
-    """Getter-function for menu dictionaries."""
-    return {
-      'file' : cls.getFileActions(),
-      'edit' : cls.getEditActions(),
-      'help' : cls.getHelpActions(),
-      'debug': cls.getDebugActions(),
-    }
-
-  @classmethod
-  def getNamedMenuActions(cls, name: str) -> list[str]:
-    """Getter-function for named menus."""
-    return cls._getMenuDicts().get(name, [])
-
-  def __init__(self, mainWindow: BaseWindow):
-    """Initializes the menu bar."""
-    self.__main_window__ = mainWindow
-    QMenuBar.__init__(self)
-    self.initUi()
+  def initStyle(self, ) -> None:
+    """Initializes the style for the widget. Optional for subclasses to
+    implement. """
 
   def initUi(self, ) -> None:
-    """Initializes the user interface for the menu bar."""
-    self.addMenu(self.fileMenu)
-    self.addMenu(self.editMenu)
-    self.addMenu(self.helpMenu)
-    self.addMenu(self.debugMenu)
+    """Initializes the user interface for the widget. Required for subclasses
+    to implement. """
+    self.file = FileMenu(self.tr('File'))
+    self.fileAction = self.addMenu(self.file)
+    self.edit = EditMenu(self.tr('Edit'))
+    self.editAction = self.addMenu(self.edit)
+    self.help = HelpMenu(self.tr('Help'))
+    self.addMenu(self.help)
 
-  def addMenu(self, *args, **kwargs) -> QMenu:
-    """Reimplementation"""
-    setattr(self, '__main_menu_bar__', True)
-    return QMenuBar.addMenu(self, *args, **kwargs)
+  def initDebug(self) -> None:
+    """Initializes the debug menu. Optional for subclasses to implement."""
+    self.debug = DebugMenu(self.tr('Debug'))
+    self.addMenu(self.debug)
 
-  def getMain(self) -> MainMenuBar:
-    """Getter-function for the owning menu bar"""
-    mainWindow = self.__main_window__
-    if TYPE_CHECKING:
-      assert isinstance(mainWindow, MainMenuBar)
-    if mainWindow is not None:
-      if getattr(mainWindow, '__main_window__', None) is not None:
-        return mainWindow
-      e = """Expected owning instance of MainMenuBar to have set the 
-      attribute '__main_window__', but received: '%s' of type: '%s'"""
-      raise AttributeError(e % (mainWindow, type(mainWindow)))
+  def initSignalSlot(self) -> None:
+    """Initializes the signal/slot connections for the widget. Optional for
+    subclasses to implement."""
+
+  def _getMenuList(self) -> list[AbstractMenu]:
+    """Return a list of menus."""
+    if self.__added_menus__ is None:
+      self.__added_menus__ = []
+    return self.__added_menus__
+
+  def addMenu(self, *args) -> QAction:
+    """Add a menu to the menu bar. """
+    for arg in args:
+      if isinstance(arg, AbstractMenu):
+        self._getMenuList().append(arg)
+        return QMenuBar.addMenu(self, arg)
+    else:
+      return QMenuBar.addMenu(self, *args)
+
+  def hoverFactory(self, menu: AbstractMenu) -> Callable:
+    """Factory for hover handling"""
+
+    def hoverMenu(text: str) -> None:
+      """Handle hover action."""
+      clsName = menu.__class__.__name__
+      self.hoverText.emit('%s/%s' % (clsName, text))
+
+    return hoverMenu
+
+  def __iter__(self) -> MainMenuBar:
+    """Iterate over the contents of the menu bar."""
+    self.__iter_contents__ = self._getMenuList()
+    return self
+
+  def __next__(self, ) -> AbstractMenu:
+    """Implementation of iteration protocol"""
+    try:
+      return self.__iter_contents__.pop(0)
+    except IndexError:
+      raise StopIteration
+
+  def __len__(self) -> int:
+    """Return the number of menus in the menu bar."""
+    return len(self._getMenuList())
+
+  def __contains__(self, other: QMenu) -> bool:
+    """Check if a menu is in the menu bar."""
+    for menu in self:
+      if menu is other:
+        return True
+    else:
+      return False

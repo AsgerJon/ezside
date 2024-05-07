@@ -15,9 +15,7 @@ class MainWindow(LayoutWindow):
   """MainWindow subclasses the LayoutWindow and provides the main
   application business logic."""
 
+  __class_identity__ = 'MainWindow'
+
   def initSignalSlot(self) -> None:
     """Initialize the actions."""
-
-  def debug1Func(self, ) -> None:
-    """Debug1Func provides a function for debugging."""
-    self.statusBar().showMessage(str(self.menuBar()))

@@ -7,6 +7,9 @@ from __future__ import annotations
 from abc import abstractmethod
 from collections.abc import Callable
 from types import MethodType
+from typing import Any
+
+from vistutils.waitaminute import typeMsg
 
 
 class MetaCase(type):
@@ -15,6 +18,16 @@ class MetaCase(type):
   def __str__(cls) -> str:
     """String representation"""
     return cls.__name__
+
+  def __rmatmul__(cls, other: Any) -> Any:
+    """Return the result of the joinWords method."""
+    joinWords = getattr(cls, 'joinWords', None)
+    if joinWords is None:
+      return NotImplemented
+    if callable(joinWords):
+      return joinWords(*other)
+    e = typeMsg('joinWords', joinWords, Callable)
+    raise TypeError(e)
 
 
 class AbstractCase(metaclass=MetaCase):
