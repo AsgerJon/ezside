@@ -87,19 +87,21 @@ class BaseSettings(QSettings):
     """
     if key is None:
       return {
-        "new"      : "CTRL+N",
-        "open"     : "CTRL+O",
-        "save"     : "CTRL+S",
-        "saveAs"   : "CTRL+SHIFT+S",
-        "close"    : "CTRL+W",
-        "undo"     : "CTRL+Z",
-        "redo"     : "CTRL+Y",
-        "cut"      : "CTRL+X",
-        "copy"     : "CTRL+C",
-        "paste"    : "CTRL+V",
-        "selectAll": "CTRL+A",
-        "aboutQt"  : "F12",
-        "exit"     : "ALT+F4",
+        'new'      : 'CTRL+N',
+        'open'     : 'CTRL+O',
+        'save'     : 'CTRL+S',
+        'saveAs'   : 'CTRL+SHIFT+S',
+        'close'    : 'CTRL+W',
+        'undo'     : 'CTRL+Z',
+        'redo'     : 'CTRL+Y',
+        'cut'      : 'CTRL+X',
+        'copy'     : 'CTRL+C',
+        'paste'    : 'CTRL+V',
+        'selectAll': 'CTRL+A',
+        'aboutQt'  : 'F12',
+        'exit'     : 'ALT+F4',
+        'help'     : 'F1',
+        '__empty__': '',
       }
     if isinstance(key, str):
       shortcuts = cls._getKeyboardShortcuts()

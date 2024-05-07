@@ -6,10 +6,11 @@ LayoutWindow class."""
 from __future__ import annotations
 
 from abc import abstractmethod
+from random import randint
 from typing import Any, Callable
 
-from PySide6.QtCore import Signal, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import Signal, QUrl, Slot
+from PySide6.QtGui import QDesktopServices, QAction
 from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 
@@ -45,12 +46,6 @@ class BaseWindow(_AttriWindow):
 
     return go
 
-  def __init__(self, *args, **kwargs) -> None:
-    """Initialize the BaseWindow object."""
-    QMainWindow.__init__(self, )
-    if kwargs.get('debug', False):
-      setattr(self, '__debug_flag__', True)
-
   def show(self) -> None:
     """Show the window."""
     if self.__is_initialized__ is None:  # Initialize the menu bar
@@ -65,6 +60,8 @@ class BaseWindow(_AttriWindow):
 
   def _initCoreConnections(self) -> None:
     """Initialize the core actions for the main window."""
+    self.statusBar()
+    self.statusBar().showMessage('Initiating core connections...')
     self.menuBar().file.exit.triggered.connect(self.requestQuit)
     self.menuBar().help.help.triggered.connect(self.requestHelp)
     self.menuBar().help.aboutQt.triggered.connect(QApplication.aboutQt)
@@ -76,6 +73,29 @@ class BaseWindow(_AttriWindow):
     self.menuBar().help.aboutPython.triggered.connect(pythonLink)
     self.menuBar().help.aboutPySide6.triggered.connect(pysideLink)
     self.menuBar().help.help.triggered.connect(helpLink)
+    self._connectHover()
+    self.hoverText.connect(self._announceHover)
+
+  def _hoverFactory(self, action: QAction) -> Callable:
+    """Factory function for hover handlers"""
+
+    def hoverHandler() -> None:
+      """Handle hover events."""
+      self.hoverText.emit(action.text())
+
+    return hoverHandler
+
+  def _connectHover(self, ) -> None:
+    """Connects all hover actions to hover text"""
+    for menu in self.menuBar():
+      for action in menu:
+        handle = self._hoverFactory(action)
+        action.hovered.connect(handle)
+
+  @Slot(str)
+  def _announceHover(self, message) -> None:
+    """Announce hover text."""
+    self.statusBar().showMessage(message)
 
   @abstractmethod  # LayoutWindow
   def initStyle(self, ) -> None:
@@ -121,9 +141,7 @@ class BaseWindow(_AttriWindow):
 
   def setStatusBar(self, mainStatusBar: MainStatusBar) -> None:
     """Set the status bar for the main window."""
-    mainStatusBar.initStyle()
     mainStatusBar.initUi()
-    mainStatusBar.initSignalSlot()
     self.mainStatusBar = mainStatusBar
     QMainWindow.setStatusBar(self, mainStatusBar)
 

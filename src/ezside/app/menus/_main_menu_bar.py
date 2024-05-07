@@ -4,7 +4,6 @@ actions. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import TYPE_CHECKING, Callable
 
 from PySide6.QtCore import Signal

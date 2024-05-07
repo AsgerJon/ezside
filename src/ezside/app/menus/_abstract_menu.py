@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QAction
@@ -58,28 +58,21 @@ class AbstractMenu(_AttriMenu):
   def addAction(self, *args) -> QAction:
     """Add an action to the menu."""
     title = args[0]
+    name = title.split(' ')
+    if len(name) > 1:
+      first = '%s%s' % (name[0][0].lower(), name[0][1:])
+      rest = [word for word in name[1:]]
+      rest = ['%s%s' % (word[0].upper(), word[1:]) for word in rest]
+      name = '%s%s' % (first, ''.join(rest))
+    else:
+      name = name[0].lower()
     settings = AppSettings()
-    snake = settings.snakeCase(title)
-    camel = settings.camelCase(title)
-    icon = settings.value('icon/%s' % snake, )
-    shortcut = settings.value('shortcut/%s' % camel, )
-    bar = self.getOwningInstance()
+    icon = settings.value('icon/%s' % name, )
+    shortcut = settings.value('shortcut/%s' % name, )
     action = QMenu.addAction(self, icon, title, shortcut)
-    setattr(self, camel, action)
-    hoverHandler = self.hoverFactory(action)
-    action.hovered.connect(hoverHandler)
+    setattr(self, name, action)
     self._getActionList().append(action)
     return action
-
-  def hoverFactory(self, action: QAction) -> Callable:
-    """Factory for hover handling"""
-
-    def hoverAction() -> None:
-      """Handle hover action."""
-      clsName = self.__class__.__name__
-      self.hoverText.emit('%s/%s' % (clsName, action.text()))
-
-    return hoverAction
 
   def __iter__(self) -> AbstractMenu:
     """Iterate over the contents of the menu bar."""

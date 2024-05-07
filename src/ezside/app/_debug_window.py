@@ -3,10 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import time
-from typing import Callable
-
-from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QWidget
 from icecream import ic
 
 from ezside.app import MainWindow
@@ -21,6 +18,7 @@ class DebugWindow(MainWindow):
 
   def initSignalSlot(self) -> None:
     """Initialize the actions."""
+    MainWindow.initSignalSlot(self)
     self.mainMenuBar.debug.debug1.triggered.connect(self.debug1Func)
     self.mainMenuBar.debug.debug2.triggered.connect(self.debug2Func)
     self.mainMenuBar.debug.debug3.triggered.connect(self.debug3Func)
@@ -34,6 +32,10 @@ class DebugWindow(MainWindow):
   def debug1Func(self, ) -> None:
     """Debug1 function."""
     note = 'Debug1 function called'
+    print(note)
+    self.statusBar().showMessage(note)
+    QWidget.adjustSize(self.sevenSegDisplay)
+    QWidget.update(self.sevenSegDisplay)
 
   def debug2Func(self, ) -> None:
     """Debug2 function."""

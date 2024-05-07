@@ -9,13 +9,20 @@ from typing import Any
 from PySide6.QtCore import Qt, QMargins, QRect, QPointF
 from PySide6.QtGui import QFont, QPen, QColor, QBrush, QPaintEvent, QPainter
 from attribox import AttriBox
+from vistutils.text import monoSpace
 
 from ezside.core import Normal, \
   SolidFill, \
   SolidLine, \
   AlignCenter, \
   emptyPen, \
-  Center, AlignHCenter, AlignVCenter, AlignLeft, AlignRight, emptyBrush
+  Center, \
+  AlignHCenter, \
+  AlignVCenter, \
+  AlignLeft, \
+  AlignRight, \
+  emptyBrush, \
+  AlignTop, AlignBottom
 from ezside.widgets import BaseWidget
 
 
@@ -37,159 +44,224 @@ class Label(BaseWidget):
     self.text = self.__fallback_text__ if iniText is None else iniText
     super().__init__(*posArgs, **kwargs)
 
-  def getStyleFallbacks(self) -> dict[str, Any]:
-    """Returns the style fallbacks for the Label."""
-    font = QFont()
-    font.setFamily('Montserrat')
-    font.setPointSize(12)
-    font.setWeight(Normal)
-    textPen = QPen()
-    textPen.setColor(QColor(0, 0, 0, 255))
-    textPen.setStyle(Qt.PenStyle.SolidLine)
-    textPen.setWidth(1)
-    borderPen = QPen()
-    borderPen.setColor(QColor(144, 144, 144, 255))
-    borderPen.setStyle(SolidLine)
-    borderPen.setWidth(2)
-    backgroundBrush = QBrush()
-    backgroundBrush.setColor(QColor(255, 255, 255, 255))
-    backgroundBrush.setStyle(SolidFill)
-    align = AlignCenter
-    cornerRadius = 4
-    margins = 2
-    paddings = 2
+  @classmethod
+  def registerStyleIds(cls) -> list[str]:
+    """Registers the supported style IDs for Label."""
+    return ['title', 'warning', 'normal']
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """Registers the supported states for Label."""
+    return ['base', 'focus']
+
+  @classmethod
+  def registerFields(cls) -> dict[str, Any]:
+    """Registers default field values for Label, providing a foundation
+    for customization across different styleIds and states."""
     return {
-      'font'           : font,
-      'textPen'        : textPen,
-      'borderPen'      : borderPen,
-      'backgroundBrush': backgroundBrush,
-      'align'          : align,
-      'cornerRadius'   : cornerRadius,
-      'margins'        : margins,
-      'paddings'       : paddings,
+      'fontSize'           : 12,
+      'fontWeight'         : QFont.Weight.Normal,
+      'fontCapitalization' : QFont.Capitalization.MixedCase,
+      # Options: QFont.Capitalization.MixedCase, 'capitalize',
+      # QFont.Capitalization.SmallCaps, 'lowercase'
+      'textColor'          : QColor(0, 0, 0),  # Default black text
+      'backgroundColor'    : QColor(255, 255, 255),
+      'borderColor'        : QColor(0, 0, 0),
+      # Default white background
+      'borderCornerRadius' : 5,
+      'margins'            : QMargins(5, 5, 5, 5),
+      'borders'            : QMargins(1, 1, 1, 1),
+      'paddings'           : QMargins(5, 5, 5, 5),
+      'horizontalAlignment': AlignHCenter,
+      'verticalAlignment'  : AlignVCenter
     }
 
-  def initStyle(self) -> None:
-    """Initializes the styles. """
-
-  def initUi(self) -> None:
-    """Because the Label does not use layout or nested widgets,
-    the implementation of this abstract method is empty."""
-
-  def initSignalSlot(self) -> None:
-    """Because the Label does not use signals or slots,
-    the implementation of this abstract method is empty."""
-
-  def _getKey(self) -> str:
-    """Returns the key for the settings."""
-    return 'label/%s' % self.styleId
-
-  def _getOuterMargins(self) -> QMargins:
-    """Returns the outer margins."""
-    outerMargins = self.getStyle('outerMargins', QMargins(0, 0, 0, 0))
-    return outerMargins
-
-  def _getBorderWidth(self) -> int:
-    """Returns the border width."""
-    borderWidth = self.getStyle('borderWidth', 0)
-    return borderWidth
-
-  def _getBorderMargins(self) -> QMargins:
-    """Returns the border margins."""
-    width = self._getBorderWidth()
-    return QMargins(width, width, width, width)
-
-  def _getPadding(self, ) -> QMargins:
-    """Returns the padding."""
-    return self.getStyle('padding', QMargins(4, 4, 4, 4))
-
-  def _getCornerRadius(self) -> int:
-    """Returns the corner radius."""
-    return self.getStyle('cornerRadius', 4)
-
-  def _getBackgroundBrush(self) -> QBrush:
-    """Returns the background brush."""
-    fallbackBrush = QBrush()
-    fallbackBrush.setStyle(SolidFill)
-    fallbackBrush.setColor(QColor(225, 225, 225, 255, ))
-    return self.getStyle('backgroundBrush', fallbackBrush)
-
-  def _getBorderPen(self) -> QPen:
-    """Returns the border pen."""
-    fallbackPen = QPen()
-    fallbackPen.setStyle(SolidLine)
-    fallbackPen.setColor(QColor(63, 63, 63, 255))
-    fallbackPen.setWidth(2)
-    return self.getStyle('borderPen', fallbackPen)
-
-  def _getTextPen(self) -> QPen:
-    """Returns the text pen."""
-    fallbackTextPen = QPen()
-    fallbackTextPen.setStyle(SolidLine)
-    fallbackTextPen.setColor(QColor(0, 0, 0, 255))
-    fallbackTextPen.setWidth(1)
-    return self.getStyle('textPen', fallbackTextPen)
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Defines dynamic fields based on styleId and state. These settings
+    override the base field values in specific styles and states."""
+    return {
+      'title'  : {
+        'base' : {
+          'fontSize'          : 18,
+          'fontWeight'        : QFont.Weight.Bold,
+          'fontCapitalization': QFont.Capitalization.SmallCaps,
+          'textColor'         : QColor(25, 50, 75),
+          'backgroundColor'   : QColor(230, 240, 250),
+          'borderCornerRadius': 0,
+          'margins'           : QMargins(10, 10, 10, 10),
+          'borders'           : QMargins(2, 2, 2, 2),
+          'paddings'          : QMargins(10, 10, 10, 10)
+        },
+        'focus': {
+          'fontSize'          : 18,
+          'fontWeight'        : QFont.Weight.Bold,
+          'fontCapitalization': QFont.Capitalization.SmallCaps,
+          'textColor'         : QColor(25, 50, 75),
+          'backgroundColor'   : QColor(210, 220, 230),
+          'borderCornerRadius': 0,
+          'margins'           : QMargins(12, 12, 12, 12),
+          'borders'           : QMargins(3, 3, 3, 3),
+          'paddings'          : QMargins(12, 12, 12, 12)
+        }
+      },
+      'warning': {
+        'base' : {
+          'fontSize'          : 16,
+          'fontWeight'        : QFont.Weight.Bold,
+          'fontCapitalization': QFont.Capitalization.SmallCaps,
+          'textColor'         : QColor(255, 255, 255),
+          'backgroundColor'   : QColor(255, 165, 0),  # Orange
+          'borderCornerRadius': 10,
+          'margins'           : QMargins(8, 8, 8, 8),
+          'borders'           : QMargins(1, 1, 1, 1),
+          'paddings'          : QMargins(8, 8, 8, 8)
+        },
+        'focus': {
+          'fontSize'          : 16,
+          'fontWeight'        : QFont.Weight.Bold,
+          'fontCapitalization': QFont.Capitalization.SmallCaps,
+          'textColor'         : QColor(255, 255, 255),
+          'backgroundColor'   : QColor(255, 140, 0),  # Dark orange
+          'borderCornerRadius': 10,
+          'margins'           : QMargins(10, 10, 10, 10),
+          'borders'           : QMargins(2, 2, 2, 2),
+          'paddings'          : QMargins(10, 10, 10, 10)
+        }
+      },
+      'normal' : {
+        'base' : {
+          'fontSize'          : 12,
+          'fontWeight'        : QFont.Weight.Normal,
+          'fontCapitalization': QFont.Capitalization.MixedCase,
+          'textColor'         : QColor(0, 0, 0),
+          'backgroundColor'   : QColor(255, 255, 255),
+          'borderCornerRadius': 5,
+          'margins'           : QMargins(5, 5, 5, 5),
+          'borders'           : QMargins(1, 1, 1, 1),
+          'paddings'          : QMargins(5, 5, 5, 5)
+        },
+        'focus': {
+          'fontSize'          : 12,
+          'fontWeight'        : QFont.Weight.Normal,
+          'fontCapitalization': QFont.Capitalization.MixedCase,
+          'textColor'         : QColor(0, 0, 0),
+          'backgroundColor'   : QColor(245, 245, 245),  # Light grey
+          'borderCornerRadius': 5,
+          'margins'           : QMargins(7, 7, 7, 7),
+          'borders'           : QMargins(2, 2, 2, 2),
+          'paddings'          : QMargins(7, 7, 7, 7)
+        }
+      }
+    }
 
   def _getFont(self) -> QFont:
-    """Returns the font."""
-    fallbackFont = QFont()
-    fallbackFont.setFamily('Montserrat')
-    fallbackFont.setPointSize(12)
-    fallbackFont.setWeight(Normal)
-    return self.getStyle('font', fallbackFont)
+    """Instantiates QFont based on current state and styleId"""
+    fontSize = self._getFieldValue('fontSize')
+    fontWeight = self._getFieldValue('fontWeight')
+    fontCapitalization = self._getFieldValue('fontCapitalization')
+    font = QFont()
+    font.setPointSize(fontSize)
+    font.setWeight(fontWeight)
+    font.setCapitalization(fontCapitalization)
+    return font
 
-  def _getAlignRect(self, viewRect: QRect, movingRect: QRect) -> QRect:
-    """Returns the moving rectangle aligned to the view rectangle given
-    the current alignment settings"""
+  def _getTextPen(self) -> QPen:
+    """Instantiates QPen for text based on current state and styleId"""
+    textColor = self._getFieldValue('textColor')
+    pen = QPen()
+    pen.setStyle(SolidLine)
+    pen.setWidth(1)
+    pen.setColor(textColor)
+    return pen
+
+  def _getBackgroundBrush(self) -> QBrush:
+    """Instantiates QBrush for background based on current state and
+    styleId"""
+    backgroundColor = self._getFieldValue('backgroundColor')
+    brush = QBrush()
+    brush.setStyle(SolidFill)
+    brush.setColor(backgroundColor)
+    return brush
+
+  def _getBorderPen(self) -> QPen:
+    """Instantiates QPen for border based on current state and styleId"""
+    borderColor = self._getFieldValue('textColor')
+    pen = QPen()
+    pen.setStyle(SolidLine)
+    pen.setWidth(1)
+    pen.setColor(borderColor)
+    return pen
+
+  def _getBorderBrush(self) -> QBrush:
+    """Instantiates QBrush for border based on current state and styleId"""
+    borderColor = self._getFieldValue('borderColor')
+    brush = QBrush()
+    brush.setStyle(SolidFill)
+    brush.setColor(borderColor)
+    return brush
+
+  def _getAlignedRect(self, staticRect: QRect, movingRect: QRect) -> QRect:
+    """Calculates the aligned rectangle for text"""
+    vAlign = self._getFieldValue('verticalAlignment')
+    hAlign = self._getFieldValue('horizontalAlignment')
     movingSize = movingRect.size()
-    hAlign = self.getStyle('hAlign', AlignLeft)
-    vAlign = self.getStyle('vAlign', AlignVCenter)
-    left, top = viewRect.left(), viewRect.top()
+    staticHeight, movingHeight = staticRect.height(), movingRect.height()
+    staticWidth, movingWidth = staticRect.width(), movingRect.width()
+    if vAlign == AlignTop:
+      top = staticRect.top()
+    elif vAlign in [AlignCenter, AlignVCenter]:
+      top = staticRect.top() + (staticHeight - movingHeight) / 2
+    elif vAlign == AlignBottom:
+      top = staticRect.bottom() - movingHeight
+    else:
+      e = """Unrecognized value for vertical alignment: '%s'"""
+      raise ValueError(monoSpace(e % str(vAlign)))
     if hAlign == AlignLeft:
-      left += 0
-    elif hAlign == AlignHCenter:
-      left += (viewRect.width() - movingSize.width()) / 2
+      left = staticRect.left()
+    elif hAlign in [AlignCenter, AlignHCenter]:
+      left = staticRect.left() + (staticWidth - movingWidth) / 2
     elif hAlign == AlignRight:
-      left += viewRect.width() - movingSize.width()
-    if vAlign == AlignLeft:
-      top += 0
-    elif vAlign == AlignVCenter:
-      top += (viewRect.height() - movingSize.height()) / 2
-    elif vAlign == AlignRight:
-      top += viewRect.height() - movingSize.height()
+      left = staticRect.right() - movingWidth
+    else:
+      e = """Unrecognized value for horizontal alignment: '%s'"""
+      raise ValueError(monoSpace(e % str(hAlign)))
     topLeft = QPointF(left, top).toPoint()
     return QRect(topLeft, movingSize)
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Custom implementation of paint event"""
     painter = QPainter()
-    painter.begin(self)
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Request data
+
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Collect shapes
+    painter.begin(self)
     painter.setFont(self._getFont())  # Font must be set before boundingRect
     viewRect = painter.viewport()
     viewSize = viewRect.size()
-    outerMargins = self._getOuterMargins()
-    borderMargins = self._getBorderMargins()
-    padding = self._getPadding()
+    outerMargins = self._getFieldValue('margins')
+    borderMargins = self._getFieldValue('borders')
+    padding = self._getFieldValue('paddings')
     borderRect = viewRect.marginsRemoved(outerMargins)
     paddedRect = borderRect.marginsRemoved(borderMargins)
     innerRect = paddedRect.marginsRemoved(padding)
     textRect = painter.boundingRect(innerRect, Center, self.text)
-    alignedRect = self._getAlignRect(innerRect, textRect)
-    rectRadius = self._getCornerRadius()
+    alignedRect = self._getAlignedRect(innerRect, textRect)
+    cornerRadius = self._getFieldValue('borderCornerRadius')
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    #  Fill background
+    #  Fill background including border
+    borderBrush = self._getBorderBrush()
+    painter.setPen(emptyPen())
+    painter.setBrush(borderBrush)
+    painter.drawRoundedRect(borderRect, cornerRadius, cornerRadius)
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Fill background excluding border
     backgroundBrush = self._getBackgroundBrush()
     painter.setPen(emptyPen())
     painter.setBrush(backgroundBrush)
-    painter.drawRoundedRect(innerRect, rectRadius, rectRadius)
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    #  Draw border
-    borderPen = self._getBorderPen()
-    painter.setPen(borderPen)
-    painter.setBrush(emptyBrush())
-    painter.drawRoundedRect(borderRect, rectRadius, rectRadius)
+    painter.drawRoundedRect(innerRect, cornerRadius, cornerRadius)
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Print Text
     painter.setPen(self._getTextPen())

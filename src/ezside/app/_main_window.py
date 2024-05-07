@@ -15,7 +15,5 @@ class MainWindow(LayoutWindow):
   """MainWindow subclasses the LayoutWindow and provides the main
   application business logic."""
 
-  __class_identity__ = 'MainWindow'
-
   def initSignalSlot(self) -> None:
     """Initialize the actions."""

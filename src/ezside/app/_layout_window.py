@@ -12,18 +12,20 @@ from attribox import AttriBox
 from icecream import ic
 
 from ezside.app import BaseWindow
-from ezside.widgets import BaseWidget, Label
+from ezside.widgets import Label, SevenSegmentDisplay, BaseWidget
 
 ic.configureOutput(includeContext=True, )
 
-
+ 
 class LayoutWindow(BaseWindow):
   """LayoutWindow subclasses BaseWindow and implements the layout of
   widgets."""
 
   baseLayout = AttriBox[QVBoxLayout]()
   baseWidget = AttriBox[BaseWidget]()
-  welcomeLabel = AttriBox[Label]('YOLO')
+
+  welcomeLabel = Label
+  sevenSegDisplay = SevenSegmentDisplay
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -31,8 +33,9 @@ class LayoutWindow(BaseWindow):
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.setMinimumSize(QSize(320, 240))
+    self.setMinimumSize(QSize(640, 480))
     self.baseLayout.addWidget(self.welcomeLabel)
+    self.baseLayout.addWidget(self.sevenSegDisplay)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
