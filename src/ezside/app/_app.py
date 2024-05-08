@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QApplication
 from icecream import ic
 
-from ezside.app import MainWindow, DebugWindow
+from ezside.app import DebugWindow
 
 ic.configureOutput(includeContext=True, )
 
@@ -36,6 +36,7 @@ class App(QApplication):
     self.setOrganizationName('EZ')
     self.setAttribute(MenuFlag, True)
     self.mainWindow = DebugWindow()
+    self.quitRequested.connect(self.quit)
 
   @Slot()
   def maybeQuit(self, ) -> None:
@@ -59,4 +60,5 @@ class App(QApplication):
   def exec(self) -> int:
     """Executes the application."""
     self.mainWindow.show()
+    self.mainWindow.requestQuit.connect(self.quitRequested)
     return QApplication.exec_(self)

@@ -57,6 +57,7 @@ alignDict = {
 Expand = QSizePolicy.Policy.MinimumExpanding
 Tight = QSizePolicy.Policy.Maximum
 Fixed = QSizePolicy.Policy.Fixed
+Prefer = QSizePolicy.Policy.Preferred
 
 TimerType = Qt.TimerType
 Precise = Qt.TimerType.PreciseTimer
@@ -87,5 +88,5 @@ __all__ = [
   'AlignBottom', 'Expand', 'Tight', 'Fixed', 'TimerType', 'Precise',
   'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
   'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
-  'VERTICAL', 'HORIZONTAL', 'alignDict'
+  'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer'
 ]

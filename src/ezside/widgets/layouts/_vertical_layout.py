@@ -7,10 +7,17 @@ The suggested use is to add widget classes to it during initUi and call
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QVBoxLayout, QMainWindow
 from attribox import AttriBox
+from vistutils.waitaminute import typeMsg
 
-from ezside.core import AlignTop, AlignVCenter, Center, AlignBottom
+from ezside.core import AlignTop, \
+  AlignVCenter, \
+  Center, \
+  AlignBottom, \
+  Tight, \
+  Prefer
+from ezside.widgets import BaseWidget
 from ezside.widgets.layouts import AbstractLayout
 
 
@@ -21,16 +28,28 @@ class VerticalLayout(AbstractLayout):
 
   __inner_layout__ = AttriBox[QVBoxLayout]()
 
+  def __init__(self, *args, **kwargs) -> None:
+    AbstractLayout.__init__(self, *args, **kwargs)
+    self.setSizePolicy(Prefer, Tight)
+
   def initUi(self, ) -> None:
     """Initialize the user interface."""
     parent = self.getOwningInstance()
     self.__inner_layout__.setContentsMargins(0, 0, 0, 0)
     self.__inner_layout__.setSpacing(self.spacing)
-    if self.vAlign in [AlignTop, AlignVCenter, Center]:
+    if self.vAlign in [AlignBottom, AlignVCenter, Center]:
       self.__inner_layout__.addWidget(self.__top_spacer__)
     for entry in self._getAddedWidgets():
       cls, args, kwargs = entry['widget'], entry['pos'], entry['key']
-      self.__inner_layout__.addWidget(cls(parent, *args, **kwargs))
-    if self.vAlign in [AlignBottom, AlignVCenter, Center]:
+      widget = self.initWidget(cls, *args, **kwargs)
+      self.__inner_layout__.addWidget(widget)
+    if self.vAlign in [AlignTop, AlignVCenter, Center]:
       self.__inner_layout__.addWidget(self.__bottom_spacer__)
-    self.setLayout(self.__inner_layout__)
+    if isinstance(parent, QMainWindow):
+      self.setLayout(self.__inner_layout__)
+      parent.setCentralWidget(self)
+    elif isinstance(parent, BaseWidget):
+      parent.setLayout(self.__inner_layout__)
+    else:
+      e = typeMsg('parent', parent, BaseWidget)
+      raise TypeError

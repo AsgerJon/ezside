@@ -27,3 +27,7 @@ class Cunt:
   def __str__(self) -> str:
     """LMAO"""
     return str(self.align)
+
+  def __getitem__(self, item: Any) -> Any:
+    """FUCK"""
+    # ic(item)

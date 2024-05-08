@@ -12,3 +12,5 @@ from ._base_label import BaseLabel
 from ._label import Label
 from ._seven_segment_digit import SevenSegmentDigit
 from ._seven_segment_display import SevenSegmentDisplay
+from ._colon_display import ColonDisplay
+from ._digital_clock import DigitalClock

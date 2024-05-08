@@ -5,14 +5,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import QSizeF, QPointF, QRectF, QSize
+from PySide6.QtCore import QSizeF, QPointF, QRectF, QSize, QMargins
 from PySide6.QtGui import QPaintEvent, QPainter, QBrush, QColor, QPen
 from PySide6.QtWidgets import QWidget
+from icecream import ic
 from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
-from ezside.core import SolidFill, emptyPen, SolidLine, Tight
+from ezside.core import SolidFill, emptyPen, SolidLine, Expand
 from ezside.widgets import BaseWidget
+
+ic.configureOutput(includeContext=True, )
 
 
 class SevenSegmentDigit(BaseWidget):
@@ -35,8 +38,10 @@ class SevenSegmentDigit(BaseWidget):
       power = 4 if power is None else power
     self.__power_scale__ = power
     BaseWidget.__init__(self, parent)
-    self.setMinimumSize(QSize(32, 64))
-    self.setSizePolicy(Tight, Tight)
+    self.setFixedHeight(32)
+    self.setFixedWidth(16)
+    self.setSizePolicy(Expand, Expand)
+    self.__is_dot__ = kwargs.get('dot', False)
 
   @classmethod
   def registerFields(cls) -> dict[str, Any]:
@@ -44,10 +49,11 @@ class SevenSegmentDigit(BaseWidget):
     return {
       'backgroundColor' : QColor(223, 223, 223),
       'highSegmentColor': QColor(0, 0, 0),
-      'lowSegmentColor' : QColor(191, 191, 191),
-      'segmentAspect'   : 0.2,
-      'segmentSpacing'  : 4,
-      'cornerRadius'    : 2
+      'lowSegmentColor' : QColor(215, 215, 215),
+      'segmentAspect'   : 0.25,
+      'segmentSpacing'  : 1,
+      'cornerRadius'    : 1,
+      'margins'         : QMargins(0, 0, 0, 0, ),
     }
 
   def _getInnerValue(self) -> int:
@@ -74,6 +80,10 @@ class SevenSegmentDigit(BaseWidget):
     else:
       e = typeMsg('value', value, int)
       raise TypeError(e)
+
+  def setInnerValue(self, value: int) -> None:
+    """Public setter for the inner value."""
+    self._setInnerValue(value)
 
   def _increment(self) -> None:
     """Increments the inner value rolling over from 9 to 0"""
@@ -136,8 +146,15 @@ class SevenSegmentDigit(BaseWidget):
     pen = QPen()
     pen.setStyle(SolidLine)
     pen.setWidth(1)
-    pen.setColor(QColor(0, 0, 0, ))
+    pen.setColor(QColor(191, 191, 191, ))
     return emptyPen() if self._getSegState(segment) else pen
+
+  def _getBackgroundBrush(self) -> QBrush:
+    """Get the background brush."""
+    brush = QBrush()
+    brush.setStyle(SolidFill)
+    brush.setColor(self._getFieldValue('backgroundColor'))
+    return brush
 
   def _setPowerScale(self, scale: int) -> None:
     """Set the power scale."""
@@ -182,26 +199,32 @@ class SevenSegmentDigit(BaseWidget):
   def __float__(self) -> float:
     """Returns the inner value multiplied by 10 to the power at power
     scale. Please note that this may be negative. """
-    return self._getInnerValue() * 10 ** self._getPowerScale()
+    return float(self._getInnerValue() * 10 ** self._getPowerScale())
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Custom implementation of paint event"""
     aspect = self._getFieldValue('segmentAspect')
     radius = self._getFieldValue('cornerRadius')
     spacing = self._getFieldValue('segmentSpacing')
+    margins = self._getFieldValue('margins')
     painter = QPainter()
     painter.begin(self)
     painter.setPen(emptyPen())
     viewRect = painter.viewport()
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    H, W = viewRect.height(), viewRect.width()
+    painter.setBrush(self._getBackgroundBrush())
+    painter.setPen(emptyPen())
+    painter.drawRoundedRect(viewRect, radius, radius, )
+    innerRect = viewRect - margins
+    topMargin, leftMargin = margins.top(), margins.left()
+    H, W = innerRect.height(), innerRect.width()
     if self.__is_dot__:
       color = self._getFieldValue('highSegmentColor')
       brush = QBrush()
       brush.setStyle(SolidFill)
       brush.setColor(color)
       painter.setBrush(brush)
-      dotR = viewRect.width() / 3
+      dotR = viewRect.width() / 9
       dotX = viewRect.center().x()
       dotY = viewRect.bottom() - dotR * 1.5
       center = QPointF(dotX, dotY)
@@ -223,13 +246,15 @@ class SevenSegmentDigit(BaseWidget):
       DLeft = GLeft
       BLeft = ALeft + w + spacing
       CLeft = BLeft
-      A = QPointF(ALeft, ATop)
-      B = QPointF(BLeft, BFTop)
-      C = QPointF(CLeft, CETop)
-      D = QPointF(DLeft, DTop)
-      E = QPointF(ELeft, CETop)
-      F = QPointF(FLeft, BFTop)
-      G = QPointF(GLeft, GTop)
+      bottom = DTop + h + spacing
+      dv = (H - bottom) / 2
+      A = QPointF(ALeft + leftMargin, ATop + topMargin + dv)
+      B = QPointF(BLeft + leftMargin, BFTop + topMargin + dv)
+      C = QPointF(CLeft + leftMargin, CETop + topMargin + dv)
+      D = QPointF(DLeft + leftMargin, DTop + topMargin + dv)
+      E = QPointF(ELeft + leftMargin, CETop + topMargin + dv)
+      F = QPointF(FLeft + leftMargin, BFTop + topMargin + dv)
+      G = QPointF(GLeft + leftMargin, GTop + topMargin + dv)
       segments = {
         'A': QRectF(A, hSize),
         'B': QRectF(B, vSize),
@@ -242,13 +267,5 @@ class SevenSegmentDigit(BaseWidget):
       for (seg, rect) in segments.items():
         painter.setBrush(self._getSegBrush(seg))
         painter.setPen(self._getSegPen(seg))
-        painter.drawRoundedRect(rect, radius, radius)
-    debugBrush = QBrush()
-    debugBrush.setStyle(SolidFill)
-    coin = self._getPowerScale() % 2
-    color = QColor(255, 0, 144, 63) if coin else QColor(144, 255, 0, 63)
-    debugBrush.setColor(color)
-    painter.setBrush(debugBrush)
-    lmaoRect = QRectF(QPointF(0, 0), QSize(W, H))
-    painter.drawRect(lmaoRect)
+        painter.drawRect(rect, )
     painter.end()

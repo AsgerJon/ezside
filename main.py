@@ -11,6 +11,8 @@ from typing import Callable
 from icecream import ic
 
 from ezside.app import MainWindow, App
+from morevistutils._instance_slice import Q
+from tester_class_03 import Cunt
 
 
 def tester00() -> None:
@@ -22,6 +24,31 @@ def tester00() -> None:
 def tester01() -> int:
   """Main Tester Script"""
   return App().exec()
+
+
+def tester02() -> int:
+  """lmao"""
+  cunt = Cunt()
+  cunt[69:420]
+  cunt[::1]
+  cunt[::-1]
+  cunt[::Cunt]
+  cunt[cunt::Cunt]
+  Q = Cunt()
+  Q[cunt::Cunt]
+  return 0
+
+
+def tester03() -> int:
+  ic(Q[7::int])
+  ic(Q[7:int])
+  return 0
+
+
+def tester04() -> int:
+  lmao = time.clock()
+  ic(lmao)
+  return 0
 
 
 def main(callMeMaybe: Callable) -> None:

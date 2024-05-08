@@ -17,12 +17,17 @@ class FileMenu(AbstractMenu):
   open: QAction
   save: QAction
   saveAs: QAction
+  preferences: QAction
   exit: QAction
 
   def initUi(self) -> None:
     """Initialize the user interface."""
     self.new = self.addAction(self.tr('New'))
     self.open = self.addAction(self.tr('Open'))
+    self.addSeparator()
     self.save = self.addAction(self.tr('Save'))
     self.saveAs = self.addAction(self.tr('Save As'))
+    self.addSeparator()
+    self.preferences = self.addAction(self.tr('Preferences'))
+    self.addSeparator()
     self.exit = self.addAction(self.tr('Exit'))

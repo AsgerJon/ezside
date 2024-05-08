@@ -7,25 +7,23 @@ from __future__ import annotations
 from abc import abstractmethod
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QVBoxLayout
 from attribox import AttriBox
 from icecream import ic
 
 from ezside.app import BaseWindow
-from ezside.widgets import Label, SevenSegmentDisplay, BaseWidget
+from ezside.widgets import Label, DigitalClock
+from ezside.widgets.layouts import VerticalLayout
+from morevistutils import Bag
 
 ic.configureOutput(includeContext=True, )
 
- 
+
 class LayoutWindow(BaseWindow):
   """LayoutWindow subclasses BaseWindow and implements the layout of
   widgets."""
 
-  baseLayout = AttriBox[QVBoxLayout]()
-  baseWidget = AttriBox[BaseWidget]()
-
-  welcomeLabel = Label
-  sevenSegDisplay = SevenSegmentDisplay
+  baseLayout = AttriBox[VerticalLayout]()
+  welcomeLabel = Label @ Bag('YOLO!')
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -35,9 +33,7 @@ class LayoutWindow(BaseWindow):
     """The initUi method initializes the user interface of the window."""
     self.setMinimumSize(QSize(640, 480))
     self.baseLayout.addWidget(self.welcomeLabel)
-    self.baseLayout.addWidget(self.sevenSegDisplay)
-    self.baseWidget.setLayout(self.baseLayout)
-    self.setCentralWidget(self.baseWidget)
+    self.baseLayout.initUi()
 
   @abstractmethod  # MainWindow
   def initSignalSlot(self) -> None:

@@ -32,9 +32,9 @@ class GridLayout(AbstractLayout):
     self.__inner_layout__.setSpacing(self.spacing)
     addedWidgets = self._getAddedWidgets()
     rowOffset, colOffset = 0, 0
-    if self.hAlign in [AlignLeft, AlignHCenter, Center]:
+    if self.hAlign in [AlignRight, AlignHCenter, Center]:
       rowOffset = 1
-    if self.vAlign in [AlignTop, AlignVCenter, Center]:
+    if self.vAlign in [AlignBottom, AlignVCenter, Center]:
       colOffset = 1
     maxRow, maxCol = 0, 0
     for entry in addedWidgets:
@@ -63,16 +63,16 @@ class GridLayout(AbstractLayout):
       col += colOffset
       maxRow = max(row + rowSpan, maxRow)
       maxCol = max(col + colSpan, maxCol)
-      widget = cls(parent, *notInts, **kwargs)
+      widget = self.initWidget(parent, *notInts, **kwargs)
       self.__inner_layout__.addWidget(widget, row, col, rowSpan, colSpan)
     if rowOffset:
       self.__inner_layout__.addWidget(self.__left_spacer__, 0, 0, maxCol, 1)
     if colOffset:
       self.__inner_layout__.addWidget(self.__top_spacer__, 0, 0, 1, maxRow)
-    if self.hAlign in [AlignHCenter, Center, AlignRight]:
+    if self.hAlign in [AlignHCenter, Center, AlignLeft]:
       rightSpacer = self.__right_spacer__
       self.__inner_layout__.addWidget(rightSpacer, 0, maxCol, maxRow, 1)
-    if self.vAlign in [AlignVCenter, Center, AlignBottom]:
+    if self.vAlign in [AlignVCenter, Center, AlignTop]:
       bottomSpacer = self.__bottom_spacer__
       self.__inner_layout__.addWidget(bottomSpacer, maxRow, 0, 1, maxCol)
     self.setLayout(self.__inner_layout__)

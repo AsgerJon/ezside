@@ -8,10 +8,17 @@ The suggested use is to add widget classes to it during initUi and call
 from __future__ import annotations
 
 from PySide6.QtCore import QObject
-from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QHBoxLayout, QMainWindow
 from attribox import AttriBox
+from vistutils.waitaminute import typeMsg
 
-from ezside.core import AlignLeft, Center, AlignHCenter
+from ezside.core import AlignLeft, \
+  Center, \
+  AlignHCenter, \
+  AlignRight, \
+  Tight, \
+  Prefer
+from ezside.widgets import BaseWidget
 from ezside.widgets.layouts import AbstractLayout
 
 Shiboken = type(QObject)
@@ -24,14 +31,29 @@ class HorizontalLayout(AbstractLayout):
 
   __inner_layout__ = AttriBox[QHBoxLayout]()
 
+  def __init__(self, *args, **kwargs) -> None:
+    AbstractLayout.__init__(self, *args, **kwargs)
+    self.setSizePolicy(Tight, Prefer, )
+
   def initUi(self, ) -> None:
     """Initialize the user interface."""
     parent = self.getOwningInstance()
     self.__inner_layout__.setContentsMargins(0, 0, 0, 0)
     self.__inner_layout__.setSpacing(self.spacing)
-    if self.hAlign in [AlignLeft, AlignHCenter, Center]:
+    if self.hAlign in [AlignRight, AlignHCenter, Center]:
       self.__inner_layout__.addWidget(self.__left_spacer__)
     for entry in self._getAddedWidgets():
       cls, args, kwargs = entry['widget'], entry['pos'], entry['key']
-      self.__inner_layout__.addWidget(cls(parent, *args, **kwargs))
+      widget = self.initWidget(cls, *args, **kwargs)
+      self.__inner_layout__.addWidget(widget)
     self.setLayout(self.__inner_layout__)
+    if self.hAlign in [AlignHCenter, Center, AlignLeft]:
+      self.__inner_layout__.addWidget(self.__right_spacer__, )
+    if isinstance(parent, QMainWindow):
+      self.setLayout(self.__inner_layout__)
+      parent.setCentralWidget(self)
+    elif isinstance(parent, BaseWidget):
+      parent.setLayout(self.__inner_layout__)
+    else:
+      e = typeMsg('parent', parent, BaseWidget)
+      raise TypeError

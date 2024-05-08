@@ -3,10 +3,13 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from PySide6.QtCore import QSettings
 from PySide6.QtWidgets import QWidget
+from attribox import AttriBox
 from icecream import ic
 
 from ezside.app import MainWindow
+from ezside.core import EZTimer, Coarse
 
 ic.configureOutput(includeContext=True, )
 
@@ -32,16 +35,16 @@ class DebugWindow(MainWindow):
   def debug1Func(self, ) -> None:
     """Debug1 function."""
     note = 'Debug1 function called'
-    print(note)
     self.statusBar().showMessage(note)
-    QWidget.adjustSize(self.sevenSegDisplay)
-    QWidget.update(self.sevenSegDisplay)
 
   def debug2Func(self, ) -> None:
     """Debug2 function."""
     note = 'Debug2 function called'
     print(note)
     self.statusBar().showMessage(note)
+    settings = QSettings()
+    for item in settings.allKeys():
+      print(item, settings.value(item))
 
   def debug3Func(self, ) -> None:
     """Debug3 function."""

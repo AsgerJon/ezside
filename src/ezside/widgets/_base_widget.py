@@ -4,13 +4,14 @@ application."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from PySide6.QtGui import QPaintEvent, QPainter, QColor, QPen
+from typing import TYPE_CHECKING, Callable, Any
 
 from PySide6.QtWidgets import QWidget
 from vistutils.text import monoSpace
 
 from ezside.app import AppSettings
+from ezside.core import SolidLine, emptyBrush
 from ezside.widgets import _AttriWidget
 
 if TYPE_CHECKING:
@@ -20,6 +21,8 @@ if TYPE_CHECKING:
 class BaseWidget(_AttriWidget):
   """BaseWidget provides a common base class for all widgets in the
   application."""
+
+  __debug_flag__ = None
 
   __style_map__ = None
   __style_fields__ = None
@@ -53,6 +56,7 @@ class BaseWidget(_AttriWidget):
     else:
       QWidget.__init__(self)
     self.__style_id__ = kwargs.get('id', 'normal')
+    self._applyFields()
 
   def initUi(self, ) -> None:
     """Initializes the user interface for the widget. If subclasses have
@@ -165,7 +169,7 @@ class BaseWidget(_AttriWidget):
   def _applyFields(cls, ) -> None:
     """Applies the fields to the widget. Subclasses are not permitted to
     reimplement. This prohibition will be enforced in a future update."""
-    fields = cls.registerFields()
+    fields = cls.registerFields() or {}
     styleIds = cls.registerStyleIds() or ['normal']
     states = cls.registerStates() or ['base']
     dynamicFields = cls.registerDynamicFields() or {}
@@ -240,3 +244,19 @@ class BaseWidget(_AttriWidget):
       names = '\n  '.join([name for name in styleMap.keys()])
       raise KeyError(monoSpace(e % (name, styleKey, names)))
     return AppSettings().value(styleKey, fb)
+
+  def paintEvent(self, event: QPaintEvent) -> None:
+    """The paintEvent method paints the widget."""
+    if self.__debug_flag__ is None:
+      return
+    painter = QPainter()
+    painter.begin(self)
+    viewRect = painter.viewport()
+    pen = QPen()
+    pen.setStyle(SolidLine)
+    pen.setWidth(1)
+    pen.setColor(QColor(0, 0, 0, ))
+    painter.setPen(pen)
+    painter.setBrush(emptyBrush())
+    painter.drawRoundedRect(viewRect, 4, 4)
+    painter.end()

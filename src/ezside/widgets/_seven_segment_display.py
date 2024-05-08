@@ -3,23 +3,29 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QWidget, QHBoxLayout
-from vistutils.waitaminute import typeMsg
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QWidget
+from attribox import AttriBox
+from icecream import ic
 
 from ezside.widgets import BaseWidget, SevenSegmentDigit
+from ezside.widgets.layouts import HorizontalLayout
+from morevistutils import Bag
 
 
 class SevenSegmentDisplay(BaseWidget):
   """SevenSegmentDisplay implements a seven segment display in a widget. """
 
-  __num_digs__ = None
   __digit_widgets__ = None
   __base_layout__ = None
   __inner_value__ = None
 
+  numDigs = AttriBox[int]()
+  baseLayout = AttriBox[HorizontalLayout](spacing=4)
+  digWidgets = SevenSegmentDigit @ Bag()
+
   def __init__(self, *args) -> None:
     parent, numDigs = None, None
-
     for arg in args:
       if isinstance(arg, QWidget) and parent is None:
         parent = arg
@@ -29,14 +35,16 @@ class SevenSegmentDisplay(BaseWidget):
         break
     else:
       numDigs = 4 if numDigs is None else numDigs
-
-    self.__num_digs__ = numDigs
-
+    self.numDigs = numDigs
     BaseWidget.__init__(self, parent)
 
   def _getInnerValue(self) -> float:
     """Getter-function for the inner value of the widget"""
     return self.__inner_value__
+
+  def _getDigitWidgets(self) -> list[SevenSegmentDigit]:
+    """Getter-function for the digit widgets"""
+    return [*self.baseLayout]
 
   def _getDisplayValue(self) -> float:
     """Getter-function for the value currently displayed on the widget"""
@@ -48,6 +56,13 @@ class SevenSegmentDisplay(BaseWidget):
   def _setInnerValue(self, value: float) -> None:
     """Setter-function for the inner value of the widget"""
     self.__inner_value__ = value
+    self.update()
+
+  @Slot(float)
+  def setValue(self, value: float) -> None:
+    """Setter-function for the value to be displayed on the widget"""
+    ic(value)
+    self._setInnerValue(value)
 
   def _dotLeft(self) -> None:
     """Shifts all digits left"""
@@ -61,13 +76,17 @@ class SevenSegmentDisplay(BaseWidget):
 
   def _setDisplayValue(self, value: float) -> None:
     """Setter-function for the value currently displayed on the widget"""
-    while getattr(self, 'dig0').getScale() * 10 > value:
+    while 10 ** self.baseLayout[0].getScale() > 10 * value:
       self._dotLeft()
-    while getattr(self, 'dig0').getScale() * 10 < value:
+    while 10 ** self.baseLayout[0].getScale() < 10 * value:
       self._dotRight()
-    fmtSpec = '%%.%df' % self._getNumDigs()
+    for widget in self.baseLayout:
+      ic(widget.getScale())
+    fmtSpec = '%%.%df' % len(self.baseLayout)
     lmao = fmtSpec % value
-    digValues = [int(d) for d in lmao]
+    dotLeft, dotRight = [*[len(i) for i in lmao.split('.')], None][:2]
+    digChars = [c for c in lmao if c in '0123456789']
+    digValues = [int(d) for d in digChars]
     for widget, value in zip(self._getDigitWidgets(), digValues):
       widget.setInnerValue(value)
 
@@ -81,48 +100,13 @@ class SevenSegmentDisplay(BaseWidget):
         widget.update()
     super().update()
 
-  def _getNumDigs(self) -> int:
-    """Get the number of digits."""
-    if self.__num_digs__ is None:
-      e = """The number of digits must be set before the widget is 
-      initialized!"""
-      raise AttributeError(e)
-    if isinstance(self.__num_digs__, int):
-      return self.__num_digs__
-    e = typeMsg('num_digs', self.__num_digs__, int)
-    raise TypeError(e)
-
-  def _setNumDigs(self, numDigs: int) -> None:
-    """Set the number of digits."""
-    if self.__num_digs__ is not None:
-      e = """The number of digits has already been set!"""
-      raise AttributeError(e)
-    if isinstance(numDigs, int):
-      self.__num_digs__ = numDigs
-    else:
-      e = typeMsg('numDigs', numDigs, int)
-      raise TypeError(e)
-
-  def _getDigitWidgets(self) -> list[SevenSegmentDigit]:
-    """Get the digit widgets."""
-    n = self._getNumDigs()
-    if self.__digit_widgets__ is None:
-      self.__digit_widgets__ = []
-      for i in range(self._getNumDigs()):
-        widget = SevenSegmentDigit(self, n - i)
-        key = 'dig%d' % i
-        setattr(self, key, widget)
-        self.__digit_widgets__.append(widget)
-    return self.__digit_widgets__
-
-  def _getBaseLayout(self, ) -> QHBoxLayout:
-    """Get the base layout."""
-    if self.__base_layout__ is None:
-      self.__base_layout__ = QHBoxLayout(self)
-    return self.__base_layout__
-
-  def initUi(self) -> None:
+  def initUi(self, ) -> None:
     """Initialize the user interface."""
-    for widget in self._getDigitWidgets():
-      self._getBaseLayout().addWidget(widget)
-    self.setLayout(self._getBaseLayout())
+    n = 0
+    for i in range(self.numDigs):
+      n = self.numDigs - i - 1
+      self.baseLayout.addWidget(self.digWidgets(scale=n, key='%d' % n))
+    n -= 1
+    self.baseLayout.addWidget(
+      self.digWidgets(dot=True, scale=n, key='%d' % n))
+    self.baseLayout.initUi()
