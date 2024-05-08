@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Callable
-from types import MethodType
 from typing import Any
 
 from vistutils.waitaminute import typeMsg

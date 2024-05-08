@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF, QMargins
+from PySide6.QtCore import QRectF, QPointF, QSizeF, QMargins
 from PySide6.QtGui import QPaintEvent, QPainter, QBrush, QColor
 
 from ezside.core import emptyPen, SolidFill

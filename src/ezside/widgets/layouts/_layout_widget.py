@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from PySide6.QtGui import QPaintEvent, QPainter, QBrush, QColor
 
+from typing import Any
 from ezside.core import Tight, SolidFill, emptyPen
 from ezside.widgets import BaseWidget
 
@@ -17,6 +18,25 @@ class LayoutWidget(BaseWidget):
   assigned to it before a QMainWindow makes it the central widget.
   Typically, a simple QWidget instance may be used, but a subclass such as
   this can be made to provide additional functionality. """
+
+  @classmethod
+  def registerFields(cls) -> dict[str, Any]:
+    """Registers field"""
+    return {}
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """Registers states"""
+    return ['base', ]
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Registers dynamic fields"""
+    return {}
+
+  def detectState(self) -> str:
+    """State detection"""
+    return 'base'
 
   def initUi(self) -> None:
     """Initialize the user interface."""

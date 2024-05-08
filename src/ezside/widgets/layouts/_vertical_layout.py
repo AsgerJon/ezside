@@ -7,6 +7,7 @@ The suggested use is to add widget classes to it during initUi and call
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Any
 from PySide6.QtWidgets import QVBoxLayout, QMainWindow
 from attribox import AttriBox
 from vistutils.waitaminute import typeMsg
@@ -25,6 +26,25 @@ class VerticalLayout(AbstractLayout):
   """VerticalLayout provides a layout packing widgets vertically. The
   class supports alignments and spacing between widgets. It achieves this by
   the use of spacers."""
+
+  @classmethod
+  def registerFields(cls) -> dict[str, Any]:
+    """Registers field"""
+    return {}
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """Registers states"""
+    return ['base', ]
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Registers dynamic fields"""
+    return {}
+
+  def detectState(self) -> str:
+    """State detection"""
+    return 'base'
 
   __inner_layout__ = AttriBox[QVBoxLayout]()
 

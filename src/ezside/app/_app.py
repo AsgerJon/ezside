@@ -37,6 +37,7 @@ class App(QApplication):
     self.setApplicationName('EZSide')
     self.setOrganizationName('EZ')
     self.setAttribute(MenuFlag, True)
+    self.mainWindow.initUi()
     self.requestQuit.connect(self.initiateQuit)
     self.threadsExited.connect(self.quit)
 

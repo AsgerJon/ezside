@@ -7,6 +7,8 @@ The suggested use is to add widget classes to it during initUi and call
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Any
+
 from PySide6.QtWidgets import QGridLayout
 from attribox import AttriBox
 from vistutils.text import monoSpace
@@ -22,6 +24,25 @@ class GridLayout(AbstractLayout):
   the use of spacers. Although labelled a 'layout' it is in fact a widget.
   The suggested use is to add widget classes to it during initUi and call
   'setCentralWidget' on it after."""
+
+  @classmethod
+  def registerFields(cls) -> dict[str, Any]:
+    """Registers field"""
+    return {}
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """Registers states"""
+    return ['base', ]
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Registers dynamic fields"""
+    return {}
+
+  def detectState(self) -> str:
+    """State detection"""
+    return 'base'
 
   __inner_layout__ = AttriBox[QGridLayout]()
 
