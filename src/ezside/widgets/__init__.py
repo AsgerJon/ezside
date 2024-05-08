@@ -5,6 +5,7 @@ window. """
 from __future__ import annotations
 
 from ._attri_widget import _AttriWidget
+from ._base_widget_privates import _BaseWidgetPrivates
 from ._base_widget import BaseWidget
 from ._horizontal_spacer import HorizontalSpacer
 from ._vertical_spacer import VerticalSpacer

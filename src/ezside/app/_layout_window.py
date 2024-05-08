@@ -11,7 +11,7 @@ from attribox import AttriBox
 from icecream import ic
 
 from ezside.app import BaseWindow
-from ezside.widgets import Label, DigitalClock
+from ezside.widgets import Label
 from ezside.widgets.layouts import VerticalLayout
 from morevistutils import Bag
 

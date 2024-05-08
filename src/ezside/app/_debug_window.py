@@ -4,12 +4,9 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QWidget
-from attribox import AttriBox
 from icecream import ic
 
 from ezside.app import MainWindow
-from ezside.core import EZTimer, Coarse
 
 ic.configureOutput(includeContext=True, )
 

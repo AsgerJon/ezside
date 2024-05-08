@@ -127,7 +127,6 @@ class AbstractLayout(BaseWidget):
       raise TypeError(e)
     parent = self.getOwningInstance()
     key = kwargs.get('key', None)
-    ic(key)
     widget = cls(parent, *args, **kwargs)
     widget.initUi()
     widget.initSignalSlot()

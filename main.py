@@ -51,6 +51,23 @@ def tester04() -> int:
   return 0
 
 
+def tester05() -> int:
+  try:
+    raise SystemExit
+  except BaseException as urmom:
+    print(urmom.__class__.__name__)
+    return 0
+
+
+def tester06() -> None:
+  """CUNTCUNTCUNT"""
+  cunt = Cunt()
+  print(Cunt.lmao)
+  for item in Cunt.yolo:
+    if callable(item['val']):
+      print(item['key'], type(item['val']))
+
+
 def main(callMeMaybe: Callable) -> None:
   """Main Tester Script"""
   tic = time.time()
@@ -64,4 +81,8 @@ def main(callMeMaybe: Callable) -> None:
 
 
 if __name__ == '__main__':
-  main(tester01)
+  try:
+    main(tester01)
+  except BaseException as exception:
+    print(str(exception))
+    raise exception

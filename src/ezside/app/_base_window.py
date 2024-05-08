@@ -6,7 +6,6 @@ LayoutWindow class."""
 from __future__ import annotations
 
 from abc import abstractmethod
-from random import randint
 from typing import Any, Callable
 
 from PySide6.QtCore import Signal, QUrl, Slot
@@ -51,9 +50,9 @@ class BaseWindow(_AttriWindow):
     if self.__is_initialized__ is None:  # Initialize the menu bar
       self.menuBar()
       self.statusBar()
-      self._initCoreConnections()
       self.initStyle()
       self.initUi()
+      self._initCoreConnections()
       self.initSignalSlot()
       self.__is_initialized__ = True
     QMainWindow.show(self)
@@ -75,6 +74,8 @@ class BaseWindow(_AttriWindow):
     self.menuBar().help.help.triggered.connect(helpLink)
     self._connectHover()
     self.hoverText.connect(self._announceHover)
+    # self.refreshClock.timeout.connect(self.statusBar().updateTime)
+    # self.refreshClock.start()
 
   def _hoverFactory(self, action: QAction) -> Callable:
     """Factory function for hover handlers"""

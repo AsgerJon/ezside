@@ -7,7 +7,6 @@ from __future__ import annotations
 from ._resolve_font_family import resolveFontFamily
 from ._parse_font import parseFont
 
-from ._ez_timer import EZTimer
 from ._qt_names import *
 from ._colors import *
 

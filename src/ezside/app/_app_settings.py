@@ -13,6 +13,12 @@ from icecream import ic
 from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
+from ezside.core import AlignHCenter, \
+  AlignRight, \
+  AlignLeft, \
+  AlignCenter, \
+  AlignFlag
+
 if TYPE_CHECKING:
   pass
 
@@ -118,7 +124,61 @@ class AppSettings(QSettings):
       return iconPaths[key]
     return iconPaths['__empty__']
 
+  @staticmethod
+  def _parseInt(val: str) -> int | None:
+    """Convert a string to an integer."""
+    if all([c in '0123456789_' for c in val]):
+      return int(val)
+    return None
+
+  @staticmethod
+  def _parseFloat(val: str) -> float | None:
+    """Convert a string to a float."""
+    if all([c in '0123456789_.' for c in val]):
+      if len(val) - len(val.replace('.', '')) > 1:
+        return None
+      return float(val)
+    return None
+
+  @staticmethod
+  def _parseAlignment(val: str, key: str = None) -> int | None:
+    """Parse the alignment."""
+    if 'align' in key.lower():
+      if 'horizontal' in key.lower():
+        if 'center' in val.lower():
+          return AlignHCenter
+        if 'left' in val.lower():
+          return AlignLeft
+        if 'right' in val.lower():
+          return AlignRight
+      if 'vertical' in key.lower():
+        if 'center' in val.lower():
+          return AlignHCenter
+        if 'top' in val.lower():
+          return AlignLeft
+        if 'bottom' in val.lower():
+          return AlignRight
+      if 'center' in val.lower():
+        return AlignCenter
+    return None
+
   def value(self, *args) -> Any:
+    """Get the value of the key."""
+    val = self._wrapValue(*args)
+    key = args[0]
+    if not isinstance(val, str):
+      return val
+    intVal = self._parseInt(val)
+    if isinstance(intVal, int):
+      return intVal
+    floatVal = self._parseFloat(val)
+    if isinstance(floatVal, float):
+      return floatVal
+    alignVal = self._parseAlignment(val, key)
+    if isinstance(alignVal, AlignFlag):
+      return alignVal
+    
+  def _wrapValue(self, *args) -> Any:
     """Get the value of the key."""
     key, fb, type_ = [*args, None, None, None][:3]
     if key is None:
@@ -151,3 +211,8 @@ class AppSettings(QSettings):
     if self.__on_missing__ is None:
       return
     return self.__on_missing__(key, fb)
+
+  def toStringFactory(self, cls: type) -> Callable:
+    """Because QSettings is a scam pretending to save python objects,
+    but instead saving text we here provide a factory for creating
+    converters from the given type to a string. """

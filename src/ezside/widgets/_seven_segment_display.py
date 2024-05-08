@@ -3,6 +3,8 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Any
+
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QWidget
 from attribox import AttriBox
@@ -15,6 +17,28 @@ from morevistutils import Bag
 
 class SevenSegmentDisplay(BaseWidget):
   """SevenSegmentDisplay implements a seven segment display in a widget. """
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Dynamic fields"""
+    return {}
+
+  def detectState(self) -> str:
+    """State detector"""
+    return 'base'
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """State register"""
+    return ['base', ]
+
+  @classmethod
+  def registerFields(cls) -> dict[str, Any]:
+    """Style Fields"""
+    return {}
+
+  def initSignalSlot(self) -> None:
+    """Connects signals and slots"""
 
   __digit_widgets__ = None
   __base_layout__ = None

@@ -40,7 +40,7 @@ class ColonDisplay(SevenSegmentDigit):
     painter = QPainter()
     painter.begin(self)
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    margins = self._getFieldValue('margins')
+    margins = self._getStyle('margins')
     viewRect = painter.viewport() - margins
     height = viewRect.height() / 6
     width = viewRect.width()

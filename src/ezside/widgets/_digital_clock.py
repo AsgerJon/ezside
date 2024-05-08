@@ -5,6 +5,7 @@ current time in a digital clock format. """
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from PySide6.QtCore import Slot
 from attribox import AttriBox
@@ -19,15 +20,35 @@ class DigitalClock(BaseWidget):
   """DigitalClock widget uses the SevenSegmentDigit class to display the
   current time in a digital clock format. """
 
+  @classmethod
+  def registerFields(cls) -> dict[str, Any]:
+    """The registerFields method registers the fields of the widget."""
+    return {}
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """The registerStates method registers the states of the widget."""
+    return ['base', ]
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """The registerDynamicFields method registers the dynamic fields of the
+    widget."""
+    return {}
+
+  def detectState(self) -> str:
+    """The detectState method detects the state of the widget."""
+    return 'base'
+
   baseLayout = AttriBox[HorizontalLayout](spacing=0, hAlign=AlignRight, )
 
   colon = ColonDisplay @ Bag()
-  seconds = SevenSegmentDigit @ Bag(key='seconds')
-  secondsTens = SevenSegmentDigit @ Bag(key='secondsTens')
-  minutes = SevenSegmentDigit @ Bag(key='minutes')
-  minutesTens = SevenSegmentDigit @ Bag(key='minutesTens')
-  hours = SevenSegmentDigit @ Bag(key='hours')
-  hoursTens = SevenSegmentDigit @ Bag(key='hoursTens')
+  seconds = SevenSegmentDigit @ Bag(key='seconds', styleId='clock')
+  secondsTens = SevenSegmentDigit @ Bag(key='secondsTens', styleId='clock')
+  minutes = SevenSegmentDigit @ Bag(key='minutes', styleId='clock')
+  minutesTens = SevenSegmentDigit @ Bag(key='minutesTens', styleId='clock')
+  hours = SevenSegmentDigit @ Bag(key='hours', styleId='clock')
+  hoursTens = SevenSegmentDigit @ Bag(key='hoursTens', styleId='clock')
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the widget."""
@@ -41,6 +62,10 @@ class DigitalClock(BaseWidget):
     self.baseLayout.addWidget(self.secondsTens, key='secondsTens')
     self.baseLayout.addWidget(self.seconds, key='seconds')
     self.baseLayout.initUi()
+
+  def initSignalSlot(self) -> None:
+    """The initSignalSlot method initializes the signal and slot connections
+    of the widget."""
 
   @Slot()
   def refresh(self) -> None:

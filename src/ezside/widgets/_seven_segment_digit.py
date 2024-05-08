@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import QSizeF, QPointF, QRectF, QSize, QMargins
+from PySide6.QtCore import QSizeF, QPointF, QRectF, QMargins
 from PySide6.QtGui import QPaintEvent, QPainter, QBrush, QColor, QPen
 from PySide6.QtWidgets import QWidget
 from icecream import ic
@@ -37,24 +37,77 @@ class SevenSegmentDigit(BaseWidget):
     else:
       power = 4 if power is None else power
     self.__power_scale__ = power
-    BaseWidget.__init__(self, parent)
+    BaseWidget.__init__(self, *args, **kwargs)
+    self.__is_dot__ = kwargs.get('dot', False)
+
+  def initUi(self, ) -> None:
+    """Initialize the user interface."""
     self.setFixedHeight(32)
     self.setFixedWidth(16)
     self.setSizePolicy(Expand, Expand)
-    self.__is_dot__ = kwargs.get('dot', False)
+
+  def initSignalSlot(self) -> None:
+    """Initialize the signal slot."""
 
   @classmethod
   def registerFields(cls) -> dict[str, Any]:
     """Register the fields."""
+    backgroundBrush = QBrush()
+    backgroundBrush.setStyle(SolidFill)
+    backgroundBrush.setColor(QColor(223, 223, 223))
+    backgroundPen = QPen()
+    backgroundPen.setStyle(SolidLine)
+    backgroundPen.setWidth(1)
+    backgroundPen.setColor(QColor(0, 0, 0, 0))
+    highBrush = QBrush()
+    highBrush.setStyle(SolidFill)
+    highBrush.setColor(QColor(0, 0, 0))
+    lowBrush = QBrush()
+    lowBrush.setStyle(SolidFill)
+    lowBrush.setColor(QColor(215, 215, 215))
+    highPen = QPen()
+    highPen.setStyle(SolidLine)
+    highPen.setWidth(0)
+    highPen.setColor(QColor(191, 191, 191))
+    lowPen = QPen()
+    lowPen.setStyle(SolidLine)
+    lowPen.setWidth(0)
+    lowPen.setColor(QColor(191, 191, 191))
+
     return {
-      'backgroundColor' : QColor(223, 223, 223),
-      'highSegmentColor': QColor(0, 0, 0),
-      'lowSegmentColor' : QColor(215, 215, 215),
-      'segmentAspect'   : 0.25,
-      'segmentSpacing'  : 1,
-      'cornerRadius'    : 1,
+      'backgroundBrush' : 777777777,
+      'backgroundBorder': QColor(0, 0, 0, 0),
+      'backgroundFill'  : QColor(223, 223, 223),
+      'backgroundWidth' : 1,
+      'highFill'        : QColor(0, 0, 0),
+      'lowFill'         : QColor(215, 215, 215),
+      'highWidth'       : 0,
+      'lowWidth'        : 0,
+      'highBorder'      : QColor(191, 191, 191),
+      'lowBorder'       : QColor(191, 191, 191),
+      'aspect'          : 0.25,
+      'spacing'         : 1,
+      'radius'          : 1,
       'margins'         : QMargins(0, 0, 0, 0, ),
     }
+
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """Register the states."""
+    return ['base', ]
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Implementation of dynamic fields"""
+    return {
+      '%s/clock/base/backgroundFill' % cls.__name__: QColor(15, 0, 0),
+      '%s/clock/base/highColor' % cls.__name__     : QColor(144, 255, 0),
+      '%s/clock/base/lowColor' % cls.__name__      : QColor(0, 0, 15),
+    }
+
+  def detectState(self, ) -> str:
+    """Detect the state."""
+    return 'base'
 
   def _getInnerValue(self) -> int:
     """Get the inner value."""
@@ -120,41 +173,63 @@ class SevenSegmentDigit(BaseWidget):
       return True if value in [2, 3, 4, 5, 6, 8, 9] else False
     raise ValueError(monoSpace('The segment must be one of "ABCDEFG"'))
 
-  def _getSegBrush(self, segment: str) -> QBrush:
-    """Get the segment brush."""
-    if not isinstance(segment, str):
-      e = typeMsg('segment', segment, str)
-      raise TypeError(e)
-    if segment not in 'ABCDEFG' + 'abcdefg':
-      e = """The segment must be one of 'ABCDEFG', but received: %s"""
-      raise ValueError(monoSpace(e % segment))
-    high = self._getFieldValue('highSegmentColor')
-    low = self._getFieldValue('lowSegmentColor')
-    brush = QBrush()
-    brush.setStyle(SolidFill)
-    brush.setColor(high if self._getSegState(segment) else low)
-    return brush
-
-  def _getSegPen(self, segment: str) -> QPen:
-    """Get the segment pen."""
-    if not isinstance(segment, str):
-      e = typeMsg('segment', segment, str)
-      raise TypeError(e)
-    if segment not in 'ABCDEFG' + 'abcdefg':
-      e = """The segment must be one of 'ABCDEFG', but received: %s"""
-      raise ValueError(monoSpace(e % segment))
+  def _getLowPen(self) -> QPen:
+    """Get the low pen."""
     pen = QPen()
     pen.setStyle(SolidLine)
-    pen.setWidth(1)
-    pen.setColor(QColor(191, 191, 191, ))
-    return emptyPen() if self._getSegState(segment) else pen
+    pen.setWidth(self._getStyle('lowWidth'))
+    pen.setColor(self._getStyle('lowBorder'))
+    return pen
+
+  def _getHighPen(self) -> QPen:
+    """Get the high pen."""
+    pen = QPen()
+    pen.setStyle(SolidLine)
+    pen.setWidth(self._getStyle('highWidth'))
+    pen.setColor(self._getStyle('highBorder'))
+    return pen
+
+  def _getSegPen(self, segment: str) -> QPen:
+    """Get the pen."""
+    if self._getSegState(segment):
+      return self._getHighPen()
+    return self._getLowPen()
+
+  def _getLowBrush(self) -> QBrush:
+    """Get the low brush."""
+    brush = QBrush()
+    brush.setStyle(SolidFill)
+    brush.setColor(self._getStyle('lowFill'))
+    return brush
+
+  def _getHighBrush(self) -> QBrush:
+    """Get the high brush."""
+    brush = QBrush()
+    brush.setStyle(SolidFill)
+    brush.setColor(self._getStyle('highFill'))
+    return brush
+
+  def _getSegBrush(self, segment: str) -> QBrush:
+    """Get the segment brush."""
+    if self._getSegState(segment):
+      return self._getHighBrush()
+    return self._getLowBrush()
 
   def _getBackgroundBrush(self) -> QBrush:
     """Get the background brush."""
     brush = QBrush()
     brush.setStyle(SolidFill)
-    brush.setColor(self._getFieldValue('backgroundColor'))
+    brush.setColor(self._getStyle('backgroundFill'))
     return brush
+
+  def _getBackgroundPen(self) -> QPen:
+    """Get the background pen."""
+    pen = QPen()
+    pen.setStyle(SolidLine)
+    width = self._getStyle('backgroundWidth')
+    pen.setWidth(self._getStyle('backgroundWidth'))
+    pen.setColor(self._getStyle('backgroundBorder'))
+    return pen
 
   def _setPowerScale(self, scale: int) -> None:
     """Set the power scale."""
@@ -203,27 +278,23 @@ class SevenSegmentDigit(BaseWidget):
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Custom implementation of paint event"""
-    aspect = self._getFieldValue('segmentAspect')
-    radius = self._getFieldValue('cornerRadius')
-    spacing = self._getFieldValue('segmentSpacing')
-    margins = self._getFieldValue('margins')
+    aspect = self._getStyle('aspect')
+    radius = self._getStyle('radius')
+    spacing = self._getStyle('spacing')
+    margins = self._getStyle('margins')
     painter = QPainter()
     painter.begin(self)
     painter.setPen(emptyPen())
     viewRect = painter.viewport()
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     painter.setBrush(self._getBackgroundBrush())
-    painter.setPen(emptyPen())
+    painter.setPen(self._getBackgroundPen())
     painter.drawRoundedRect(viewRect, radius, radius, )
     innerRect = viewRect - margins
     topMargin, leftMargin = margins.top(), margins.left()
     H, W = innerRect.height(), innerRect.width()
     if self.__is_dot__:
-      color = self._getFieldValue('highSegmentColor')
-      brush = QBrush()
-      brush.setStyle(SolidFill)
-      brush.setColor(color)
-      painter.setBrush(brush)
+      painter.setBrush(self._getHighBrush())
       dotR = viewRect.width() / 9
       dotX = viewRect.center().x()
       dotY = viewRect.bottom() - dotR * 1.5
@@ -269,3 +340,5 @@ class SevenSegmentDigit(BaseWidget):
         painter.setPen(self._getSegPen(seg))
         painter.drawRect(rect, )
     painter.end()
+
+  BaseWidget.addStyleId('clock')

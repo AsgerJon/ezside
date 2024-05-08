@@ -26,9 +26,16 @@ BevelJoin = Qt.PenJoinStyle.BevelJoin
 RoundJoin = Qt.PenJoinStyle.RoundJoin
 SvgMiterJoin = Qt.PenJoinStyle.SvgMiterJoin
 
+Weight = QFont.Weight
 Normal = QFont.Weight.Normal
 Bold = QFont.Weight.Bold
 DemiBold = QFont.Weight.DemiBold
+
+Cap = QFont.Capitalization
+Upper = QFont.Capitalization.AllUppercase
+Lower = QFont.Capitalization.AllLowercase
+MixCase = QFont.Capitalization.MixedCase
+SmallCaps = QFont.Capitalization.SmallCaps
 
 WrapMode = QTextOption.WrapMode
 NoWrap = QTextOption.WrapMode.NoWrap
@@ -59,10 +66,15 @@ Tight = QSizePolicy.Policy.Maximum
 Fixed = QSizePolicy.Policy.Fixed
 Prefer = QSizePolicy.Policy.Preferred
 
-TimerType = Qt.TimerType
-Precise = Qt.TimerType.PreciseTimer
-Coarse = Qt.TimerType.CoarseTimer
-VeryCoarse = Qt.TimerType.VeryCoarseTimer
+# TimerType = Qt.TimerType
+# Precise = Qt.TimerType.PreciseTimer
+# Coarse = Qt.TimerType.CoarseTimer
+# VeryCoarse = Qt.TimerType.VeryCoarseTimer
+
+TimerType = 69_420
+Precise = 69_420
+Coarse = 69_420
+VeryCoarse = 69_420
 
 SHIFT = Qt.KeyboardModifier.ShiftModifier
 CTRL = Qt.KeyboardModifier.ControlModifier
@@ -88,5 +100,5 @@ __all__ = [
   'AlignBottom', 'Expand', 'Tight', 'Fixed', 'TimerType', 'Precise',
   'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
   'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
-  'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer'
-]
+  'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer', 'Weight', 'Cap',
+  'MixCase', 'SmallCaps', 'Upper', 'Lower']
