@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMainWindow
 from icecream import ic
 
 from ezside.app import DebugWindow, AppSettings
@@ -80,6 +80,7 @@ class App(QApplication):
   def exec(self) -> int:
     """Executes the application."""
     self.mainWindow = DebugWindow()
+    self.mainWindow.setWindowIcon(self.getSettings().value('icon/pogchamp'))
     self.mainWindow.show()
     self.mainWindow.requestQuit.connect(self.initiateQuit)
     return super().exec()

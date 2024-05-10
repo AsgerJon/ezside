@@ -59,7 +59,7 @@ class BaseWindow(QMainWindow):
       # self.statusBar()
       self.initStyle()
       self.initUi()
-      # self._initCoreConnections()
+      self._initCoreConnections()
       self.initSignalSlot()
       self.__is_initialized__ = True
     QMainWindow.show(self)
@@ -68,17 +68,17 @@ class BaseWindow(QMainWindow):
     """Initialize the core actions for the main window."""
     self.statusBar()
     self.statusBar().showMessage('Initiating core connections...')
-    self.menuBar().file.exit.triggered.connect(self.requestQuit)
-    self.menuBar().help.help.triggered.connect(self.requestHelp)
-    self.menuBar().help.aboutQt.triggered.connect(QApplication.aboutQt)
+    self.mainMenuBar.file.exit.triggered.connect(self.requestQuit)
+    self.mainMenuBar.help.help.triggered.connect(self.requestHelp)
+    self.mainMenuBar.help.aboutQt.triggered.connect(QApplication.aboutQt)
     condaLink = self.link('https://conda.io')
     pythonLink = self.link('https://python.org')
     pysideLink = self.link('https://doc.qt.io/qtforpython/')
     helpLink = self.link('https://www.youtube.com/watch?v=l60MnDJklnM')
-    self.menuBar().help.aboutConda.triggered.connect(condaLink)
-    self.menuBar().help.aboutPython.triggered.connect(pythonLink)
-    self.menuBar().help.aboutPySide6.triggered.connect(pysideLink)
-    self.menuBar().help.help.triggered.connect(helpLink)
+    self.mainMenuBar.help.aboutConda.triggered.connect(condaLink)
+    self.mainMenuBar.help.aboutPython.triggered.connect(pythonLink)
+    self.mainMenuBar.help.aboutPySide6.triggered.connect(pysideLink)
+    self.mainMenuBar.help.help.triggered.connect(helpLink)
 
   @Slot(str)
   def _announceHover(self, message) -> None:

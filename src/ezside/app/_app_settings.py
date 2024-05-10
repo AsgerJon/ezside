@@ -112,6 +112,7 @@ class AppSettings(QSettings):
         'aboutPySide6': 'about_py_side6',
         'aboutPySide' : 'about_py_side6',
         'helpMenu'    : 'help_menu',
+        'pogchamp'    : 'pogchamp',
         '__empty__'   : 'risitas',
       }
       filePaths = {}

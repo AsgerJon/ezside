@@ -34,12 +34,12 @@ class DigitalClock(CanvasWidget):
     Please note, that subclasses can reimplement this method, but must
     provide these same fields. """
     return {
-      'margins'        : QMargins(2, 2, 2, 2, ),
+      'margins'        : QMargins(0, 0, 0, 0, ),
       'borders'        : QMargins(2, 2, 2, 2, ),
-      'paddings'       : QMargins(2, 2, 2, 2, ),
+      'paddings'       : QMargins(0, 0, 0, 0, ),
       'borderColor'    : QColor(0, 0, 0, 255),
       'backgroundColor': QColor(223, 223, 223, 255),
-      'radius'         : QPoint(8, 8, ),
+      'radius'         : QPoint(4, 4, ),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
     }
@@ -65,6 +65,8 @@ class DigitalClock(CanvasWidget):
     """Initializes the DigitalClock widget."""
     super().__init__(*args, **kwargs)
     self.baseLayout = QHBoxLayout()
+    self.baseLayout.setContentsMargins(0, 0, 0, 0, )
+    self.baseLayout.setSpacing(0)
     self.hoursTens = SevenSegmentDigit(id='clock')
     self.hours = SevenSegmentDigit(id='clock')
     self.colon1 = ColonDisplay(id='clock')

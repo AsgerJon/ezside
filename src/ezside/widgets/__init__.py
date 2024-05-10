@@ -5,7 +5,6 @@ window. """
 from __future__ import annotations
 
 from ._graffiti_vandal import GraffitiVandal
-from ._base_widget_privates import _BaseWidgetPrivates
 from ._base_widget import BaseWidget
 from ._canvas_widget import CanvasWidget
 from ._horizontal_spacer import HorizontalSpacer

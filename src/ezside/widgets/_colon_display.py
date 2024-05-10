@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import QPointF, QMargins, QPoint, QSize
+from PySide6.QtCore import QPointF, QMargins, QPoint
 from PySide6.QtGui import QPainter, QBrush, QColor, QPen
 from icecream import ic
 
@@ -22,10 +22,10 @@ class ColonDisplay(SevenSegmentDigit):
   def __init__(self, *args, **kwargs) -> None:
     """Initialize the widget."""
     super().__init__(*args, **kwargs)
-    self.setFixedSize(16, 64)
+    self.setFixedSize(12, 64)
 
   @classmethod
-  def registerFields(cls) -> dict[str, Any]:
+  def staticStyles(cls) -> dict[str, Any]:
     """Register the fields."""
     highBrush = QBrush()
     highBrush.setStyle(SolidFill)
@@ -52,11 +52,11 @@ class ColonDisplay(SevenSegmentDigit):
       'paddings'       : QMargins(2, 2, 2, 2, ),
       'borderColor'    : QColor(0, 0, 0, 255),
       'backgroundColor': QColor(223, 223, 223, 255),
-      'radius'         : QPoint(2, 2, ),
+      'radius'         : QPoint(0, 0, ),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
       'aspect'         : 0.25,
-      'spacing'        : 2,
+      'spacing'        : 0,
     }
 
   @classmethod
@@ -64,24 +64,24 @@ class ColonDisplay(SevenSegmentDigit):
     """Register the states."""
     return ['base', ]
 
-  @classmethod
-  def registerDynamicFields(cls) -> dict[str, Any]:
+  def dynStyles(self) -> dict[str, Any]:
     """Implementation of dynamic fields"""
-    return {
-      'margins'        : QMargins(2, 2, 2, 2, ),
-      'borders'        : QMargins(2, 2, 2, 2, ),
-      'paddings'       : QMargins(2, 2, 2, 2, ),
-      'borderColor'    : QColor(0, 0, 0, 255),
-      'backgroundColor': QColor(223, 223, 223, 255),
-      'radius'         : QPoint(2, 2, ),
-      'vAlign'         : AlignVCenter,
-      'hAlign'         : AlignHCenter,
-    }
+    if self.getId() == 'clock':
+      return {
+        'margins'        : QMargins(0, 0, 0, 0, ),
+        'borders'        : QMargins(0, 2, 0, 2, ),
+        'paddings'       : QMargins(0, 0, 0, 0, ),
+        'borderColor'    : QColor(0, 0, 0, 255),
+        'backgroundColor': QColor(223, 223, 223, 255),
+        'radius'         : QPoint(0, 0),
+        'vAlign'         : AlignVCenter,
+        'hAlign'         : AlignHCenter,
+      }
 
   @classmethod
   def registerStyleIds(cls) -> list[str]:
     """Registers the supported style IDs for Label."""
-    return ['normal']
+    return ['normal', ]
 
   def detectState(self) -> str:
     """Detect the state."""
@@ -89,15 +89,14 @@ class ColonDisplay(SevenSegmentDigit):
 
   def getStyle(self, name: str) -> Any:
     """Get the style."""
-    value = super().getStyle(name)
-    return value
+    return super().getStyle(name)
 
   def customPaint(self, painter: QPainter) -> None:
     """Paint the widget."""
     viewRect = painter.viewport()
     width, height = viewRect.width(), viewRect.height()
     r = height / 16
-    yTop = height / 4
+    yTop = height / 3
     yBottom = height - yTop
     x = width / 2
     painter.setBrush(self.getStyle('highBrush'))

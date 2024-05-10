@@ -105,7 +105,7 @@ class SevenSegmentDigit(CanvasWidget):
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
       'aspect'         : 0.2,
-      'spacing'        : 1,
+      'spacing'        : 2,
     }
 
   def dynStyles(self, ) -> dict[str, Any]:
@@ -205,7 +205,7 @@ class SevenSegmentDigit(CanvasWidget):
     viewRect = painter.viewport()
     width, height = viewRect.width(), viewRect.height()
     spacing = self.getStyle('spacing')
-    aspect = 0.25
+    aspect = self.getStyle('aspect')
     segmentWidth = (width - 4 * spacing) / (1 + 2 * aspect)
     segmentHeight = aspect * segmentWidth
     hSize = QSizeF(segmentWidth, segmentHeight)

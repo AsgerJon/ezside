@@ -42,9 +42,3 @@ class MainWindow(LayoutWindow):
 
   def initSignalSlot(self) -> None:
     """Initialize the actions."""
-    self.aboutQt.triggered.connect(QApplication.aboutQt)
-    self.aboutPySide6.triggered.connect(self.link(
-      'https://www.qt.io/qt-for-python'))
-    self.aboutConda.triggered.connect(self.link('https://conda.org/'))
-    self.aboutPython.triggered.connect(self.link('https://www.python.org/'))
-    self.exit.triggered.connect(self.requestQuit)
