@@ -5,7 +5,6 @@ application business logic."""
 from __future__ import annotations
 
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QApplication
 from icecream import ic
 
 from ezside.app import LayoutWindow

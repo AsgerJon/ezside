@@ -6,15 +6,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication
 from icecream import ic
 
 from ezside.app import DebugWindow, AppSettings
-from ezside.widgets import BaseWidget, \
-  ColonDisplay, \
-  SevenSegmentDigit, \
-  DigitalClock, CanvasWidget
-from morevistutils import hasAbstractMethod
 
 ic.configureOutput(includeContext=True, )
 

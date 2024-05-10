@@ -6,8 +6,7 @@ from __future__ import annotations
 
 from typing import Callable, Any, TYPE_CHECKING
 
-from PySide6.QtCore import QThread, Slot, QCoreApplication, Signal
-from vistutils.text import monoSpace
+from PySide6.QtCore import QThread, Slot, QCoreApplication
 from vistutils.waitaminute import typeMsg
 
 from ezside.app import AppSettings

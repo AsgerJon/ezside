@@ -4,12 +4,11 @@ current time in a digital clock format. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QColor
-from icecream import ic
-
 from datetime import datetime
 from typing import Any
 
+from PySide6.QtGui import QColor
+from icecream import ic
 from PySide6.QtCore import Slot, QPoint, QMargins
 from PySide6.QtWidgets import QHBoxLayout
 
@@ -17,7 +16,7 @@ from ezside.core import AlignTop, \
   AlignLeft, \
   AlignFlag, \
   AlignVCenter, \
-  AlignHCenter, Tight, Expand
+  AlignHCenter
 from ezside.widgets import BaseWidget, SevenSegmentDigit, CanvasWidget
 from ezside.widgets import ColonDisplay
 

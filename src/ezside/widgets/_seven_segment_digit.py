@@ -15,8 +15,7 @@ from vistutils.waitaminute import typeMsg
 from ezside.core import SolidFill, \
   SolidLine, \
   AlignHCenter, \
-  AlignVCenter, \
-  Fixed, Tight, Expand, Prefer
+  AlignVCenter
 from ezside.widgets import CanvasWidget
 
 ic.configureOutput(includeContext=True, )

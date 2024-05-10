@@ -37,3 +37,11 @@ def parsePen(*args) -> QPen:
   pen.setCapStyle(capStyle)
   pen.setJoinStyle(joinStyle)
   return pen
+
+
+def emptyPen() -> QPen:
+  """Returns an empty pen."""
+  pen = QPen()
+  pen.setStyle(Qt.PenStyle.NoPen)
+  pen.setColor(QColor(0, 0, 0, 0, ))
+  return pen

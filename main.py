@@ -10,10 +10,8 @@ from typing import Callable
 from PySide6.QtCore import Qt
 from pyperclip import copy
 
-from ezside.app.menus import FileMenu
 from ezside.app import App
 from ezside.core import AlignFlag, AlignLeft, SolidFill
-from morevistutils import ModInt
 
 
 def tester01() -> int:
@@ -23,12 +21,6 @@ def tester01() -> int:
 
 def tester02() -> int:
   """Main Tester Script"""
-  print(FileMenu)
-  lmao = ModInt(5, 9)
-  print(lmao)
-  yolo = lmao + 1
-  print(yolo)
-  return 0
 
 
 def tester03() -> int:

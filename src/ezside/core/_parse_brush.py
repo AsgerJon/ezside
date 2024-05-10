@@ -27,3 +27,11 @@ def parseBrush(*args, **kwargs) -> QBrush:
   brush.setStyle(fillStyle)
   brush.setColor(color)
   return brush
+
+
+def emptyBrush() -> QBrush:
+  """Returns an empty brush."""
+  brush = QBrush()
+  brush.setStyle(Qt.BrushStyle.NoBrush)
+  brush.setColor(QColor(0, 0, 0, 0))
+  return brush
