@@ -44,7 +44,8 @@ class DebugWindow(MainWindow):
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""
-    note = 'Debug1 function called'
+    self.chartView.addPoint()
+    note = 'Debug1 function called, add data to chart view'
     self.statusBar().showMessage(note)
 
   def debug2Func(self, ) -> None:

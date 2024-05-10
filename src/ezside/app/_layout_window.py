@@ -13,6 +13,7 @@ from icecream import ic
 from ezside.app import BaseWindow
 from ezside.core import AlignTop, AlignLeft
 from ezside.widgets import Label, BaseWidget, DigitalClock
+from ezside.widgets.charts import ChartView
 
 ic.configureOutput(includeContext=True, )
 
@@ -25,6 +26,7 @@ class LayoutWindow(BaseWindow):
   clock: DigitalClock
   baseLayout: QVBoxLayout
   baseWidget: BaseWidget
+  chartView: ChartView
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -43,6 +45,9 @@ class LayoutWindow(BaseWindow):
     self.clock = DigitalClock()
     self.clock.initUi()
     self.baseLayout.addWidget(self.clock)
+    self.chartView = ChartView()
+    self.chartView.initUi()
+    self.baseLayout.addWidget(self.chartView)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
