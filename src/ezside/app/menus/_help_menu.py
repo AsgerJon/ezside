@@ -19,8 +19,10 @@ class HelpMenu(AbstractMenu):
 
   def initUi(self) -> None:
     """Initialize the user interface."""
-    self.aboutQt = self.addAction(self.tr('About Qt'))
-    self.aboutPySide6 = self.addAction(self.tr('About PySide6'))
-    self.aboutConda = self.addAction(self.tr('About Conda'))
-    self.aboutPython = self.addAction(self.tr('About Python'))
-    self.help = self.addAction(self.tr('Help'))
+    self.aboutQt = self.addAction(self.tr('About Qt'), 'aboutQt')
+    self.aboutPySide6 = self.addAction(self.tr('About PySide6'),
+                                       'aboutPySide6')
+    self.aboutConda = self.addAction(self.tr('About Conda'), 'aboutConda')
+    self.aboutPython = self.addAction(self.tr('About Python'),
+                                      'aboutPython')
+    self.help = self.addAction(self.tr('Help'), 'help')

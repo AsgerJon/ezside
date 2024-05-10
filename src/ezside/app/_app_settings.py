@@ -177,7 +177,7 @@ class AppSettings(QSettings):
     alignVal = self._parseAlignment(val, key)
     if isinstance(alignVal, AlignFlag):
       return alignVal
-    
+
   def _wrapValue(self, *args) -> Any:
     """Get the value of the key."""
     key, fb, type_ = [*args, None, None, None][:3]

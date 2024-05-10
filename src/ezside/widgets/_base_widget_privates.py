@@ -5,18 +5,17 @@ that provides the private attributes and functionality."""
 from __future__ import annotations
 
 from abc import abstractmethod
+from enum import EnumType
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtGui import QFont
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from icecream import ic
-from vistutils.fields import EmptyField
-from vistutils.parse import maybe
 from vistutils.text import monoSpace, stringList
 from vistutils.waitaminute import typeMsg
 
-from ezside.app import AppSettings
-from ezside.widgets import _AttriWidget
+from ezside.core import resolveEnum
+from morevistutils import hasAbstractMethod
 
 if TYPE_CHECKING:
   pass
@@ -24,7 +23,7 @@ if TYPE_CHECKING:
 ic.configureOutput(includeContext=True)
 
 
-class _BaseWidgetPrivates(_AttriWidget):
+class _BaseWidgetPrivates(QWidget):
   """_BaseWidgetPrivates provides a base class for the BaseWidget class
   that provides the private attributes and functionality."""
 
@@ -37,47 +36,16 @@ class _BaseWidgetPrivates(_AttriWidget):
   __dynamic_styles__ = None
   __style_id__ = None
   __fallback_id__ = 'normal'
+  __fallback_styles__ = None
+  __style_types__ = None
+  __sub_classes__ = None
 
-  styleId = EmptyField()
-
-  @classmethod
-  def addStyleId(cls, styleId: str) -> None:
-    """Adds a styleId to the class."""
-    settings = AppSettings()
-    settingsKey = '%s/%s' % (cls.__name__, 'styleIds')
-    existing = maybe(settings.value(settingsKey, ), [])
-    if styleId not in existing:
-      settings.setValue(settingsKey, [*existing, styleId])
-
-  @styleId.GET
-  def _getStyleId(self, **kwargs) -> str:
-    """Getter-function for the styleId."""
-    if self.__style_id__ is None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      self._setStyleId(self.__fallback_id__)
-      return self._getStyleId(_recursion=True)
-    if isinstance(self.__style_id__, str):
-      return self.__style_id__
-    e = typeMsg('self.__style_id__', self.__style_id__, str)
-    raise TypeError(monoSpace(e))
-
-  @styleId.SET
-  def _setStyleId(self, styleId: str) -> None:
-    """Setter-function for the styleId."""
-    if self.__style_id__ is not None:
-      e = """The styleId has already been assigned!"""
-      raise AttributeError(e)
-    if isinstance(styleId, str):
-      self.__style_id__ = styleId
-      settings = AppSettings()
-      settingsKey = '%s/%s' % (self.__class__.__name__, 'styleIds')
-      existingStyleIds = maybe(settings.value(settingsKey, ), [])
-      if styleId not in existingStyleIds:
-        settings.setValue(settingsKey, [*existingStyleIds, styleId])
-    else:
-      e = typeMsg('styleId', styleId, str)
-      raise TypeError(e)
+  def __new__(cls, *args, **kwargs) -> Any:
+    """The __new__ method is used to create the instance of the class."""
+    self = super().__new__(cls)
+    self.__style_id__ = self._parseStyleId(**kwargs)
+    self._registerStyleId(self.__style_id__)
+    return self
 
   def __init__(self, *args, **kwargs) -> None:
     """Subclasses that wish to allow __init__ to set the value of the
@@ -88,36 +56,59 @@ class _BaseWidgetPrivates(_AttriWidget):
     styleId, at the following names:
       - 'styleId'
       - 'style'
-      - 'id'
-    defaulting to 'base' if none are found. """
+      - 'id'"""
     for arg in args:
       if isinstance(arg, QWidget):
         QWidget.__init__(self, arg)
         break
     else:
       QWidget.__init__(self)
+    if self.__class__.__fallback_styles__ is None:
+      self.__class__.registerSettings()
+
+  @classmethod
+  def _getStyleIds(cls) -> list[str]:
+    """Getter-function for the style ids."""
+    app = QCoreApplication.instance()
+    settings = getattr(app, 'getSettings', )()
+    settingsKey = '%s/%s' % (cls.__name__, 'styleIds')
+    styleIds = settings.value(settingsKey, None)
+    if styleIds is None:
+      settings.setValue(settingsKey, 'normal')
+      return ['normal', ]
+    if isinstance(styleIds, str):
+      return styleIds.split(', ')
+    e = typeMsg('styleIds', styleIds, str)
+    raise TypeError(monoSpace(e))
+
+  @classmethod
+  def _registerStyleId(cls, styleId: str) -> None:
+    """Registers a styleId."""
+    app = QCoreApplication.instance()
+    settings = getattr(app, 'getSettings', )()
+    settingsKey = '%s/%s' % (cls.__name__, 'styleIds')
+    existing = settings.value(settingsKey, None)
+    if existing is None:
+      settings.setValue(settingsKey, styleId)
+    if isinstance(existing, str):
+      if styleId in existing:
+        return
+      existing = '%s, %s' % (existing, styleId)
+      if styleId not in existing:
+        settings.setValue(settingsKey, '%s, %s' % (existing, styleId))
+
+  def _parseStyleId(self, **kwargs) -> str:
+    """Parses the styleId."""
     styleIdKeys = stringList("""id, styleId, style""")
     for key in styleIdKeys:
       if key in kwargs:
         val = kwargs[key]
         if isinstance(val, str):
-          self.styleId = val
-          break
+          return val
         e = typeMsg('val', val, str)
         raise TypeError(monoSpace(e))
     else:
-      self.styleId = 'normal'
-
-    settings = AppSettings()
-    settingsKey = '%s/%s' % (self.__class__.__name__, 'styleIds')
-    existing = settings.value(settingsKey, [], list)
-    if self.__style_id__ not in existing:
-      settings.setValue(settingsKey, [*existing, self.__style_id__])
-
-  @classmethod
-  @abstractmethod
-  def registerFields(cls) -> dict[str, Any]:
-    """Getter-function for the fields."""
+      return self.__fallback_id__
 
   @classmethod
   @abstractmethod
@@ -126,27 +117,18 @@ class _BaseWidgetPrivates(_AttriWidget):
 
   @classmethod
   @abstractmethod
-  def registerDynamicFields(cls) -> dict[str, Any]:
-    """Getter-function for the dynamic fields."""
+  def registerFields(cls) -> dict[str, Any]:
+    """Getter-function for the fields."""
 
   @classmethod
-  def _getStyleIds(cls, ) -> list[str]:
-    """Getter-function for the style ids."""
-    settings = AppSettings()
-    settingsKey = '%s/%s' % (cls.__name__, 'styleIds')
-    if settings.value(settingsKey, None, list) is None:
-      settings.setValue(settingsKey, ['normal', ])
-    styleIds = settings.value(settingsKey, None, list)
-    if isinstance(styleIds, list):
-      for arg in styleIds:
-        if not isinstance(arg, str):
-          e = typeMsg('arg', arg, str)
-          raise TypeError(monoSpace(e))
-      return styleIds
-    elif isinstance(styleIds, str):
-      return [styleIds, ]
-    e = typeMsg('styleIds', styleIds, list)
-    raise TypeError(monoSpace(e))
+  @abstractmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Subclasses may implement this method to define dynamic values at
+    fields that depend on the current state and style id. """
+
+  def _getStyleId(self) -> str:
+    """Getter-function for the style id."""
+    return self.__style_id__
 
   def _getStylePrefix(self, ) -> str:
     """Getter-function for the style prefix."""
@@ -183,7 +165,7 @@ class _BaseWidgetPrivates(_AttriWidget):
 
   def _createDynamicStyles(self) -> None:
     """Creates the dynamic styles."""
-    dynamicFields = self.registerFields()
+    dynamicFields = self.registerDynamicFields()
     styleIds = self._getStyleIds()
     states = self.registerStates()
     self.__dynamic_styles__ = {}
@@ -212,47 +194,79 @@ class _BaseWidgetPrivates(_AttriWidget):
   def detectState(self, ) -> str:
     """Getter-function for the state."""
 
-  def _fuckQSettings(self) -> dict[str, type]:
-    """CUNTCUNTCUNT"""
-    return {k: type(v) for (k, v) in self.registerFields().items()}
+  @classmethod
+  def updateSettings(cls, **kwargs) -> None:
+    """The updateSettings method is called to update the settings."""
+    subClasses = getattr(cls, '__sub_classes__', [])
+    if subClasses is None:
+      raise AttributeError
+    for subClass in subClasses:
+      if not hasAbstractMethod(subClass):
+        subClass.registerSettings(**kwargs)
 
-  Weight, Cap = QFont.Weight, QFont.Capitalization
+  @classmethod
+  def registerSettings(cls, **kwargs) -> None:
+    """The init subclass places the registered values into the settings
+    object. """
+    if hasAbstractMethod(cls):
+      return
+    clsName = cls.__name__
+    styleIds = cls._getStyleIds() or ['normal', ]
+    states = cls.registerStates() or ['base', ]
+    fields = cls.registerFields() or {}
+    dynamicFields = cls.registerDynamicFields() or {}
+    app = QCoreApplication.instance()
+    settings = getattr(app, 'getSettings', )()
+    cls.__fallback_styles__ = {}
+    cls.__style_types__ = {}
+    for Id in styleIds:
+      for state in states:
+        for (name, value) in fields.items():
+          key = '%s/%s/%s/%s' % (clsName, Id, state, name)
+          cls.__fallback_styles__[key] = value
+          cls.__style_types__[key] = type(value)
+          settingsValue = settings.value(key, None)
+          if settingsValue is None:
+            settings.setValue(key, value)
 
-  def _getStyle(self, key: str) -> Any:
-    """Returns the value for the current instance at the given key"""
-    staticStyles = self._getStaticStyles()
-    dynamicStyles = self._getDynamicStyles()
-    styleKey = '%s/%s' % (self._getStylePrefix(), key)
-    styleType = self._fuckQSettings()[key]
-    settings = AppSettings()
-    cunt = settings.value(styleKey, None, styleType)
-    if cunt is not None and not isinstance(cunt, styleType):
-      try:
-        return object.__call__(styleType, cunt)
-      except Exception as exception:
-        raise SystemExit from exception
-    if cunt is not None:
-      if not isinstance(cunt, styleType):
-        msg = """At key: '%s', received '%s' of type '%s', but expected type 
-        '%s'""" % (key, cunt, type(cunt).__name__, styleType.__name__)
-        raise SystemExit(monoSpace(msg))
-    if settings.value(styleKey, None, styleType) is not None:
-      return settings.value(styleKey)
+  def _getSettingsNamedStyle(self, name: str) -> Any:
+    """Gets the value in the settings for the given name"""
+    key = '%s/%s' % (self._getStylePrefix(), name)
+    app = QCoreApplication.instance()
+    settings = getattr(app, 'getSettings', )()
+    return settings.value(key, None)
 
-    if styleKey in dynamicStyles:
-      style = dynamicStyles[styleKey]
-      settings.setValue(styleKey, style)
-      return style
-    if styleKey in staticStyles:
-      style = staticStyles[styleKey]
-      settings.setValue(styleKey, style)
-      return style
-    e = """Received field name '%s' yielding style-key: '%s', but no such
-    has been registered: \n%s."""
-    names = '\n  '.join([name for name in staticStyles.keys()])
-    print(styleKey)
-    for key, val in dynamicStyles.items():
-      print(key, val)
-    for key, val in staticStyles.items():
-      print(key, val)
-    raise KeyError(monoSpace(e % (key, styleKey, names)))
+  def _getBaseValue(self, name: str) -> Any:
+    """Gets the value in the settings for the given name"""
+    baseValue = self.registerFields().get(name, None)
+    if baseValue is None:
+      e = """The name: '%s' is not recognizes as the name of a style
+      in the registerFields method on class: '%s'!""" % (
+        name, self.__class__)
+      raise KeyError(monoSpace(e))
+    return baseValue
+
+  def _getExpectedType(self, name: str) -> Any:
+    """Getter-function for the expected type."""
+    return type(self._getBaseValue(name))
+
+  def _getNamedStyle(self, name: str) -> Any:
+    """Getter-function for the named style."""
+    key = '%s/%s' % (self._getStylePrefix(), name)
+    expectedType = self._getExpectedType(name)
+    baseValue = self._getBaseValue(name)
+    fallbackValue = self.__fallback_styles__.get(key, None)
+    settingsValue = self._getSettingsNamedStyle(name)
+    value = fallbackValue if settingsValue is None else settingsValue
+
+    if isinstance(value, expectedType):
+      return value
+    if isinstance(value, str):
+      if isinstance(expectedType, EnumType):
+        return resolveEnum(expectedType, value)
+
+  def __init_subclass__(cls, **kwargs) -> None:
+    """The __init_subclass__ method is called when a subclass is created."""
+    existing = getattr(cls.__bases__[0], '__sub_classes__', []) or []
+    setattr(cls, '__sub_classes__', [*existing, cls])
+    super().__init_subclass__(**kwargs)

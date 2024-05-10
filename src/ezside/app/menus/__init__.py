@@ -4,9 +4,6 @@ application window."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ._attri_menu import _AttriMenu
-from ._attri_menu_bar import _AttriMenuBar
-from ._attri_status_bar import _AttriStatusBar
 from ._abstract_menu import AbstractMenu
 from ._file_menu import FileMenu
 from ._edit_menu import EditMenu

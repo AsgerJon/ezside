@@ -6,30 +6,38 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QMenu
+from PySide6.QtWidgets import QMenu, QMenuBar
 from icecream import ic
-
-from ezside.app import AppSettings
-from ezside.app.menus import _AttriMenu
+from vistutils.text import monoSpace
 
 if TYPE_CHECKING:
   pass
 ic.configureOutput(includeContext=True, )
 
 
-class AbstractMenu(_AttriMenu):
+class AbstractMenu(QMenu):
   """A class for managing menus in the application."""
 
   __iter_contents__ = None
   __added_actions__ = None
 
-  hoverText = Signal(str)
-
-  def __init__(self, menuName: str, *args, **kwargs) -> None:
+  def __init__(self, *args, **kwargs) -> None:
     """Initializes the menu."""
-    title = menuName.capitalize()
+    parent, title = None, None
+    for arg in args:
+      if isinstance(arg, QMenuBar) and parent is None:
+        parent = arg
+      elif isinstance(arg, str) and title is None:
+        title = arg
+      if parent is not None and title is not None:
+        break
+    else:
+      e = """AbstractMenu requires a parent QMenuBar and a title str as 
+      arguments to the constructor, but found only parent: '%s' and title: 
+      '%s'! """ % (parent, title)
+      raise ValueError(monoSpace(e))
     QMenu.__init__(self, title)
     self.initStyle()
     self.initUi()
@@ -57,21 +65,16 @@ class AbstractMenu(_AttriMenu):
 
   def addAction(self, *args) -> QAction:
     """Add an action to the menu."""
-    title = args[0]
-    name = title.split(' ')
-    if len(name) > 1:
-      first = '%s%s' % (name[0][0].lower(), name[0][1:])
-      rest = [word for word in name[1:]]
-      rest = ['%s%s' % (word[0].upper(), word[1:]) for word in rest]
-      name = '%s%s' % (first, ''.join(rest))
-    else:
-      name = name[0].lower()
-    settings = AppSettings()
-    icon = settings.value('icon/%s' % name, )
-    shortcut = settings.value('shortcut/%s' % name, )
+    strArgs = [arg for arg in args if isinstance(arg, str)]
+    title, name = [*strArgs, None, None][:2]
+    app = QCoreApplication.instance()
+    settings = getattr(app, 'getSettings', )()
+    icon = settings.value('icon/%s' % name, None)
+    shortcut = settings.value('shortcut/%s' % name, None)
     action = QMenu.addAction(self, icon, title, shortcut)
-    setattr(self, name, action)
     self._getActionList().append(action)
+    main = getattr(app, 'mainWindow', )
+    setattr(main, name, action)
     return action
 
   def __iter__(self) -> AbstractMenu:

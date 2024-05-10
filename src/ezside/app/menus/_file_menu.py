@@ -5,8 +5,11 @@ subclasses the AbstractMenu class. """
 from __future__ import annotations
 
 from PySide6.QtGui import QAction
+from icecream import ic
 
 from ezside.app.menus import AbstractMenu
+
+ic.configureOutput(includeContext=True, )
 
 
 class FileMenu(AbstractMenu):
@@ -22,12 +25,12 @@ class FileMenu(AbstractMenu):
 
   def initUi(self) -> None:
     """Initialize the user interface."""
-    self.new = self.addAction(self.tr('New'))
-    self.open = self.addAction(self.tr('Open'))
+    self.new = self.addAction(self.tr('New'), 'new')
+    self.open = self.addAction(self.tr('Open'), 'open')
     self.addSeparator()
-    self.save = self.addAction(self.tr('Save'))
-    self.saveAs = self.addAction(self.tr('Save As'))
+    self.save = self.addAction(self.tr('Save'), 'save')
+    self.saveAs = self.addAction(self.tr('Save As'), 'saveAs')
     self.addSeparator()
-    self.preferences = self.addAction(self.tr('Preferences'))
+    self.preferences = self.addAction(self.tr('Preferences'), 'preferences')
     self.addSeparator()
-    self.exit = self.addAction(self.tr('Exit'))
+    self.exit = self.addAction(self.tr('Exit'), 'exit')

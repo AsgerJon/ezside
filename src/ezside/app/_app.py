@@ -7,10 +7,14 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QApplication
-from attribox import AttriBox
 from icecream import ic
 
-from ezside.app import DebugWindow
+from ezside.app import DebugWindow, AppSettings
+from ezside.widgets import BaseWidget, \
+  ColonDisplay, \
+  SevenSegmentDigit, \
+  DigitalClock, CanvasWidget
+from morevistutils import hasAbstractMethod
 
 ic.configureOutput(includeContext=True, )
 
@@ -22,14 +26,13 @@ if TYPE_CHECKING:
 
 class App(QApplication):
   """App is a subclass of QApplication."""
-  __error_code__ = None
+
+  mainWindow: DebugWindow
+
   __registered_threads__ = None
 
-  requestQuit = Signal()
-  demandQuit = Signal()
+  stopThreads = Signal()
   threadsExited = Signal()
-
-  mainWindow = AttriBox[DebugWindow]()
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the App instance."""
@@ -37,35 +40,29 @@ class App(QApplication):
     self.setApplicationName('EZSide')
     self.setOrganizationName('EZ')
     self.setAttribute(MenuFlag, True)
-    self.mainWindow.initUi()
-    self.requestQuit.connect(self.initiateQuit)
-    self.threadsExited.connect(self.quit)
+    if kwargs.get('_reset', False):
+      self.clearSettings()
+      BaseWidget.updateSettings()
+      CanvasWidget.updateSettings()
+      DigitalClock.updateSettings()
+      SevenSegmentDigit.updateSettings()
+      ColonDisplay.updateSettings()
 
-  def _getErrorCode(self, ) -> int:
-    """Get the error code."""
-    return self.__error_code__
+  def clearSettings(self) -> None:
+    """Clear the application settings."""
+    settings = AppSettings()
+    settings.clear()
+    settings.sync()
 
-  def _setErrorCode(self, errorCode: int) -> None:
-    """Set the error code."""
-    self.__error_code__ = errorCode
-
-  def runtimeError(self, ) -> None:
-    """Handle a runtime error."""
-    self._setErrorCode(2)
-    self.maybeQuit()
-    self.quit()
-
-  def timeoutError(self, ) -> None:
-    """Handle a timeout error."""
-    self._setErrorCode(1)
-    self.maybeQuit()
-    self.demandQuit.emit()
+  @staticmethod
+  def getSettings() -> AppSettings:
+    """Get the application settings."""
+    return AppSettings()
 
   @Slot()
   def initiateQuit(self) -> None:
     """Initialize the quit signal."""
-    self.mainWindow.close()
-    self.requestQuit.emit()
+    self.stopThreads.emit()
 
   @Slot()
   def maybeQuit(self, ) -> None:
@@ -86,10 +83,7 @@ class App(QApplication):
     """Register a thread."""
     self._getRegisteredThreads().append(thread)
     thread.finished.connect(self.maybeQuit)
-    thread.errorExit.connect(self.timeoutError)
-    thread.critExit.connect(self.runtimeError)
-    self.requestQuit.connect(thread.initiateQuit)
-    self.demandQuit.connect(thread.forceQuit)
+    self.stopThreads.emit(thread.initiateQuit)
 
   def _getRunningThreads(self, ) -> list[AppThread]:
     """Get the running threads."""
@@ -98,10 +92,7 @@ class App(QApplication):
 
   def exec(self) -> int:
     """Executes the application."""
+    self.mainWindow = DebugWindow()
     self.mainWindow.show()
-    self.mainWindow.requestQuit.connect(self.requestQuit)
-    returnCode = super().exec()
-    errorCode = self._getErrorCode()
-    if errorCode:
-      return errorCode
-    return returnCode
+    self.mainWindow.requestQuit.connect(self.initiateQuit)
+    return super().exec()

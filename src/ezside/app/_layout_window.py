@@ -7,13 +7,12 @@ from __future__ import annotations
 from abc import abstractmethod
 
 from PySide6.QtCore import QSize
-from attribox import AttriBox
+from PySide6.QtWidgets import QVBoxLayout
 from icecream import ic
 
 from ezside.app import BaseWindow
-from ezside.widgets import Label
-from ezside.widgets.layouts import VerticalLayout
-from morevistutils import Bag
+from ezside.core import AlignTop, AlignLeft
+from ezside.widgets import Label, BaseWidget, DigitalClock
 
 ic.configureOutput(includeContext=True, )
 
@@ -22,8 +21,10 @@ class LayoutWindow(BaseWindow):
   """LayoutWindow subclasses BaseWindow and implements the layout of
   widgets."""
 
-  baseLayout = AttriBox[VerticalLayout]()
-  welcomeLabel = Label @ Bag('YOLO!')
+  welcomeLabel: Label
+  clock: DigitalClock
+  baseLayout: QVBoxLayout
+  baseWidget: BaseWidget
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -32,8 +33,18 @@ class LayoutWindow(BaseWindow):
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
     self.setMinimumSize(QSize(640, 480))
+    self.baseLayout = QVBoxLayout()
+    self.baseWidget = BaseWidget()
+    self.baseWidget.__debug_flag__ = True
+    self.baseLayout.setAlignment(AlignTop | AlignLeft)
+    self.welcomeLabel = Label('LMAO')
+    self.welcomeLabel.initUi()
     self.baseLayout.addWidget(self.welcomeLabel)
-    self.baseLayout.initUi()
+    self.clock = DigitalClock()
+    self.clock.initUi()
+    self.baseLayout.addWidget(self.clock)
+    self.baseWidget.setLayout(self.baseLayout)
+    self.setCentralWidget(self.baseWidget)
 
   @abstractmethod  # MainWindow
   def initSignalSlot(self) -> None:

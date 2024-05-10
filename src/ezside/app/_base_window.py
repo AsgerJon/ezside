@@ -9,17 +9,16 @@ from abc import abstractmethod
 from typing import Any, Callable
 
 from PySide6.QtCore import Signal, QUrl, Slot
-from PySide6.QtGui import QDesktopServices, QAction
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 
-from ezside.app import _AttriWindow
 from ezside.app.menus import MainMenuBar, MainStatusBar
 
 ic.configureOutput(includeContext=True, )
 
 
-class BaseWindow(_AttriWindow):
+class BaseWindow(QMainWindow):
   """BaseWindow class provides menus and actions for the application."""
 
   mainMenuBar: MainMenuBar
@@ -31,7 +30,6 @@ class BaseWindow(_AttriWindow):
 
   requestQuit = Signal()
   requestHelp = Signal()
-  hoverText = Signal(str)
 
   @staticmethod
   def link(url: Any) -> Callable:
@@ -45,14 +43,23 @@ class BaseWindow(_AttriWindow):
 
     return go
 
+  def __init__(self, *args, **kwargs) -> None:
+    """Initialize the BaseWindow."""
+    self.__debug_flag__ = kwargs.get('_debug', None)
+    QMainWindow.__init__(self, *args, **kwargs)
+
   def show(self) -> None:
     """Show the window."""
     if self.__is_initialized__ is None:  # Initialize the menu bar
-      self.menuBar()
-      self.statusBar()
+      self.mainMenuBar = MainMenuBar(self)
+      self.mainStatusBar = MainStatusBar(self)
+      self.setMenuBar(self.mainMenuBar)
+      self.setStatusBar(self.mainStatusBar)
+      # self.menuBar()
+      # self.statusBar()
       self.initStyle()
       self.initUi()
-      self._initCoreConnections()
+      # self._initCoreConnections()
       self.initSignalSlot()
       self.__is_initialized__ = True
     QMainWindow.show(self)
@@ -72,26 +79,6 @@ class BaseWindow(_AttriWindow):
     self.menuBar().help.aboutPython.triggered.connect(pythonLink)
     self.menuBar().help.aboutPySide6.triggered.connect(pysideLink)
     self.menuBar().help.help.triggered.connect(helpLink)
-    self._connectHover()
-    self.hoverText.connect(self._announceHover)
-    # self.refreshClock.timeout.connect(self.statusBar().updateTime)
-    # self.refreshClock.start()
-
-  def _hoverFactory(self, action: QAction) -> Callable:
-    """Factory function for hover handlers"""
-
-    def hoverHandler() -> None:
-      """Handle hover events."""
-      self.hoverText.emit(action.text())
-
-    return hoverHandler
-
-  def _connectHover(self, ) -> None:
-    """Connects all hover actions to hover text"""
-    for menu in self.menuBar():
-      for action in menu:
-        handle = self._hoverFactory(action)
-        action.hovered.connect(handle)
 
   @Slot(str)
   def _announceHover(self, message) -> None:
@@ -109,42 +96,6 @@ class BaseWindow(_AttriWindow):
   @abstractmethod  # MainWindow
   def initSignalSlot(self, ) -> None:
     """Initializes the signal slot for the main window."""
-
-  def menuBar(self, **kwargs) -> MainMenuBar:
-    """Getter-function for the menu bar."""
-    try:
-      return self.mainMenuBar
-    except AttributeError as attributeError:
-      if kwargs.get('_recursion', False):
-        raise RecursionError from attributeError
-      self.setMenuBar(MainMenuBar())
-      return self.menuBar(_recursion=True)
-
-  def setMenuBar(self, mainMenuBar: MainMenuBar) -> None:
-    """Set the menu bar for the main window."""
-    mainMenuBar.initStyle()
-    mainMenuBar.initUi()
-    if getattr(self, '__debug_flag__', None) is not None:
-      mainMenuBar.initDebug()
-    mainMenuBar.initSignalSlot()
-    self.mainMenuBar = mainMenuBar
-    QMainWindow.setMenuBar(self, mainMenuBar)
-
-  def statusBar(self, **kwargs) -> MainStatusBar:
-    """Getter-function for the status bar."""
-    try:
-      return self.mainStatusBar
-    except AttributeError as attributeError:
-      if kwargs.get('_recursion', False):
-        raise RecursionError from attributeError
-      self.setStatusBar(MainStatusBar(self))
-      return self.statusBar(_recursion=True)
-
-  def setStatusBar(self, mainStatusBar: MainStatusBar) -> None:
-    """Set the status bar for the main window."""
-    mainStatusBar.initUi()
-    self.mainStatusBar = mainStatusBar
-    QMainWindow.setStatusBar(self, mainStatusBar)
 
   def showEvent(self, *args) -> None:
     """Show the window."""

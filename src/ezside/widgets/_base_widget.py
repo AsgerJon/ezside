@@ -7,10 +7,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QPen
 from icecream import ic
 
-from ezside.core import SolidLine, emptyBrush
 from ezside.widgets import _BaseWidgetPrivates
 
 if TYPE_CHECKING:
@@ -22,6 +20,16 @@ ic.configureOutput(includeContext=True)
 class BaseWidget(_BaseWidgetPrivates):
   """BaseWidget provides a common base class for all widgets in the
   application."""
+
+  def __init__(self, *args, **kwargs) -> None:
+    """Initializes the BaseWidget.
+    Please note that BaseWidget will look for keyword arguments to set the
+    styleId, at the following names:
+      - 'styleId'
+      - 'style'
+      - 'id'
+    The default styleId is 'normal'. """
+    super().__init__(*args, **kwargs)
 
   @abstractmethod
   def initUi(self, ) -> None:
@@ -73,8 +81,24 @@ class BaseWidget(_BaseWidgetPrivates):
   @classmethod
   @abstractmethod
   def registerDynamicFields(cls, ) -> dict[str, Any]:
-    """Subclasses may implement this method to define dynamic values at
-    fields that depend on the current state and style id. """
+    """Getter-function for the dynamic fields. Subclasses should return
+    key value pairs with the key of the following format:
+    className/styleId/state/fieldName
+    with className being the name of the class. By stating this explicitly,
+    issues with conflicts between base classes and subclasses are avoided.
+    For example, if widget class has a QPen instance for base state and
+    another for hover state, the registerFields method should return the
+    instance for base state, and this method should define for the hover
+    state.
+    basePen = QPen()
+    hoverPen = QPen()
+    Then the registerFields method should contain:
+    'borderPen': basePen
+    and this method should contain:
+    'Button/normal/hover/borderPen': hoverPen
+    This way, the hoverPen is only used when the widget is in the hover
+    state. Fields not defined in this method fall backs to the value defined
+    by registerFields. """
 
   @abstractmethod
   def detectState(self, ) -> str:
@@ -83,18 +107,7 @@ class BaseWidget(_BaseWidgetPrivates):
     returns an object that is not an instance of 'str' present in the
     static list of states, it will result in undefined behaviour. """
 
-  def paintEvent(self, event: QPaintEvent) -> None:
-    """The paintEvent method paints the widget."""
-    if self.__debug_flag__ is None:
-      return
-    painter = QPainter()
-    painter.begin(self)
-    viewRect = painter.viewport()
-    pen = QPen()
-    pen.setStyle(SolidLine)
-    pen.setWidth(1)
-    pen.setColor(QColor(0, 0, 0, ))
-    painter.setPen(pen)
-    painter.setBrush(emptyBrush())
-    painter.drawRoundedRect(viewRect, 4, 4)
-    painter.end()
+  def getStyle(self, name: str) -> Any:
+    """This method looks up the named style using the AppSettings class.
+    This means that it may be persistently changed during runtime. """
+    return self._getNamedStyle(name)

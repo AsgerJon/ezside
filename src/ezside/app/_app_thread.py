@@ -23,9 +23,6 @@ class AppThread(QThread):
   __termination_flag__ = None
   __call_me_maybe__ = None
 
-  errorExit = Signal()
-  critExit = Signal()
-
   def __init__(self, *args, **kwargs) -> None:
     app = QCoreApplication.instance()
     if TYPE_CHECKING:
@@ -83,21 +80,7 @@ class AppThread(QThread):
     fb = 5000
     if self.wait(settings.value(key, fb)):
       return
-    e = """Thread '%s' of type: '%s' failed to finish in the allotted 
-    time!""" % (str(self), self.__class__.__name__)
-    self.errorExit.emit()
-    raise TimeoutError(monoSpace(e))
-
-  @Slot()
-  def forceQuit(self, ) -> None:
-    """This method uses more force to stop the thread."""
-    self.terminate()
-    settings = AppSettings()
-    key = '%s/cringeTime' % self.__class__.__name__
-    fb = 5000
+    self.quit()
     if self.wait(settings.value(key, fb)):
       return
-    self.critExit.emit()
-    e = """Thread '%s' of type: '%s' failed terminate in the allotted 
-    time!""" % (str(self), self.__class__.__name__)
-    raise RuntimeError(e)
+    self.terminate()

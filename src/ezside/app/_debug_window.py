@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QSettings
+from PySide6.QtGui import QAction
 from icecream import ic
 
 from ezside.app import MainWindow
+from ezside.app.menus import DebugMenu
 
 ic.configureOutput(includeContext=True, )
 
@@ -15,19 +17,30 @@ class DebugWindow(MainWindow):
   """DebugWindow subclasses the MainWindow class allowing for debugging."""
 
   __debug_flag__ = True
+  debug1: QAction
+  debug2: QAction
+  debug3: QAction
+  debug4: QAction
+  debug5: QAction
+  debug6: QAction
+  debug7: QAction
+  debug8: QAction
+  debug9: QAction
+
+  debug: DebugMenu
 
   def initSignalSlot(self) -> None:
     """Initialize the actions."""
     MainWindow.initSignalSlot(self)
-    self.mainMenuBar.debug.debug1.triggered.connect(self.debug1Func)
-    self.mainMenuBar.debug.debug2.triggered.connect(self.debug2Func)
-    self.mainMenuBar.debug.debug3.triggered.connect(self.debug3Func)
-    self.mainMenuBar.debug.debug4.triggered.connect(self.debug4Func)
-    self.mainMenuBar.debug.debug5.triggered.connect(self.debug5Func)
-    self.mainMenuBar.debug.debug6.triggered.connect(self.debug6Func)
-    self.mainMenuBar.debug.debug7.triggered.connect(self.debug7Func)
-    self.mainMenuBar.debug.debug8.triggered.connect(self.debug8Func)
-    self.mainMenuBar.debug.debug9.triggered.connect(self.debug9Func)
+    self.debug1.triggered.connect(self.debug1Func)
+    self.debug2.triggered.connect(self.debug2Func)
+    self.debug3.triggered.connect(self.debug3Func)
+    self.debug4.triggered.connect(self.debug4Func)
+    self.debug5.triggered.connect(self.debug5Func)
+    self.debug6.triggered.connect(self.debug6Func)
+    self.debug7.triggered.connect(self.debug7Func)
+    self.debug8.triggered.connect(self.debug8Func)
+    self.debug9.triggered.connect(self.debug9Func)
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""

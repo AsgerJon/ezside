@@ -5,11 +5,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import QRectF, QPointF, QSizeF, QMargins
-from PySide6.QtGui import QPaintEvent, QPainter, QBrush, QColor
+from PySide6.QtCore import QPointF, QMargins, QPoint, QSize
+from PySide6.QtGui import QPainter, QBrush, QColor, QPen
+from icecream import ic
 
-from ezside.core import emptyPen, SolidFill
+from ezside.core import SolidFill, SolidLine, AlignHCenter, AlignVCenter
 from ezside.widgets import SevenSegmentDigit
+
+ic.configureOutput(includeContext=True, )
 
 
 class ColonDisplay(SevenSegmentDigit):
@@ -19,42 +22,84 @@ class ColonDisplay(SevenSegmentDigit):
   def __init__(self, *args, **kwargs) -> None:
     """Initialize the widget."""
     super().__init__(*args, **kwargs)
-    self.setFixedHeight(32)
-    self.setFixedWidth(8)
+    self.setMinimumSize(QSize(24, 96))
 
   @classmethod
   def registerFields(cls) -> dict[str, Any]:
     """Register the fields."""
+    highBrush = QBrush()
+    highBrush.setStyle(SolidFill)
+    highBrush.setColor(QColor(0, 0, 0))
+    lowBrush = QBrush()
+    lowBrush.setStyle(SolidFill)
+    lowBrush.setColor(QColor(215, 215, 215))
+    highPen = QPen()
+    highPen.setStyle(SolidLine)
+    highPen.setWidth(0)
+    highPen.setColor(QColor(191, 191, 191))
+    lowPen = QPen()
+    lowPen.setStyle(SolidLine)
+    lowPen.setWidth(0)
+    lowPen.setColor(QColor(191, 191, 191))
+
     return {
-      'backgroundColor' : QColor(223, 223, 223),
-      'highSegmentColor': QColor(0, 0, 0),
-      'lowSegmentColor' : QColor(215, 215, 215),
-      'segmentAspect'   : 0.25,
-      'segmentSpacing'  : 1,
-      'cornerRadius'    : 1,
-      'margins'         : QMargins(2, 2, 2, 2, ),
+      'highBrush'      : highBrush,
+      'lowBrush'       : lowBrush,
+      'highPen'        : highPen,
+      'lowPen'         : lowPen,
+      'margins'        : QMargins(2, 2, 2, 2, ),
+      'borders'        : QMargins(2, 2, 2, 2, ),
+      'paddings'       : QMargins(2, 2, 2, 2, ),
+      'borderColor'    : QColor(0, 0, 0, 255),
+      'backgroundColor': QColor(223, 223, 223, 255),
+      'radius'         : QPoint(2, 2, ),
+      'vAlign'         : AlignVCenter,
+      'hAlign'         : AlignHCenter,
+      'aspect'         : 0.25,
+      'spacing'        : 2,
     }
 
-  def paintEvent(self, event: QPaintEvent) -> None:
+  @classmethod
+  def registerStates(cls) -> list[str]:
+    """Register the states."""
+    return ['base', ]
+
+  @classmethod
+  def registerDynamicFields(cls) -> dict[str, Any]:
+    """Implementation of dynamic fields"""
+    return {
+      'margins'        : QMargins(2, 2, 2, 2, ),
+      'borders'        : QMargins(2, 2, 2, 2, ),
+      'paddings'       : QMargins(2, 2, 2, 2, ),
+      'borderColor'    : QColor(0, 0, 0, 255),
+      'backgroundColor': QColor(223, 223, 223, 255),
+      'radius'         : QPoint(2, 2, ),
+      'vAlign'         : AlignVCenter,
+      'hAlign'         : AlignHCenter,
+    }
+
+  @classmethod
+  def registerStyleIds(cls) -> list[str]:
+    """Registers the supported style IDs for Label."""
+    return ['normal']
+
+  def detectState(self) -> str:
+    """Detect the state."""
+    return 'base'
+
+  def getStyle(self, name: str) -> Any:
+    """Get the style."""
+    value = super().getStyle(name)
+    return value
+
+  def customPaint(self, painter: QPainter) -> None:
     """Paint the widget."""
-    painter = QPainter()
-    painter.begin(self)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    margins = self._getStyle('margins')
-    viewRect = painter.viewport() - margins
-    height = viewRect.height() / 6
-    width = viewRect.width()
-    topTop = height + margins.top()
-    bottomTop = viewRect.height() - 2 * height + margins.top()
-    left = margins.left()
-    size = QSizeF(width, height)
-    top = QRectF(QPointF(left, topTop), size)
-    bottom = QRectF(QPointF(left, bottomTop), size)
-    brush = QBrush()
-    brush.setColor(QColor(0, 0, 0, ))
-    brush.setStyle(SolidFill)
-    painter.setBrush(brush)
-    painter.setPen(emptyPen())
-    painter.drawRoundedRect(top, 1, 1)
-    painter.drawRoundedRect(bottom, 1, 1)
-    painter.end()
+    viewRect = painter.viewport()
+    width, height = viewRect.width(), viewRect.height()
+    r = height / 16
+    yTop = height / 4
+    yBottom = height - yTop
+    x = width / 2
+    painter.setBrush(self.getStyle('highBrush'))
+    painter.drawEllipse(QPointF(x, yTop), r, r)
+    painter.drawEllipse(QPointF(x, yBottom), r, r)

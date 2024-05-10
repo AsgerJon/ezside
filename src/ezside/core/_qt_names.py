@@ -66,15 +66,10 @@ Tight = QSizePolicy.Policy.Maximum
 Fixed = QSizePolicy.Policy.Fixed
 Prefer = QSizePolicy.Policy.Preferred
 
-# TimerType = Qt.TimerType
-# Precise = Qt.TimerType.PreciseTimer
-# Coarse = Qt.TimerType.CoarseTimer
-# VeryCoarse = Qt.TimerType.VeryCoarseTimer
-
-TimerType = 69_420
-Precise = 69_420
-Coarse = 69_420
-VeryCoarse = 69_420
+TimerType = Qt.TimerType
+Precise = Qt.TimerType.PreciseTimer
+Coarse = Qt.TimerType.CoarseTimer
+VeryCoarse = Qt.TimerType.VeryCoarseTimer
 
 SHIFT = Qt.KeyboardModifier.ShiftModifier
 CTRL = Qt.KeyboardModifier.ControlModifier
@@ -90,6 +85,8 @@ ForwardClick = Qt.MouseButton.ForwardButton
 
 VERTICAL = Qt.Orientation.Vertical
 HORIZONTAL = Qt.Orientation.Horizontal
+
+coreNames = 777
 
 __all__ = [
   'SolidFill', 'BlankFill', 'SolidLine', 'DashLine', 'DotLine', 'DashDot',

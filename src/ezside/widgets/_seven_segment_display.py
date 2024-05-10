@@ -6,17 +6,21 @@ from __future__ import annotations
 from typing import Any
 
 from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QHBoxLayout
 from attribox import AttriBox
 from icecream import ic
 
 from ezside.widgets import BaseWidget, SevenSegmentDigit
-from ezside.widgets.layouts import HorizontalLayout
-from morevistutils import Bag
+
+ic.configureOutput(includeContext=True)
 
 
 class SevenSegmentDisplay(BaseWidget):
   """SevenSegmentDisplay implements a seven segment display in a widget. """
+
+  baseLayout: QHBoxLayout
+
+  __dig_widgets__ = None
 
   @classmethod
   def registerDynamicFields(cls) -> dict[str, Any]:
@@ -45,8 +49,6 @@ class SevenSegmentDisplay(BaseWidget):
   __inner_value__ = None
 
   numDigs = AttriBox[int]()
-  baseLayout = AttriBox[HorizontalLayout](spacing=4)
-  digWidgets = SevenSegmentDigit @ Bag()
 
   def __init__(self, *args) -> None:
     parent, numDigs = None, None
@@ -68,14 +70,17 @@ class SevenSegmentDisplay(BaseWidget):
 
   def _getDigitWidgets(self) -> list[SevenSegmentDigit]:
     """Getter-function for the digit widgets"""
-    return [*self.baseLayout]
+    return self.__digit_widgets__
 
   def _getDisplayValue(self) -> float:
     """Getter-function for the value currently displayed on the widget"""
-    value = 0
-    for widget in self._getDigitWidgets():
-      value += float(widget)
-    return value
+    values = [int(widget) for widget in self._getDigitWidgets()]
+    c = 0
+    out = 0
+    while values:
+      out += (values.pop() * 10 ** c)
+      c += 1
+    return out
 
   def _setInnerValue(self, value: float) -> None:
     """Setter-function for the inner value of the widget"""
@@ -85,40 +90,16 @@ class SevenSegmentDisplay(BaseWidget):
   @Slot(float)
   def setValue(self, value: float) -> None:
     """Setter-function for the value to be displayed on the widget"""
-    ic(value)
-    self._setInnerValue(value)
-
-  def _dotLeft(self) -> None:
-    """Shifts all digits left"""
-    for widget in self._getDigitWidgets():
-      widget.dotLeft()
-
-  def _dotRight(self) -> None:
-    """Shifts all digits right"""
-    for widget in self._getDigitWidgets():
-      widget.dotRight()
-
-  def _setDisplayValue(self, value: float) -> None:
-    """Setter-function for the value currently displayed on the widget"""
-    while 10 ** self.baseLayout[0].getScale() > 10 * value:
-      self._dotLeft()
-    while 10 ** self.baseLayout[0].getScale() < 10 * value:
-      self._dotRight()
-    for widget in self.baseLayout:
-      ic(widget.getScale())
-    fmtSpec = '%%.%df' % len(self.baseLayout)
-    lmao = fmtSpec % value
-    dotLeft, dotRight = [*[len(i) for i in lmao.split('.')], None][:2]
-    digChars = [c for c in lmao if c in '0123456789']
-    digValues = [int(d) for d in digChars]
-    for widget, value in zip(self._getDigitWidgets(), digValues):
-      widget.setInnerValue(value)
+    widgets = reversed(self._getDigitWidgets())
+    for widget in widgets:
+      widget.setInnerValue(value % 10)
+      value = int(value / 10)
 
   def update(self) -> None:
     """Checks if the inner value of the widget is different from the
     displayed value and changes before applying parent update."""
     if self._getDisplayValue() != self._getInnerValue():
-      self._setDisplayValue(self._getInnerValue())
+      self.setValue(self._getInnerValue())
     else:
       for widget in self._getDigitWidgets():
         widget.update()
@@ -126,11 +107,10 @@ class SevenSegmentDisplay(BaseWidget):
 
   def initUi(self, ) -> None:
     """Initialize the user interface."""
-    n = 0
+    self.baseLayout = QHBoxLayout()
     for i in range(self.numDigs):
-      n = self.numDigs - i - 1
-      self.baseLayout.addWidget(self.digWidgets(scale=n, key='%d' % n))
-    n -= 1
-    self.baseLayout.addWidget(
-      self.digWidgets(dot=True, scale=n, key='%d' % n))
-    self.baseLayout.initUi()
+      digit = SevenSegmentDigit(self)
+      digit.initUi()
+      self.baseLayout.addWidget(digit)
+      self._getDigitWidgets().append(digit)
+    self.setLayout(self.baseLayout)

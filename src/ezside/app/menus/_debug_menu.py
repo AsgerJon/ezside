@@ -23,12 +23,12 @@ class DebugMenu(AbstractMenu):
 
   def initUi(self) -> None:
     """Initialize the user interface."""
-    self.debug1 = self.addAction(self.tr('Debug1'))
-    self.debug2 = self.addAction(self.tr('Debug2'))
-    self.debug3 = self.addAction(self.tr('Debug3'))
-    self.debug4 = self.addAction(self.tr('Debug4'))
-    self.debug5 = self.addAction(self.tr('Debug5'))
-    self.debug6 = self.addAction(self.tr('Debug6'))
-    self.debug7 = self.addAction(self.tr('Debug7'))
-    self.debug8 = self.addAction(self.tr('Debug8'))
-    self.debug9 = self.addAction(self.tr('Debug9'))
+    self.debug1 = self.addAction(self.tr('Debug1'), 'debug1')
+    self.debug2 = self.addAction(self.tr('Debug2'), 'debug2')
+    self.debug3 = self.addAction(self.tr('Debug3'), 'debug3')
+    self.debug4 = self.addAction(self.tr('Debug4'), 'debug4')
+    self.debug5 = self.addAction(self.tr('Debug5'), 'debug5')
+    self.debug6 = self.addAction(self.tr('Debug6'), 'debug6')
+    self.debug7 = self.addAction(self.tr('Debug7'), 'debug7')
+    self.debug8 = self.addAction(self.tr('Debug8'), 'debug8')
+    self.debug9 = self.addAction(self.tr('Debug9'), 'debug9')

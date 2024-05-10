@@ -20,11 +20,11 @@ class EditMenu(AbstractMenu):
 
   def initUi(self) -> None:
     """Initialize the user interface."""
-    self.selectAll = self.addAction(self.tr('Select All'))
+    self.selectAll = self.addAction(self.tr('Select All'), 'selectAll')
     self.addSeparator()
-    self.copy = self.addAction(self.tr('Copy'))
-    self.cut = self.addAction(self.tr('Cut'))
-    self.paste = self.addAction(self.tr('Paste'))
+    self.copy = self.addAction(self.tr('Copy'), 'copy')
+    self.cut = self.addAction(self.tr('Cut'), 'cut')
+    self.paste = self.addAction(self.tr('Paste'), 'paste')
     self.addSeparator()
-    self.undo = self.addAction(self.tr('Undo'))
-    self.redo = self.addAction(self.tr('Redo'))
+    self.undo = self.addAction(self.tr('Undo'), 'undo')
+    self.redo = self.addAction(self.tr('Redo'), 'redo')

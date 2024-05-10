@@ -13,16 +13,13 @@ from icecream import ic
 
 if TYPE_CHECKING:
   pass
-from ezside.app.menus import _AttriMenuBar, \
-  FileMenu, \
-  EditMenu, \
-  HelpMenu, \
+from ezside.app.menus import FileMenu, EditMenu, HelpMenu, \
   DebugMenu, AbstractMenu
 
 ic.configureOutput(includeContext=True, )
 
 
-class MainMenuBar(_AttriMenuBar):
+class MainMenuBar(QMenuBar):
   """MainMenuBar subclasses QMenuBar and brings common menus with common
   actions. """
 
@@ -34,27 +31,32 @@ class MainMenuBar(_AttriMenuBar):
   edit: EditMenu
   editAction: QAction
   help: HelpMenu
+  helpAction: QAction
   debug: DebugMenu
+  debugAction: QAction
 
   hoverText = Signal(str)
 
-  def initStyle(self, ) -> None:
-    """Initializes the style for the widget. Optional for subclasses to
-    implement. """
+  def __init__(self, *args, **kwargs) -> None:
+    """Initializes the MainMenuBar."""
+    QMenuBar.__init__(self, *args, **kwargs)
+    self.initUi()
+    self.initDebug()
+    self.initSignalSlot()
 
   def initUi(self, ) -> None:
     """Initializes the user interface for the widget. Required for subclasses
     to implement. """
-    self.file = FileMenu(self.tr('File'))
+    self.file = FileMenu(self, 'File')
     self.fileAction = self.addMenu(self.file)
-    self.edit = EditMenu(self.tr('Edit'))
+    self.edit = EditMenu(self, 'Edit')
     self.editAction = self.addMenu(self.edit)
-    self.help = HelpMenu(self.tr('Help'))
-    self.addMenu(self.help)
+    self.help = HelpMenu(self, 'Help')
+    self.helpAction = self.addMenu(self.help)
 
   def initDebug(self) -> None:
     """Initializes the debug menu. Optional for subclasses to implement."""
-    self.debug = DebugMenu(self.tr('Debug'))
+    self.debug = DebugMenu(self, 'Debug')
     self.addMenu(self.debug)
 
   def initSignalSlot(self) -> None:
