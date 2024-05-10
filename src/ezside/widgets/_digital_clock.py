@@ -4,68 +4,76 @@ current time in a digital clock format. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from PySide6.QtGui import QColor
+from icecream import ic
+
 from datetime import datetime
 from typing import Any
 
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QPoint, QMargins
 from PySide6.QtWidgets import QHBoxLayout
 
-from ezside.core import AlignTop, AlignLeft
-from ezside.widgets import BaseWidget, \
-  SevenSegmentDigit, \
-  CanvasWidget, \
-  ColonDisplay
+from ezside.core import AlignTop, \
+  AlignLeft, \
+  AlignFlag, \
+  AlignVCenter, \
+  AlignHCenter, Tight, Expand
+from ezside.widgets import BaseWidget, SevenSegmentDigit, CanvasWidget
+from ezside.widgets import ColonDisplay
+
+ic.configureOutput(includeContext=True)
 
 
 class DigitalClock(CanvasWidget):
   """DigitalClock widget uses the SevenSegmentDigit class to display the
   current time in a digital clock format. """
 
-  hoursTens: SevenSegmentDigit
-  hours: SevenSegmentDigit
-  colon1: ColonDisplay
-  minutesTens: SevenSegmentDigit
-  minutes: SevenSegmentDigit
-  colon2: ColonDisplay
-  secondsTens: SevenSegmentDigit
-  seconds: SevenSegmentDigit
+  @classmethod
+  def staticStyles(cls) -> dict[str, Any]:
+    """The registerFields method registers the fields of the widget.
+    Please note, that subclasses can reimplement this method, but must
+    provide these same fields. """
+    return {
+      'margins'        : QMargins(2, 2, 2, 2, ),
+      'borders'        : QMargins(2, 2, 2, 2, ),
+      'paddings'       : QMargins(2, 2, 2, 2, ),
+      'borderColor'    : QColor(0, 0, 0, 255),
+      'backgroundColor': QColor(223, 223, 223, 255),
+      'radius'         : QPoint(8, 8, ),
+      'vAlign'         : AlignVCenter,
+      'hAlign'         : AlignHCenter,
+    }
+
+  @classmethod
+  def styleTypes(cls) -> dict[str, type]:
+    """The styleTypes method provides the type expected at each name. """
+    return {
+      'margins'        : QMargins,
+      'borders'        : QMargins,
+      'paddings'       : QMargins,
+      'borderColor'    : QColor,
+      'backgroundColor': QColor,
+      'radius'         : QPoint,
+      'vAlign'         : AlignFlag,
+      'hAlign'         : AlignFlag,
+    }
+
+  def dynStyles(self) -> list[str]:
+    """The dynStyles method provides the dynamic styles of the widget."""
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the DigitalClock widget."""
     super().__init__(*args, **kwargs)
     self.baseLayout = QHBoxLayout()
-    self.hoursTens = SevenSegmentDigit()
-    self.hours = SevenSegmentDigit()
-    self.colon1 = ColonDisplay()
-    self.minutesTens = SevenSegmentDigit()
-    self.minutes = SevenSegmentDigit()
-    self.colon2 = ColonDisplay()
-    self.secondsTens = SevenSegmentDigit()
-    self.seconds = SevenSegmentDigit()
+    self.hoursTens = SevenSegmentDigit(id='clock')
+    self.hours = SevenSegmentDigit(id='clock')
+    self.colon1 = ColonDisplay(id='clock')
+    self.minutesTens = SevenSegmentDigit(id='clock')
+    self.minutes = SevenSegmentDigit(id='clock')
+    self.colon2 = ColonDisplay(id='clock')
+    self.secondsTens = SevenSegmentDigit(id='clock')
+    self.seconds = SevenSegmentDigit(id='clock')
     self.initUi()
-
-  @classmethod
-  def registerFields(cls) -> dict[str, Any]:
-    """The registerFields method registers the fields of the widget."""
-    fields = CanvasWidget.registerFields()
-    fields['vAlign'] = AlignTop
-    fields['hAlign'] = AlignLeft
-    return fields
-
-  @classmethod
-  def registerStates(cls) -> list[str]:
-    """The registerStates method registers the states of the widget."""
-    return ['base', ]
-
-  @classmethod
-  def registerDynamicFields(cls) -> dict[str, Any]:
-    """The registerDynamicFields method registers the dynamic fields of the
-    widget."""
-    return {}
-
-  def detectState(self) -> str:
-    """The detectState method detects the state of the widget."""
-    return 'base'
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the widget."""

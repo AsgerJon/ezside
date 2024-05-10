@@ -5,20 +5,19 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import QSizeF, QPointF, QRectF, QMargins, QPoint, QSize
+from PySide6.QtCore import QSizeF, QPointF, QRectF, QMargins, QPoint
 from PySide6.QtGui import QPainter, QBrush, QColor, QPen
 from PySide6.QtWidgets import QWidget
 from icecream import ic
 from vistutils.parse import maybe
-from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
 from ezside.core import SolidFill, \
   SolidLine, \
-  Expand, \
   AlignHCenter, \
-  AlignVCenter
-from ezside.widgets import BaseWidget, CanvasWidget
+  AlignVCenter, \
+  Fixed, Tight, Expand, Prefer
+from ezside.widgets import CanvasWidget
 
 ic.configureOutput(includeContext=True, )
 
@@ -42,10 +41,11 @@ class SevenSegmentDigit(CanvasWidget):
       if parent is not None and scale is not None:
         break
     else:
-      self.__power_scale__ = maybe(scale, 1)
+      self.__inner_scale__ = maybe(scale, 1)
     CanvasWidget.__init__(self, *args, **kwargs)
     self.__is_dot__ = kwargs.get('dot', False)
-    self.setMinimumSize(QSize(48, 96))
+    if self.getId() == 'clock':
+      self.setFixedSize(32, 64)
 
   def initUi(self, ) -> None:
     """Initialize the user interface."""
@@ -54,7 +54,27 @@ class SevenSegmentDigit(CanvasWidget):
     """Initialize the signal slot."""
 
   @classmethod
-  def registerFields(cls) -> dict[str, Any]:
+  def styleTypes(cls) -> dict[str, type]:
+    """The styleTypes method provides the type expected at each name."""
+    return {
+      'highBrush'      : QBrush,
+      'lowBrush'       : QBrush,
+      'highPen'        : QPen,
+      'lowPen'         : QPen,
+      'margins'        : QMargins,
+      'borders'        : QMargins,
+      'paddings'       : QMargins,
+      'borderColor'    : QColor,
+      'backgroundColor': QColor,
+      'radius'         : QPoint,
+      'vAlign'         : int,
+      'hAlign'         : int,
+      'aspect'         : float,
+      'spacing'        : int,
+    }
+
+  @classmethod
+  def staticStyles(cls) -> dict[str, Any]:
     """Register the fields."""
     highBrush = QBrush()
     highBrush.setStyle(SolidFill)
@@ -64,100 +84,89 @@ class SevenSegmentDigit(CanvasWidget):
     lowBrush.setColor(QColor(215, 215, 215))
     highPen = QPen()
     highPen.setStyle(SolidLine)
-    highPen.setWidth(0)
-    highPen.setColor(QColor(191, 191, 191))
+    highPen.setWidth(1)
+    highPen.setColor(QColor(0, 0, 0, ))
     lowPen = QPen()
     lowPen.setStyle(SolidLine)
-    lowPen.setWidth(0)
-    lowPen.setColor(QColor(191, 191, 191))
+    lowPen.setWidth(1)
+    lowPen.setColor(QColor(255, 255, 255, ))
 
     return {
       'highBrush'      : highBrush,
       'lowBrush'       : lowBrush,
       'highPen'        : highPen,
       'lowPen'         : lowPen,
-      'margins'        : QMargins(2, 2, 2, 2, ),
-      'borders'        : QMargins(2, 2, 2, 2, ),
-      'paddings'       : QMargins(2, 2, 2, 2, ),
-      'borderColor'    : QColor(0, 0, 0, 255),
+      'margins'        : QMargins(1, 1, 1, 1, ),
+      'borders'        : QMargins(1, 1, 1, 1, ),
+      'paddings'       : QMargins(1, 1, 1, 1, ),
+      'borderColor'    : QColor(0, 0, 0, 0),
       'backgroundColor': QColor(223, 223, 223, 255),
-      'radius'         : QPoint(2, 2, ),
+      'radius'         : QPoint(1, 1, ),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
-      'aspect'         : 0.25,
-      'spacing'        : 2,
+      'aspect'         : 0.2,
+      'spacing'        : 1,
     }
 
-  @classmethod
-  def registerStates(cls) -> list[str]:
-    """Register the states."""
-    return ['base', ]
-
-  @classmethod
-  def registerDynamicFields(cls) -> dict[str, Any]:
+  def dynStyles(self, ) -> dict[str, Any]:
     """Implementation of dynamic fields"""
-    highBrush = QBrush()
-    highBrush.setStyle(SolidFill)
-    highBrush.setColor(QColor(144, 255, 0))
-    lowBrush = QBrush()
-    lowBrush.setStyle(SolidFill)
-    lowBrush.setColor(QColor(0, 0, 15))
-    return {
-      'backgroundColor': QColor(15, 0, 0),
-      'highBrush'      : highBrush,
-      'lowBrush'       : lowBrush,
-    }
+    if self.getId() == 'clock':
+      highBrush = QBrush()
+      highBrush.setStyle(SolidFill)
+      highBrush.setColor(QColor(0, 0, 0))
+      lowBrush = QBrush()
+      lowBrush.setStyle(SolidFill)
+      lowBrush.setColor(QColor(255, 255, 255))
+      return {
+        'backgroundColor': QColor(223, 223, 223, 255),
+        'highBrush'      : highBrush,
+        'lowBrush'       : lowBrush,
+        'radius'         : QPoint(1, 1),
+      }
 
-  def detectState(self, ) -> str:
-    """Detect the state."""
-    return 'base'
+  def __int__(self, ) -> int:
+    """Returns the inner value."""
+    return self.getInnerValue() or 0
 
-  def _getInnerValue(self) -> int:
+  def __float__(self) -> float:
+    """Returns the inner value multiplied by 10 to the power at power
+    scale. Please note that this may be negative. """
+    return float(self.getInnerValue() * self.getScale()) or float(0)
+
+  def getInnerValue(self) -> int:
     """Get the inner value."""
     self.update()
     if self.__inner_value__ is None:
       return 0
     if isinstance(self.__inner_value__, int):
-      if abs(self.__inner_value__) > 9:
-        e = """Each digit supports no higher than 9, but received: %d"""
-        raise ValueError(monoSpace(e % self.__inner_value__))
-      return abs(self.__inner_value__)
+      return self.__inner_value__ % 10
     e = typeMsg('inner_value', self.__inner_value__, int)
     raise TypeError(e)
 
-  def _setInnerValue(self, value: int) -> None:
+  def setInnerValue(self, value: int) -> None:
     """Set the inner value."""
     self.update()
     if isinstance(value, int):
-      if abs(value) > 9:
-        e = """Each digit supports no higher than 9, but received: %d"""
-        raise ValueError(monoSpace(e % value))
-      self.__inner_value__ = abs(value)
+      self.__inner_value__ = value % 10
     else:
       e = typeMsg('value', value, int)
       raise TypeError(e)
 
-  def setInnerValue(self, value: int) -> None:
-    """Public setter for the inner value."""
-    self._setInnerValue(value)
-
   def increment(self) -> None:
     """Increments the inner value rolling over from 9 to 0"""
     self.update()
-    self._setInnerValue((self._getInnerValue() + 1) % 10)
+    self.__inner_value__ += 1
+    self.__inner_value__ %= 10
 
   def decrement(self) -> None:
     """Decrements the inner value rolling over from 0 to 9"""
     self.update()
-    self._setInnerValue((self._getInnerValue() - 1) % 10)
+    self.__inner_value__ -= 1
+    self.__inner_value__ %= 10
 
-  def _getSegState(self, segment: str) -> bool:
+  def segState(self, segment: str) -> bool:
     """Get the segment state."""
     return True if segment in self.map7()[int(self)] else False
-
-  def __int__(self, ) -> int:
-    """Returns the inner value."""
-    return self._getInnerValue()
 
   @staticmethod
   def map7() -> list[list[str]]:
@@ -182,29 +191,17 @@ class SevenSegmentDigit(CanvasWidget):
     should be on for the corresponding digit. """
     return self.map7()[int(self)]
 
-  def _getSegPen(self, segment: str) -> QPen:
-    """Get the pen."""
-    if self._getSegState(segment):
-      return self.getStyle('highPen')
-    return self.getStyle('lowPen')
-
-  def _getSegBrush(self, segment: str) -> QBrush:
-    """Get the segment brush."""
-    if self._getSegState(segment):
-      return self.getStyle('highBrush')
-    return self.getStyle('lowBrush')
-
   def getScale(self) -> int:
     """Public getter for the power scale."""
-    return self.__inner_scale__
-
-  def __float__(self) -> float:
-    """Returns the inner value multiplied by 10 to the power at power
-    scale. Please note that this may be negative. """
-    return float(self._getInnerValue() * self.getScale())
+    return self.__inner_scale__ or 0.
 
   def customPaint(self, painter: QPainter) -> None:
     """Custom paint method for Label."""
+    lowPen = self.getStyle('lowPen')
+    lowBrush = self.getStyle('lowBrush')
+    highPen = self.getStyle('highPen')
+    highBrush = self.getStyle('highBrush')
+
     viewRect = painter.viewport()
     width, height = viewRect.width(), viewRect.height()
     spacing = self.getStyle('spacing')

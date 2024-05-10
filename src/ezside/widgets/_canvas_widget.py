@@ -8,58 +8,38 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from typing import Any
-
-from PySide6.QtCore import QMargins, \
-  QPoint, \
-  QRect, \
-  QPointF, \
-  QRectF, \
-  QSizeF, \
-  QSize
-from PySide6.QtGui import QPaintEvent, QPainter, QColor
+from PySide6.QtCore import QPoint, QRect, QPointF, QRectF, QSizeF, QSize
+from PySide6.QtCore import QMargins
+from PySide6.QtGui import QPaintEvent, QColor
 from icecream import ic
 from vistutils.text import monoSpace
 
-from ezside.widgets import BaseWidget
-from ezside.core import parseBrush, SolidFill, emptyPen, AlignTop
+from ezside.widgets import BaseWidget, GraffitiVandal
+from ezside.core import parseBrush, SolidFill, emptyPen, AlignTop, AlignFlag
 from ezside.core import AlignCenter, AlignBottom, AlignVCenter, AlignLeft
 from ezside.core import AlignHCenter, AlignRight
 
 ic.configureOutput(includeContext=True)
 
 
-class _Painter(QPainter):
-  """Class implementing restriction on the viewport"""
-
-  __inner_rect__ = None
-
-  def begin(self, *args) -> None:
-    """Begins the painting"""
-    QPainter.begin(self, *args)
-    QPainter.setRenderHint(self, QPainter.RenderHint.Antialiasing)
-
-  def viewport(self) -> QRect:
-    """Returns the viewport"""
-    if self.__inner_rect__ is None:
-      return QPainter.viewport(self)
-    return self.__inner_rect__
-
-  def setInnerViewport(self, rect: QRect) -> None:
-    """Sets the viewport"""
-    # QPainter.setViewport(self, rect)
-    self.translate(rect.topLeft())
-    self.__inner_rect__ = QRect(QPoint(0, 0), rect.size())
-
-  def end(self) -> None:
-    """Ends the painting"""
-    self.__inner_rect__ = None
-    QPainter.end(self)
-
-
 class CanvasWidget(BaseWidget):
 
   @classmethod
-  def registerFields(cls) -> dict[str, Any]:
+  def styleTypes(cls) -> dict[str, type]:
+    """The styleTypes method provides the type expected at each name. """
+    return {
+      'margins'        : QMargins,
+      'borders'        : QMargins,
+      'paddings'       : QMargins,
+      'borderColor'    : QColor,
+      'backgroundColor': QColor,
+      'radius'         : QPoint,
+      'vAlign'         : AlignFlag,
+      'hAlign'         : AlignFlag,
+    }
+
+  @classmethod
+  def staticStyles(cls) -> dict[str, Any]:
     """The registerFields method registers the fields of the widget.
     Please note, that subclasses can reimplement this method, but must
     provide these same fields. """
@@ -76,14 +56,8 @@ class CanvasWidget(BaseWidget):
 
   @classmethod
   @abstractmethod
-  def registerStates(cls) -> list[str]:
+  def dynStyles(cls) -> list[str]:
     """The registerStates method registers the states of the widget."""
-
-  @classmethod
-  @abstractmethod
-  def registerDynamicFields(cls) -> dict[str, Any]:
-    """The registerDynamicFields method registers the dynamic fields of the
-    widget."""
 
   @abstractmethod
   def initSignalSlot(self) -> None:
@@ -145,19 +119,19 @@ class CanvasWidget(BaseWidget):
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """The paintEvent method paints the widget."""
-    painter = _Painter()
-    painter.begin(self)
-    viewRect = painter.viewport()
-    pen = emptyPen()
-    painter.setPen(pen)
     margins = self.getStyle('margins')
     borders = self.getStyle('borders')
     paddings = self.getStyle('paddings')
     backgroundColor = self.getStyle('backgroundColor')
     borderColor = self.getStyle('borderColor')
+    radius = self.getStyle('radius')
     backgroundBrush = parseBrush(backgroundColor, SolidFill)
     borderBrush = parseBrush(borderColor, SolidFill)
-    radius = self.getStyle('radius')
+    painter = GraffitiVandal()
+    painter.begin(self)
+    viewRect = painter.viewport()
+    pen = emptyPen()
+    painter.setPen(pen)
     if radius is None:
       rx, ry = 0, 0
     else:
@@ -176,7 +150,7 @@ class CanvasWidget(BaseWidget):
     self.customPaint(painter)
     painter.end()
 
-  def customPaint(self, painter: QPainter) -> None:
+  def customPaint(self, painter: GraffitiVandal) -> None:
     """Subclasses must reimplement this method to define the painting
     action. The painter is already set up and will be ended by the parent
     class. """

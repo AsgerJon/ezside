@@ -7,9 +7,9 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from PySide6.QtWidgets import QWidget
 from icecream import ic
-
-from ezside.widgets import _BaseWidgetPrivates
+from vistutils.waitaminute import typeMsg
 
 if TYPE_CHECKING:
   pass
@@ -17,9 +17,11 @@ if TYPE_CHECKING:
 ic.configureOutput(includeContext=True)
 
 
-class BaseWidget(_BaseWidgetPrivates):
+class BaseWidget(QWidget):
   """BaseWidget provides a common base class for all widgets in the
   application."""
+
+  __style_id__ = None
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the BaseWidget.
@@ -29,7 +31,18 @@ class BaseWidget(_BaseWidgetPrivates):
       - 'style'
       - 'id'
     The default styleId is 'normal'. """
-    super().__init__(*args, **kwargs)
+    for arg in args:
+      if isinstance(arg, QWidget):
+        QWidget.__init__(self, arg)
+    else:
+      QWidget.__init__(self)
+    styleKeys = ['styleId', 'style', 'id', ]
+    for key in styleKeys:
+      if key in kwargs:
+        self.__style_id__ = kwargs[key]
+        break
+    else:
+      self.__style_id__ = 'normal'
 
   @abstractmethod
   def initUi(self, ) -> None:
@@ -49,65 +62,47 @@ class BaseWidget(_BaseWidgetPrivates):
 
   @classmethod
   @abstractmethod
-  def registerFields(cls) -> dict[str, Any]:
-    """Subclasses are required to implement this method to provide
-    centrally managed settings. The method should return a dictionary
-    mapping setting names to fallback values. An empty dictionary may be
-    returned if no settings are required.
-
-    This method is expected to be available to class decorators. This
-    means that the class creation tries to invoke '__set_name__' on all
-    descriptors before class decorators receive the finished class. This
-    allows for fields to be provided by descriptor classes the implement
-    __set_name__.
-
-    In contrast to 'registerStates', 'registerDynamicFields' and to this
-    method there is no registerStyleIds method. Instead, styleIds should
-    be defined at instantiation time. This allows the field values to be
-    editable during runtime and even to be persistent across sessions
-    thanks to the AppSettings class which is a subclass of QSettings. """
+  def styleTypes(cls) -> dict[str, type]:
+    """Subclasses are required to implement this method,
+    the 'staticStyles' method and the 'dynStyles' method. This method
+    should provide the type expected at each name. The 'staticStyles'
+    method should return fallback values for the styles. Please note that
+    these are defined on the class level, meaning that these are not
+    sensitive to the instance state. Finally, the 'dynStyles' provides
+    the styles that are sensitive to the instance state. Styles not
+    sensitive to the instance state, should be defined in the
+    'staticStyles' method."""
 
   @classmethod
   @abstractmethod
-  def registerStates(cls, ) -> list[str]:
-    """State-aware widgets are expected to implement this method to return
-    a list of the states supported by this class. Subclass implementation
-    must return a list of at least one state. The suggested name for this
-    state is 'defaultState'.
-
-    The second half of the docstring for 'registerFields' applies to this
-    method as well. """
-
-  @classmethod
-  @abstractmethod
-  def registerDynamicFields(cls, ) -> dict[str, Any]:
-    """Getter-function for the dynamic fields. Subclasses should return
-    key value pairs with the key of the following format:
-    className/styleId/state/fieldName
-    with className being the name of the class. By stating this explicitly,
-    issues with conflicts between base classes and subclasses are avoided.
-    For example, if widget class has a QPen instance for base state and
-    another for hover state, the registerFields method should return the
-    instance for base state, and this method should define for the hover
-    state.
-    basePen = QPen()
-    hoverPen = QPen()
-    Then the registerFields method should contain:
-    'borderPen': basePen
-    and this method should contain:
-    'Button/normal/hover/borderPen': hoverPen
-    This way, the hoverPen is only used when the widget is in the hover
-    state. Fields not defined in this method fall backs to the value defined
-    by registerFields. """
+  def staticStyles(cls, ) -> dict[str, Any]:
+    """Returns the static styles for the widget. """
 
   @abstractmethod
-  def detectState(self, ) -> str:
-    """State-aware widgets should implement this method to define which
-    state the widget is currently in. Please note that if this method
-    returns an object that is not an instance of 'str' present in the
-    static list of states, it will result in undefined behaviour. """
+  def dynStyles(self, ) -> dict[str, Any]:
+    """Returns the dynamic styles for the widget."""
+
+  def getId(self, ) -> str:
+    """Returns the styleId given to this widget at instantiation time.
+    Subclasses may use this value in the 'dynStyles' method to let some
+    styles depend on the styleId. By default, the styleId is 'normal'. """
+    return self.__style_id__ or 'normal'
 
   def getStyle(self, name: str) -> Any:
-    """This method looks up the named style using the AppSettings class.
-    This means that it may be persistently changed during runtime. """
-    return self._getNamedStyle(name)
+    """Returns the style value for the given style name. """
+    styleType = (self.styleTypes() or {}).get(name, None)
+    staticValue = (self.staticStyles() or {}).get(name, None)
+    dynamicValue = (self.dynStyles() or {}).get(name, None)
+    if styleType is None:
+      e = """The styleType for the style name '%s' is not defined!""" % name
+      raise ValueError(e)
+    if not isinstance(staticValue, styleType):
+      e = typeMsg('staticValue', staticValue, styleType)
+      raise TypeError(e)
+    if dynamicValue is None:
+      return staticValue
+    if isinstance(dynamicValue, styleType):
+      if isinstance(dynamicValue, styleType):
+        return dynamicValue
+    e = typeMsg('dynamicValue', dynamicValue, styleType)
+    raise TypeError(e)

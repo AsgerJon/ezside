@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import Any
 
 from PySide6.QtCore import QMargins, QPoint, QRect, QSize
-from PySide6.QtGui import QColor, QPainter, QFontMetrics
+from PySide6.QtGui import QColor, QPainter, QFontMetrics, QPen, QFont
 from attribox import AttriBox
 from icecream import ic
 
@@ -65,9 +65,22 @@ class Label(CanvasWidget):
   def initSignalSlot(self) -> None:
     """Connects signals and slots"""
 
-  def detectState(self) -> str:
-    """State detector"""
-    return 'base'
+  @classmethod
+  def styleTypes(cls) -> dict[str, type]:
+    """Registers the field types for Label."""
+    return {
+      'font'           : QFont,
+      'textPen'        : QPen,
+      'textColor'      : QColor,
+      'borderColor'    : QColor,
+      'backgroundColor': QColor,
+      'margins'        : QMargins,
+      'borders'        : QMargins,
+      'paddings'       : QMargins,
+      'radius'         : QPoint,
+      'vAlign'         : int,
+      'hAlign'         : int,
+    }
 
   @classmethod
   def registerStyleIds(cls) -> list[str]:
@@ -80,7 +93,7 @@ class Label(CanvasWidget):
     return ['base', 'focus']
 
   @classmethod
-  def registerFields(cls) -> dict[str, Any]:
+  def staticStyles(cls) -> dict[str, Any]:
     """Registers default field values for Label, providing a foundation
     for customization across different styleIds and states."""
     return {
@@ -97,22 +110,21 @@ class Label(CanvasWidget):
       'hAlign'         : AlignLeft,
     }
 
-  @classmethod
-  def registerDynamicFields(cls) -> dict[str, Any]:
+  def dynStyles(self) -> dict[str, Any]:
     """Defines dynamic fields based on styleId and state. These settings
     override the base field values in specific styles and states."""
-    return {
-      'title/base'  : {
+    if self.getId() == 'title':
+      return {
         'font'     : parseFont('Montserrat', 16, Bold, MixCase),
         'textPen'  : parsePen(QColor(0, 0, 0, 255), 2, SolidLine),
         'textColor': QColor(0, 0, 0, 255),
-      },
-      'warning/base': {
+      }
+    if self.getId() == 'warning':
+      return {
         'font'     : parseFont('Montserrat', 12, Bold, MixCase),
         'textPen'  : parsePen(QColor(255, 0, 0, 255), 2, SolidLine),
         'textColor': QColor(255, 0, 0, 255),
-      },
-    }
+      }
 
   def customPaint(self, painter: QPainter) -> None:
     """Custom paint method for Label."""

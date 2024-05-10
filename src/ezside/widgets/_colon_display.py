@@ -22,7 +22,7 @@ class ColonDisplay(SevenSegmentDigit):
   def __init__(self, *args, **kwargs) -> None:
     """Initialize the widget."""
     super().__init__(*args, **kwargs)
-    self.setMinimumSize(QSize(24, 96))
+    self.setFixedSize(16, 64)
 
   @classmethod
   def registerFields(cls) -> dict[str, Any]:

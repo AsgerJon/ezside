@@ -40,19 +40,6 @@ class App(QApplication):
     self.setApplicationName('EZSide')
     self.setOrganizationName('EZ')
     self.setAttribute(MenuFlag, True)
-    if kwargs.get('_reset', False):
-      self.clearSettings()
-      BaseWidget.updateSettings()
-      CanvasWidget.updateSettings()
-      DigitalClock.updateSettings()
-      SevenSegmentDigit.updateSettings()
-      ColonDisplay.updateSettings()
-
-  def clearSettings(self) -> None:
-    """Clear the application settings."""
-    settings = AppSettings()
-    settings.clear()
-    settings.sync()
 
   @staticmethod
   def getSettings() -> AppSettings:
