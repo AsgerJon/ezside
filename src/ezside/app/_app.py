@@ -3,11 +3,9 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow
 from icecream import ic
 from vistutils.text import monoSpace

@@ -61,9 +61,6 @@ class BaseWindow(QMainWindow):
       self.mainStatusBar = MainStatusBar(self)
       self.setMenuBar(self.mainMenuBar)
       self.setStatusBar(self.mainStatusBar)
-      # self.menuBar()
-      # self.statusBar()
-      self.initStyle()
       self.initUi()
       self._initCoreConnections()
       self.initSignalSlot()
@@ -91,10 +88,6 @@ class BaseWindow(QMainWindow):
   def _announceHover(self, message) -> None:
     """Announce hover text."""
     self.statusBar().showMessage(message)
-
-  @abstractmethod  # LayoutWindow
-  def initStyle(self, ) -> None:
-    """Initializes the style of the main window."""
 
   @abstractmethod  # LayoutWindow
   def initUi(self, ) -> None:
