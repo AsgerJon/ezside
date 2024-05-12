@@ -51,3 +51,13 @@ class LayoutWindow(BaseWindow):
   @abstractmethod  # MainWindow
   def initSignalSlot(self) -> None:
     """The initActions method initializes the actions of the window."""
+    self.liveView.pauseButton.singleClick.connect(self.testPauseButton)
+    self.liveView.resumeButton.singleClick.connect(self.testResumeButton)
+
+  def testPauseButton(self) -> None:
+    """Test the pause button."""
+    self.mainStatusBar.showMessage('Pause button clicked.', 5000)
+
+  def testResumeButton(self) -> None:
+    """Test the resume button."""
+    self.mainStatusBar.showMessage('Resume button clicked.', 5000)
