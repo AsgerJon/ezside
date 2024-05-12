@@ -8,16 +8,17 @@ from enum import Enum
 from typing import Any
 
 from PySide6.QtCore import QEvent, QMargins, Signal, Slot
-from PySide6.QtGui import QMouseEvent, QEnterEvent, QColor
+from PySide6.QtGui import QMouseEvent, QEnterEvent, QColor, QFontMetrics
+from PySide6.QtWidgets import QWidget
 from icecream import ic
 
 from ezside.core import EZTimer, \
   Precise, \
   SolidLine, \
   parseBrush, \
-  SolidFill
+  SolidFill, Tight
 from ezside.core import LeftClick, Click
-from ezside.widgets import Label
+from ezside.widgets import Label, BaseWidget
 
 ic.configureOutput(includeContext=True)
 
@@ -62,6 +63,11 @@ class PushButton(Label):
 
   def initUi(self, ) -> None:
     """Initialize the user interface."""
+    self.setSizePolicy(Tight, Tight)
+    textRect = QFontMetrics(self.getStyle('font')).boundingRect(self.text)
+    outerRect = textRect + self.getStyle('paddings')
+    outerRect += self.getStyle('borders')
+    outerRect += self.getStyle('margins')
     self.setMouseTracking(True)
 
   def initSignalSlot(self, ) -> None:
