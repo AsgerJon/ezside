@@ -61,6 +61,11 @@ class PushButton(Label):
 
   singleClick = Signal()
 
+  def setEnabled(self, enabled: bool) -> None:
+    """This method sets the enabled state of the button. """
+    self.__is_enabled__ = True if enabled else False
+    self.update()
+
   def initUi(self, ) -> None:
     """Initialize the user interface."""
     self.setSizePolicy(Tight, Tight)
