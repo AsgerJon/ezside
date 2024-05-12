@@ -12,10 +12,12 @@ from icecream import ic
 from vistutils.parse import maybe
 from vistutils.waitaminute import typeMsg
 
-from ezside.core import SolidFill, \
-  SolidLine, \
+from ezside.core import SolidLine, \
   AlignHCenter, \
-  AlignVCenter
+  AlignVCenter, \
+  parseBrush, \
+  AlignFlag
+from ezside.core import SolidFill, parsePen
 from ezside.widgets import CanvasWidget
 
 ic.configureOutput(includeContext=True, )
@@ -45,6 +47,8 @@ class SevenSegmentDigit(CanvasWidget):
     self.__is_dot__ = kwargs.get('dot', False)
     if self.getId() == 'clock':
       self.setFixedSize(32, 64)
+    if self.getId() == 'statusBarClock':
+      self.setFixedSize(16, 32)
 
   def initUi(self, ) -> None:
     """Initialize the user interface."""
@@ -55,72 +59,73 @@ class SevenSegmentDigit(CanvasWidget):
   @classmethod
   def styleTypes(cls) -> dict[str, type]:
     """The styleTypes method provides the type expected at each name."""
-    return {
+    canvasWidgetStyles = CanvasWidget.styleTypes()
+    sevenSegmentDigitStyles = {
       'highBrush'      : QBrush,
       'lowBrush'       : QBrush,
+      'backgroundBrush': QBrush,
+      'borderBrush'    : QBrush,
       'highPen'        : QPen,
       'lowPen'         : QPen,
       'margins'        : QMargins,
       'borders'        : QMargins,
       'paddings'       : QMargins,
-      'borderColor'    : QColor,
-      'backgroundColor': QColor,
       'radius'         : QPoint,
-      'vAlign'         : int,
-      'hAlign'         : int,
+      'vAlign'         : AlignFlag,
+      'hAlign'         : AlignFlag,
       'aspect'         : float,
       'spacing'        : int,
     }
+    return {**canvasWidgetStyles, **sevenSegmentDigitStyles}
 
   @classmethod
   def staticStyles(cls) -> dict[str, Any]:
     """Register the fields."""
-    highBrush = QBrush()
-    highBrush.setStyle(SolidFill)
-    highBrush.setColor(QColor(0, 0, 0))
-    lowBrush = QBrush()
-    lowBrush.setStyle(SolidFill)
-    lowBrush.setColor(QColor(215, 215, 215))
-    highPen = QPen()
-    highPen.setStyle(SolidLine)
-    highPen.setWidth(1)
-    highPen.setColor(QColor(0, 0, 0, ))
-    lowPen = QPen()
-    lowPen.setStyle(SolidLine)
-    lowPen.setWidth(1)
-    lowPen.setColor(QColor(255, 255, 255, ))
-
-    return {
+    highBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
+    lowBrush = parseBrush(QColor(215, 215, 215, 255), SolidFill)
+    highPen = parsePen(QColor(0, 0, 0, 255), 0, SolidLine)
+    lowPen = parsePen(QColor(255, 255, 255, 255), 0, SolidLine)
+    backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    canvasWidgetStyles = CanvasWidget.staticStyles()
+    return {**{
       'highBrush'      : highBrush,
       'lowBrush'       : lowBrush,
       'highPen'        : highPen,
       'lowPen'         : lowPen,
+      'backgroundBrush': backgroundBrush,
+      'borderBrush'    : borderBrush,
       'margins'        : QMargins(1, 1, 1, 1, ),
       'borders'        : QMargins(1, 1, 1, 1, ),
       'paddings'       : QMargins(1, 1, 1, 1, ),
-      'borderColor'    : QColor(0, 0, 0, 0),
-      'backgroundColor': QColor(223, 223, 223, 255),
       'radius'         : QPoint(1, 1, ),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
       'aspect'         : 0.2,
       'spacing'        : 2,
-    }
+    }, **canvasWidgetStyles}
 
   def dynStyles(self, ) -> dict[str, Any]:
     """Implementation of dynamic fields"""
-    if self.getId() == 'clock':
-      highBrush = QBrush()
-      highBrush.setStyle(SolidFill)
-      highBrush.setColor(QColor(0, 0, 0))
-      lowBrush = QBrush()
-      lowBrush.setStyle(SolidFill)
-      lowBrush.setColor(QColor(255, 255, 255))
+    if self.getId() in ['clock', 'statusBarClock']:
+      highBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
+      lowBrush = parseBrush(QColor(191, 191, 191, 255), SolidFill)
+      highPen = parsePen(QColor(0, 0, 0, 255), 0, SolidLine)
+      lowPen = parsePen(QColor(191, 191, 191, 255), 0, SolidLine)
+      backgroundBrush = parseBrush(QColor(207, 207, 207, 255), SolidFill)
+      borderBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
       return {
-        'backgroundColor': QColor(223, 223, 223, 255),
         'highBrush'      : highBrush,
         'lowBrush'       : lowBrush,
-        'radius'         : QPoint(1, 1),
+        'highPen'        : highPen,
+        'lowPen'         : lowPen,
+        'backgroundBrush': backgroundBrush,
+        'borderBrush'    : borderBrush,
+        'radius'         : QPoint(0, 0),
+        'spacing'        : 1,
+        'margins'        : QMargins(0, 0, 0, 0, ),
+        'borders'        : QMargins(0, 0, 0, 0, ),
+        'paddings'       : QMargins(0, 0, 0, 0, ),
       }
 
   def __int__(self, ) -> int:

@@ -44,18 +44,20 @@ class DebugWindow(MainWindow):
 
   def debug1Func(self, ) -> None:
     """Debug1 function."""
-    self.chartView.addPoint()
+    self.liveView.addPoint()
     note = 'Debug1 function called, add data to chart view'
     self.statusBar().showMessage(note)
+    if self.__paused_time__ is None:
+      self.pulseClock.start()
+    else:
+      self.__resume_clock__.start(self.__paused_time__)
 
   def debug2Func(self, ) -> None:
     """Debug2 function."""
     note = 'Debug2 function called'
     print(note)
-    self.statusBar().showMessage(note)
-    settings = QSettings()
-    for item in settings.allKeys():
-      print(item, settings.value(item))
+    self.__paused_time__ = self.pulseClock.remainingTime()
+    self.pulseClock.stop()
 
   def debug3Func(self, ) -> None:
     """Debug3 function."""

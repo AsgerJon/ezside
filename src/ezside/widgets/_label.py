@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import Any
 
 from PySide6.QtCore import QMargins, QPoint, QRect, QSize
-from PySide6.QtGui import QColor, QPainter, QFontMetrics, QPen, QFont
+from PySide6.QtGui import QColor, QPainter, QFontMetrics, QPen, QFont, QBrush
 from attribox import AttriBox
 from icecream import ic
 
@@ -16,7 +16,7 @@ from ezside.core import SolidLine, \
   parsePen, \
   AlignLeft, \
   Center, \
-  Normal
+  Normal, parseBrush, SolidFill
 from ezside.core import AlignVCenter
 from ezside.core import Bold, MixCase
 from ezside.widgets import CanvasWidget
@@ -68,19 +68,18 @@ class Label(CanvasWidget):
   @classmethod
   def styleTypes(cls) -> dict[str, type]:
     """Registers the field types for Label."""
-    return {
+    return {**CanvasWidget.styleTypes(), **{
       'font'           : QFont,
       'textPen'        : QPen,
-      'textColor'      : QColor,
-      'borderColor'    : QColor,
-      'backgroundColor': QColor,
+      'backgroundBrush': QBrush,
+      'borderBrush'    : QBrush,
       'margins'        : QMargins,
       'borders'        : QMargins,
       'paddings'       : QMargins,
       'radius'         : QPoint,
       'vAlign'         : int,
       'hAlign'         : int,
-    }
+    }, }
 
   @classmethod
   def registerStyleIds(cls) -> list[str]:
@@ -96,34 +95,31 @@ class Label(CanvasWidget):
   def staticStyles(cls) -> dict[str, Any]:
     """Registers default field values for Label, providing a foundation
     for customization across different styleIds and states."""
-    return {
+    backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    return {**CanvasWidget.staticStyles(), **{
       'font'           : parseFont('Montserrat', 12, Normal, MixCase),
       'textPen'        : parsePen(QColor(0, 0, 0, 255), 1, SolidLine),
-      'textColor'      : QColor(0, 0, 0, 255),
-      'borderColor'    : QColor(0, 0, 0, 255),
-      'backgroundColor': QColor(223, 235, 223, 255),
+      'backgroundBrush': backgroundBrush,
+      'borderBrush'    : borderBrush,
       'margins'        : QMargins(2, 2, 2, 2, ),
       'borders'        : QMargins(2, 2, 2, 2),
       'paddings'       : QMargins(4, 4, 4, 4, ),
       'radius'         : QPoint(4, 4),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignLeft,
-    }
+    }}
 
   def dynStyles(self) -> dict[str, Any]:
     """Defines dynamic fields based on styleId and state. These settings
     override the base field values in specific styles and states."""
     if self.getId() == 'title':
       return {
-        'font'     : parseFont('Montserrat', 16, Bold, MixCase),
-        'textPen'  : parsePen(QColor(0, 0, 0, 255), 2, SolidLine),
-        'textColor': QColor(0, 0, 0, 255),
+        'font': parseFont('Montserrat', 16, Bold, MixCase),
       }
     if self.getId() == 'warning':
       return {
-        'font'     : parseFont('Montserrat', 12, Bold, MixCase),
-        'textPen'  : parsePen(QColor(255, 0, 0, 255), 2, SolidLine),
-        'textColor': QColor(255, 0, 0, 255),
+        'font': parseFont('Montserrat', 12, Bold, MixCase),
       }
 
   def customPaint(self, painter: QPainter) -> None:

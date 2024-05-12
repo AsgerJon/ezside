@@ -10,7 +10,7 @@ from abc import abstractmethod
 from typing import Any
 from PySide6.QtCore import QPoint, QRect, QPointF, QRectF, QSizeF, QSize
 from PySide6.QtCore import QMargins
-from PySide6.QtGui import QPaintEvent, QColor
+from PySide6.QtGui import QPaintEvent, QColor, QBrush
 from icecream import ic
 from vistutils.text import monoSpace
 
@@ -31,8 +31,8 @@ class CanvasWidget(BaseWidget):
       'margins'        : QMargins,
       'borders'        : QMargins,
       'paddings'       : QMargins,
-      'borderColor'    : QColor,
-      'backgroundColor': QColor,
+      'borderBrush'    : QBrush,
+      'backgroundBrush': QBrush,
       'radius'         : QPoint,
       'vAlign'         : AlignFlag,
       'hAlign'         : AlignFlag,
@@ -47,8 +47,8 @@ class CanvasWidget(BaseWidget):
       'margins'        : QMargins(2, 2, 2, 2, ),
       'borders'        : QMargins(2, 2, 2, 2, ),
       'paddings'       : QMargins(2, 2, 2, 2, ),
-      'borderColor'    : QColor(0, 0, 0, 255),
-      'backgroundColor': QColor(255, 255, 0, 255),
+      'borderBrush'    : parseBrush(QColor(0, 0, 0, 255), SolidFill, ),
+      'backgroundBrush': parseBrush(QColor(215, 215, 215), SolidFill, ),
       'radius'         : QPoint(8, 8, ),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
@@ -122,11 +122,9 @@ class CanvasWidget(BaseWidget):
     margins = self.getStyle('margins')
     borders = self.getStyle('borders')
     paddings = self.getStyle('paddings')
-    backgroundColor = self.getStyle('backgroundColor')
-    borderColor = self.getStyle('borderColor')
     radius = self.getStyle('radius')
-    backgroundBrush = parseBrush(backgroundColor, SolidFill)
-    borderBrush = parseBrush(borderColor, SolidFill)
+    backgroundBrush = self.getStyle('backgroundBrush')
+    borderBrush = self.getStyle('borderBrush')
     painter = GraffitiVandal()
     painter.begin(self)
     viewRect = painter.viewport()

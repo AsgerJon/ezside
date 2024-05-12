@@ -5,12 +5,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from PySide6.QtCore import QPointF, QMargins, QPoint
-from PySide6.QtGui import QPainter, QBrush, QColor, QPen
+from PySide6.QtCore import QPointF, QMargins
+from PySide6.QtGui import QPainter, QColor
 from icecream import ic
 
-from ezside.core import SolidFill, SolidLine, AlignHCenter, AlignVCenter
-from ezside.widgets import SevenSegmentDigit
+from ezside.core import SolidFill, \
+  SolidLine, \
+  parseBrush, parsePen
+from ezside.widgets import SevenSegmentDigit, CanvasWidget
 
 ic.configureOutput(includeContext=True, )
 
@@ -22,42 +24,33 @@ class ColonDisplay(SevenSegmentDigit):
   def __init__(self, *args, **kwargs) -> None:
     """Initialize the widget."""
     super().__init__(*args, **kwargs)
-    self.setFixedSize(12, 64)
+    if self.getId() == 'clock':
+      self.setFixedSize(12, 64)
+    if self.getId() == 'statusBarClock':
+      self.setFixedSize(6, 32)
 
   @classmethod
   def staticStyles(cls) -> dict[str, Any]:
     """Register the fields."""
-    highBrush = QBrush()
-    highBrush.setStyle(SolidFill)
-    highBrush.setColor(QColor(0, 0, 0))
-    lowBrush = QBrush()
-    lowBrush.setStyle(SolidFill)
-    lowBrush.setColor(QColor(215, 215, 215))
-    highPen = QPen()
-    highPen.setStyle(SolidLine)
-    highPen.setWidth(0)
-    highPen.setColor(QColor(191, 191, 191))
-    lowPen = QPen()
-    lowPen.setStyle(SolidLine)
-    lowPen.setWidth(0)
-    lowPen.setColor(QColor(191, 191, 191))
-
-    return {
+    highBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
+    lowBrush = parseBrush(QColor(215, 215, 215, 255), SolidFill)
+    highPen = parsePen(QColor(0, 0, 0, 255), 0, SolidLine)
+    lowPen = parsePen(QColor(255, 255, 255, 255), 0, SolidLine)
+    backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    canvasWidgetStyles = CanvasWidget.staticStyles()
+    canvasWidgetStyles = SevenSegmentDigit.staticStyles()
+    colonStyles = {
       'highBrush'      : highBrush,
       'lowBrush'       : lowBrush,
       'highPen'        : highPen,
       'lowPen'         : lowPen,
-      'margins'        : QMargins(2, 2, 2, 2, ),
-      'borders'        : QMargins(2, 2, 2, 2, ),
-      'paddings'       : QMargins(2, 2, 2, 2, ),
-      'borderColor'    : QColor(0, 0, 0, 255),
-      'backgroundColor': QColor(223, 223, 223, 255),
-      'radius'         : QPoint(0, 0, ),
-      'vAlign'         : AlignVCenter,
-      'hAlign'         : AlignHCenter,
+      'backgroundBrush': backgroundBrush,
+      'borderBrush'    : borderBrush,
       'aspect'         : 0.25,
       'spacing'        : 0,
     }
+    return {**canvasWidgetStyles, **colonStyles}
 
   @classmethod
   def registerStates(cls) -> list[str]:
@@ -68,14 +61,7 @@ class ColonDisplay(SevenSegmentDigit):
     """Implementation of dynamic fields"""
     if self.getId() == 'clock':
       return {
-        'margins'        : QMargins(0, 0, 0, 0, ),
-        'borders'        : QMargins(0, 2, 0, 2, ),
-        'paddings'       : QMargins(0, 0, 0, 0, ),
-        'borderColor'    : QColor(0, 0, 0, 255),
-        'backgroundColor': QColor(223, 223, 223, 255),
-        'radius'         : QPoint(0, 0),
-        'vAlign'         : AlignVCenter,
-        'hAlign'         : AlignHCenter,
+        'borders': QMargins(0, 0, 0, 0, ),
       }
 
   @classmethod

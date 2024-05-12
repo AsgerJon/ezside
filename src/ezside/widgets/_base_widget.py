@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 from PySide6.QtWidgets import QWidget
 from icecream import ic
+from vistutils.text import monoSpace
 from vistutils.waitaminute import typeMsg
 
 if TYPE_CHECKING:
@@ -90,15 +91,24 @@ class BaseWidget(QWidget):
 
   def getStyle(self, name: str) -> Any:
     """Returns the style value for the given style name. """
-    styleType = (self.styleTypes() or {}).get(name, None)
-    staticValue = (self.staticStyles() or {}).get(name, None)
-    dynamicValue = (self.dynStyles() or {}).get(name, None)
+    try:
+      styleType = (self.styleTypes() or {}).get(name, None)
+      staticValue = (self.staticStyles() or {}).get(name, None)
+      dynamicValue = (self.dynStyles() or {}).get(name, None)
+    except Exception as exception:
+      print(self.__class__.__name__)
+      print(self.staticStyles)
+      print(exception)
+      raise SystemExit from exception
     if styleType is None:
-      e = """The styleType for the style name '%s' is not defined!""" % name
-      raise ValueError(e)
+      e = """The styleType at key: '%s' is not defined by the current 
+      class: '%s'!""" % (name, self.__class__.__name__)
+      raise ValueError(monoSpace(e))
     if not isinstance(staticValue, styleType):
       e = typeMsg('staticValue', staticValue, styleType)
-      raise TypeError(e)
+      e2 = """When attempting to retrieve style at key: '%s' from widget 
+      class: '%s', the following error was encountered: \n'%s'!"""
+      raise TypeError(monoSpace(e2 % (name, self.__class__.__name__, e)))
     if dynamicValue is None:
       return staticValue
     if isinstance(dynamicValue, styleType):

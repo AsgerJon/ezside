@@ -7,12 +7,12 @@ import sys
 import time
 from typing import Callable
 
-from ezside.app import App
+from ezside.app import App, MainWindow
 
 
 def tester01() -> int:
   """Main Tester Script"""
-  return App(_reset=True).exec()
+  return App(MainWindow, ).exec()
 
 
 def main(callMeMaybe: Callable) -> None:

@@ -24,12 +24,17 @@ class BaseWindow(QMainWindow):
   mainMenuBar: MainMenuBar
   mainStatusBar: MainStatusBar
 
+  __allow_close__ = False
   __debug_flag__ = None
+  __paused_time__ = None
 
   __is_initialized__ = None
+  __is_closing__ = False
 
   requestQuit = Signal()
+  confirmQuit = Signal()
   requestHelp = Signal()
+  pulse = Signal()
 
   @staticmethod
   def link(url: Any) -> Callable:
@@ -47,6 +52,7 @@ class BaseWindow(QMainWindow):
     """Initialize the BaseWindow."""
     self.__debug_flag__ = kwargs.get('_debug', None)
     QMainWindow.__init__(self, *args, **kwargs)
+    self.setMouseTracking(True)
 
   def show(self) -> None:
     """Show the window."""
@@ -68,6 +74,7 @@ class BaseWindow(QMainWindow):
     """Initialize the core actions for the main window."""
     self.statusBar()
     self.statusBar().showMessage('Initiating core connections...')
+    self.pulse.connect(self.mainStatusBar.updateTime)
     self.mainMenuBar.file.exit.triggered.connect(self.requestQuit)
     self.mainMenuBar.help.help.triggered.connect(self.requestHelp)
     self.mainMenuBar.help.aboutQt.triggered.connect(QApplication.aboutQt)
@@ -101,3 +108,11 @@ class BaseWindow(QMainWindow):
     """Show the window."""
     QMainWindow.showEvent(self, *args)
     self.statusBar().showMessage('Ready')
+
+  def closeEvent(self, *args, **kwargs) -> None:
+    """Close the window."""
+    if self.__is_closing__:
+      self.confirmQuit.emit()
+      return QMainWindow.closeEvent(self, *args, **kwargs)
+    self.__is_closing__ = True
+    self.requestQuit.emit()

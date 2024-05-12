@@ -41,3 +41,5 @@ class MainWindow(LayoutWindow):
 
   def initSignalSlot(self) -> None:
     """Initialize the actions."""
+    LayoutWindow.initSignalSlot(self)
+    self.pulse.connect(self.clock.refresh)

@@ -8,7 +8,7 @@ from PySide6.QtGui import QFont, QFontDatabase
 
 def parseFont(*args, **kwargs) -> QFont:
   """The 'parseFont' function creates instances of QFont. """
-  fontFamilies = QFontDatabase().families()
+  fontFamilies = []
   family, fontSize, fontWeight, fontCase = None, None, None, None
   for arg in args:
     if isinstance(arg, str):

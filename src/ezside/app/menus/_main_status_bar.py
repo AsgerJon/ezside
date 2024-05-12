@@ -18,12 +18,10 @@ class MainStatusBar(QStatusBar):
   def __init__(self, *args, **kwargs) -> None:
     """Initialize the MainStatusBar."""
     QStatusBar.__init__(self, *args, **kwargs)
-    self.digitalClock = DigitalClock()
+    self.digitalClock = DigitalClock(id='statusBarClock')
+    self.digitalClock.initUi()
+    self.addPermanentWidget(self.digitalClock, )
     self.initUi()
-
-  def fuck(self) -> None:
-    """You"""
-    self.addPermanentWidget(self.digitalClock)
 
   def initUi(self, ) -> None:
     """Initializes the user interface for the status bar."""

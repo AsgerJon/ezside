@@ -76,6 +76,7 @@ CTRL = Qt.KeyboardModifier.ControlModifier
 ALT = Qt.KeyboardModifier.AltModifier
 META = Qt.KeyboardModifier.MetaModifier
 
+Click = Qt.MouseButton
 LeftClick = Qt.MouseButton.LeftButton
 RightClick = Qt.MouseButton.RightButton
 MiddleClick = Qt.MouseButton.MiddleButton
@@ -85,8 +86,6 @@ ForwardClick = Qt.MouseButton.ForwardButton
 
 VERTICAL = Qt.Orientation.Vertical
 HORIZONTAL = Qt.Orientation.Horizontal
-
-coreNames = 777
 
 __all__ = [
   'SolidFill', 'BlankFill', 'SolidLine', 'DashLine', 'DotLine', 'DashDot',
@@ -98,4 +97,4 @@ __all__ = [
   'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
   'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
   'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer', 'Weight', 'Cap',
-  'MixCase', 'SmallCaps', 'Upper', 'Lower']
+  'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click']

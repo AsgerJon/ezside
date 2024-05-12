@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QBrush, QPen
 from icecream import ic
 from PySide6.QtCore import Slot, QPoint, QMargins
 from PySide6.QtWidgets import QHBoxLayout
@@ -16,7 +16,8 @@ from ezside.core import AlignTop, \
   AlignLeft, \
   AlignFlag, \
   AlignVCenter, \
-  AlignHCenter
+  parseBrush, SolidFill
+from ezside.core import AlignHCenter
 from ezside.widgets import BaseWidget, SevenSegmentDigit, CanvasWidget
 from ezside.widgets import ColonDisplay
 
@@ -32,13 +33,15 @@ class DigitalClock(CanvasWidget):
     """The registerFields method registers the fields of the widget.
     Please note, that subclasses can reimplement this method, but must
     provide these same fields. """
+    backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
+    borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     return {
       'margins'        : QMargins(0, 0, 0, 0, ),
       'borders'        : QMargins(2, 2, 2, 2, ),
       'paddings'       : QMargins(0, 0, 0, 0, ),
-      'borderColor'    : QColor(0, 0, 0, 255),
-      'backgroundColor': QColor(223, 223, 223, 255),
-      'radius'         : QPoint(4, 4, ),
+      'borderBrush'    : borderBrush,
+      'backgroundBrush': backgroundBrush,
+      'radius'         : QPoint(2, 2, ),
       'vAlign'         : AlignVCenter,
       'hAlign'         : AlignHCenter,
     }
@@ -46,16 +49,24 @@ class DigitalClock(CanvasWidget):
   @classmethod
   def styleTypes(cls) -> dict[str, type]:
     """The styleTypes method provides the type expected at each name. """
-    return {
+    canvasWidgetStyles = CanvasWidget.styleTypes()
+    digitalClockStyles = {
+      'highBrush'      : QBrush,
+      'lowBrush'       : QBrush,
+      'backgroundBrush': QBrush,
+      'borderBrush'    : QBrush,
+      'highPen'        : QPen,
+      'lowPen'         : QPen,
       'margins'        : QMargins,
       'borders'        : QMargins,
       'paddings'       : QMargins,
-      'borderColor'    : QColor,
-      'backgroundColor': QColor,
       'radius'         : QPoint,
-      'vAlign'         : AlignFlag,
-      'hAlign'         : AlignFlag,
+      'vAlign'         : int,
+      'hAlign'         : int,
+      'aspect'         : float,
+      'spacing'        : int,
     }
+    return {**canvasWidgetStyles, **digitalClockStyles}
 
   def dynStyles(self) -> list[str]:
     """The dynStyles method provides the dynamic styles of the widget."""
@@ -64,16 +75,17 @@ class DigitalClock(CanvasWidget):
     """Initializes the DigitalClock widget."""
     super().__init__(*args, **kwargs)
     self.baseLayout = QHBoxLayout()
-    self.baseLayout.setContentsMargins(0, 0, 0, 0, )
+    self.baseLayout.setContentsMargins(1, 0, 1, 0, )
     self.baseLayout.setSpacing(0)
-    self.hoursTens = SevenSegmentDigit(id='clock')
-    self.hours = SevenSegmentDigit(id='clock')
-    self.colon1 = ColonDisplay(id='clock')
-    self.minutesTens = SevenSegmentDigit(id='clock')
-    self.minutes = SevenSegmentDigit(id='clock')
-    self.colon2 = ColonDisplay(id='clock')
-    self.secondsTens = SevenSegmentDigit(id='clock')
-    self.seconds = SevenSegmentDigit(id='clock')
+    styleId = self.getId()
+    self.hoursTens = SevenSegmentDigit(id=styleId)
+    self.hours = SevenSegmentDigit(id=styleId)
+    self.colon1 = ColonDisplay(id=styleId)
+    self.minutesTens = SevenSegmentDigit(id=styleId)
+    self.minutes = SevenSegmentDigit(id=styleId)
+    self.colon2 = ColonDisplay(id=styleId)
+    self.secondsTens = SevenSegmentDigit(id=styleId)
+    self.seconds = SevenSegmentDigit(id=styleId)
     self.initUi()
 
   def initUi(self) -> None:
@@ -114,10 +126,10 @@ class DigitalClock(CanvasWidget):
     s, S = int(rightNow.second % 10), int(rightNow.second // 10)
     m, M = int(rightNow.minute % 10), int(rightNow.minute // 10)
     h, H = int(rightNow.hour % 10), int(rightNow.hour // 10)
-    self.hoursTens.setInnerValue(s)
-    self.hours.setInnerValue(S)
-    self.colon1.setInnerValue(m)
+    self.hoursTens.setInnerValue(H)
+    self.hours.setInnerValue(h)
     self.minutesTens.setInnerValue(M)
-    self.minutes.setInnerValue(h)
-    self.colon2.setInnerValue(H)
+    self.minutes.setInnerValue(m)
+    self.secondsTens.setInnerValue(S)
+    self.seconds.setInnerValue(s)
     BaseWidget.update(self)
