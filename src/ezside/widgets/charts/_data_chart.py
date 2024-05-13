@@ -3,7 +3,8 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCharts import QChart, QValueAxis
+from PySide6.QtCharts import QChart, QValueAxis, QXYSeries
+from PySide6.QtGui import QColor
 
 from ezside.core import AlignBottom, AlignLeft
 from ezside.widgets.charts import RollSeries
@@ -35,6 +36,7 @@ class DataChart(QChart):
 
   def initChart(self, ) -> None:
     """Initializes the chart."""
+    self.__roll_series__.setPointLabelsVisible(False)
     self.addSeries(self.__roll_series__)
     self.setTitle(self.__chart_title__ or self.__fallback_title__)
 
@@ -51,5 +53,4 @@ class DataChart(QChart):
 
   def append(self, value: float) -> None:
     """Append a value to the chart."""
-    self.__roll_series__.append(value)
-  
+    self.__roll_series__.addValue(value)

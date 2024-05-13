@@ -13,6 +13,7 @@ from icecream import ic
 from ezside.app import BaseWindow
 from ezside.core import AlignTop, AlignLeft
 from ezside.widgets import Label, BaseWidget, DigitalClock
+from ezside.widgets.charts import RealTimeView
 
 ic.configureOutput(includeContext=True, )
 
@@ -25,9 +26,8 @@ class LayoutWindow(BaseWindow):
     """The constructor of the LayoutWindow class."""
     BaseWindow.__init__(self, *args, **kwargs)
     self.baseLayout = QVBoxLayout()
-    self.welcomeLabel = Label('LMAO')
-    self.clock = DigitalClock()
     self.baseWidget = BaseWidget()
+    self.realTimeView = RealTimeView()
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -38,10 +38,8 @@ class LayoutWindow(BaseWindow):
     self.setMinimumSize(QSize(640, 480))
     self.baseWidget.__debug_flag__ = True
     self.baseLayout.setAlignment(AlignTop | AlignLeft)
-    self.welcomeLabel.initUi()
-    self.baseLayout.addWidget(self.welcomeLabel)
-    self.clock.initUi()
-    self.baseLayout.addWidget(self.clock)
+    self.realTimeView.initUi()
+    self.baseLayout.addWidget(self.realTimeView)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
