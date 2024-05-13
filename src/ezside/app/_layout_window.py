@@ -12,7 +12,7 @@ from icecream import ic
 
 from ezside.app import BaseWindow
 from ezside.core import AlignTop, AlignLeft
-from ezside.widgets import Label, BaseWidget, DigitalClock, LiveChart
+from ezside.widgets import Label, BaseWidget, DigitalClock
 
 ic.configureOutput(includeContext=True, )
 
@@ -28,7 +28,6 @@ class LayoutWindow(BaseWindow):
     self.welcomeLabel = Label('LMAO')
     self.clock = DigitalClock()
     self.baseWidget = BaseWidget()
-    self.liveView = LiveChart()
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -43,16 +42,12 @@ class LayoutWindow(BaseWindow):
     self.baseLayout.addWidget(self.welcomeLabel)
     self.clock.initUi()
     self.baseLayout.addWidget(self.clock)
-    self.liveView.initUi()
-    self.baseLayout.addWidget(self.liveView)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
   @abstractmethod  # MainWindow
   def initSignalSlot(self) -> None:
     """The initActions method initializes the actions of the window."""
-    self.liveView.pauseButton.singleClick.connect(self.testPauseButton)
-    self.liveView.resumeButton.singleClick.connect(self.testResumeButton)
 
   def testPauseButton(self) -> None:
     """Test the pause button."""

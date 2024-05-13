@@ -9,7 +9,6 @@ from ._base_widget import BaseWidget
 from ._canvas_widget import CanvasWidget
 from ._label import Label
 from ._push_button import PushButton
-from ._live_chart import LiveChart
 from ._seven_segment_digit import SevenSegmentDigit
 from ._colon_display import ColonDisplay
 from ._digital_clock import DigitalClock
