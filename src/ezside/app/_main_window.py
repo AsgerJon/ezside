@@ -73,8 +73,7 @@ class MainWindow(LayoutWindow):
 
   def debug1Func(self, *args) -> None:
     """Debug1 function."""
-    point = args[0]
-    note = 'Debug1: (%03d, %03d)' % (point.x(), point.y())
+    note = 'Debug1 function called'
     self.statusBar().showMessage(note)
 
   def debug2Func(self, ) -> None:
@@ -93,9 +92,10 @@ class MainWindow(LayoutWindow):
     self.realTimeView.update()
     self.realTimeView.viewport().update()
 
-  def debug3Func(self, ) -> None:
+  def debug3Func(self, *args) -> None:
     """Debug3 function."""
-    note = 'Debug3 function called'
+    point = args[0]
+    note = 'Debug1: (%03d, %03d)' % (point.x(), point.y())
     print(note)
     self.statusBar().showMessage(note)
 

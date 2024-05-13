@@ -4,6 +4,8 @@ QChart framework."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from PySide6.QtCharts import QChartView, QChart, QValueAxis
 from PySide6.QtCore import QPointF, \
   Signal, \
@@ -12,7 +14,7 @@ from PySide6.QtCore import QPointF, \
   Qt, \
   QRect, \
   QSize, \
-  QSizeF, QRectF
+  QSizeF, QRectF, Slot
 from PySide6.QtGui import QPainter, \
   QColor, \
   QFont, \
@@ -21,6 +23,7 @@ from PySide6.QtGui import QPainter, \
   QBrush
 from PySide6.QtWidgets import QGraphicsRectItem
 from icecream import ic
+from vistutils.fields import EmptyField
 from vistutils.parse import maybe
 from vistutils.waitaminute import typeMsg
 
@@ -49,6 +52,103 @@ class RealTimeView(QChartView):
 
   cursorPos = Signal(QPoint)
 
+  title = EmptyField()
+  hAxis = EmptyField()
+  vAxis = EmptyField()
+  hMax = EmptyField()
+  hMin = EmptyField()
+  vMax = EmptyField()
+  vMin = EmptyField()
+
+  @title.GET
+  def getTitle(self) -> str:
+    """Get the title of the chart."""
+    return self.__inner_chart__.title()
+
+  @title.SET
+  def setTitle(self, title: str) -> None:
+    """Set the title of the chart."""
+    self.__inner_chart__.setTitle(title)
+
+  @Slot()
+  def append(self, value: float) -> None:
+    """Append a value to the chart."""
+    self.__inner_chart__.append(value)
+
+  @hMax.SET
+  def _setHorizontalMax(self, value: float) -> None:
+    """Set the maximum value of the horizontal axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.hAxis, QValueAxis)
+    self.hAxis.setMax(value)
+
+  @hMin.SET
+  def _setHorizontalMin(self, value: float) -> None:
+    """Set the minimum value of the horizontal axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.hAxis, QValueAxis)
+    self.hAxis.setMin(value)
+
+  @vMax.SET
+  def _setVerticalMax(self, value: float) -> None:
+    """Set the maximum value of the vertical axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.vAxis, QValueAxis)
+    self.vAxis.setMax(value)
+
+  @vMin.SET
+  def _setVerticalMin(self, value: float) -> None:
+    """Set the minimum value of the vertical axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.vAxis, QValueAxis)
+    self.vAxis.setMin(value)
+
+  @hMax.GET
+  def _getHorizontalMax(self) -> float:
+    """Get the maximum value of the horizontal axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.hAxis, QValueAxis)
+    return self.hAxis.max()
+
+  @hMin.GET
+  def _getHorizontalMin(self) -> float:
+    """Get the minimum value of the horizontal axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.hAxis, QValueAxis)
+    return self.hAxis.min()
+
+  @vMax.GET
+  def _getVerticalMax(self) -> float:
+    """Get the maximum value of the vertical axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.vAxis, QValueAxis)
+    return self.vAxis.max()
+
+  @vMin.GET
+  def _getVerticalMin(self) -> float:
+    """Get the minimum value of the vertical axis."""
+    if TYPE_CHECKING:
+      assert isinstance(self.vAxis, QValueAxis)
+    return self.vAxis.min()
+
+  @hAxis.GET
+  def _getHorizontalAxis(self) -> QValueAxis:
+    """Get the horizontal axis."""
+    axis = self.__inner_chart__.axes(Qt.Orientation.Horizontal)[0]
+    if isinstance(axis, QValueAxis):
+      return axis
+    e = typeMsg('axis', axis, QValueAxis)
+    raise TypeError(e)
+
+  @vAxis.GET
+  def _getVerticalAxis(self) -> QValueAxis:
+    """Get the vertical axis."""
+    axis = self.__inner_chart__.axes(Qt.Orientation.Vertical)[0]
+    if isinstance(axis, QValueAxis):
+      return axis
+    e = typeMsg('axis', axis, QValueAxis)
+    raise TypeError(e)
+
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the RealTimeView."""
     fallbackAlign, chartTheme, title = None, None, None
@@ -62,6 +162,7 @@ class RealTimeView(QChartView):
         chartTheme = arg
       elif isinstance(arg, str) and title is None:
         title = arg
+
     self.__align_flags__ = maybe(fallbackAlign, self.__fallback_align__)
     self.__chart_theme__ = maybe(chartTheme, self.__fallback_theme__)
     self.__inner_chart__ = DataChart(*args, **kwargs)
@@ -81,10 +182,6 @@ class RealTimeView(QChartView):
       'Montserrat', 16, QFont.Capitalization.Capitalize, )
     self.__inner_chart__.setTitleBrush(titleBrush)
     self.__inner_chart__.setTitleFont(titleFont)
-
-  def append(self, value: float) -> None:
-    """Append a value to the chart."""
-    self.__inner_chart__.append(value)
 
   def overLay(self, rect: QRect, brush: QBrush = None) -> None:
     """Overlay a value to the chart."""
