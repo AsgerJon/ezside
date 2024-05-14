@@ -12,3 +12,4 @@ from ._debug_menu import DebugMenu
 
 from ._main_menu_bar import MainMenuBar
 from ._main_status_bar import MainStatusBar
+from ._confirm_box import ConfirmBox

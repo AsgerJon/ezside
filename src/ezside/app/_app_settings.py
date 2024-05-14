@@ -185,7 +185,7 @@ class AppSettings(QSettings):
     if key is None:
       e = """At least a key must be provided!"""
       raise ValueError(monoSpace(e))
-    keyWords = key.split('/')
+    keyWords = [w for w in key.split('/') if w]
     if keyWords[0] == 'icon':
       return QIcon(self._getIconPath(keyWords[1]))
     if keyWords[0] == 'shortcut':

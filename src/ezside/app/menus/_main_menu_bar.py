@@ -11,11 +11,11 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenuBar, QMenu
 from icecream import ic
 
-if TYPE_CHECKING:
-  pass
 from ezside.app.menus import FileMenu, EditMenu, HelpMenu, \
   DebugMenu, AbstractMenu
 
+if TYPE_CHECKING:
+  pass
 ic.configureOutput(includeContext=True, )
 
 

@@ -6,8 +6,8 @@ content. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import Any
+
 from PySide6.QtCore import QPoint, QRect, QPointF, QRectF, QSizeF, QSize
 from PySide6.QtCore import QMargins
 from PySide6.QtGui import QPaintEvent, QColor, QBrush
@@ -24,9 +24,9 @@ ic.configureOutput(includeContext=True)
 
 class CanvasWidget(BaseWidget):
 
-  @classmethod
-  def styleTypes(cls) -> dict[str, type]:
-    """The styleTypes method provides the type expected at each name. """
+  @staticmethod
+  def getStyleTypes() -> dict[str, type]:
+    """Getter-function for the style types."""
     return {
       'margins'        : QMargins,
       'borders'        : QMargins,
@@ -39,10 +39,22 @@ class CanvasWidget(BaseWidget):
     }
 
   @classmethod
-  def staticStyles(cls) -> dict[str, Any]:
-    """The registerFields method registers the fields of the widget.
-    Please note, that subclasses can reimplement this method, but must
-    provide these same fields. """
+  def typeGuard(cls, name: str, value: Any) -> Any:
+    """The styleTypes method provides the type expected at each name. """
+    data = cls.getStyleTypes()
+    styleType = data.get(name, None)
+    if styleType is None:
+      e = """Unrecognized style name: '%s'"""
+      raise KeyError(monoSpace(e % name))
+    if isinstance(value, styleType):
+      return True
+    e = """Expected a value of type '%s' for style '%s'!"""
+    raise TypeError(monoSpace(e % (str(styleType), name)))
+
+  @classmethod
+  def getFallbackStyles(cls) -> dict[str, Any]:
+    """The fallbackStyles method provides the default values for the
+    styles."""
     return {
       'margins'        : QMargins(2, 2, 2, 2, ),
       'borders'        : QMargins(2, 2, 2, 2, ),
@@ -55,15 +67,24 @@ class CanvasWidget(BaseWidget):
     }
 
   @classmethod
-  @abstractmethod
-  def dynStyles(cls) -> list[str]:
-    """The registerStates method registers the states of the widget."""
+  def fallbackStyles(cls, name: str) -> Any:
+    """The registerFields method registers the fields of the widget.
+    Please note, that subclasses can reimplement this method, but must
+    provide these same fields. """
+    fallbackStyles = cls.getFallbackStyles()
+    style = fallbackStyles.get(name, None)
+    if style is None:
+      e = """Unrecognized style name: '%s'"""
+      raise KeyError(monoSpace(e % name))
+    return style
 
-  @abstractmethod
+  def defaultStyles(self, name: str) -> Any:
+    """The defaultStyles method provides the default values for the
+    styles."""
+
   def initSignalSlot(self) -> None:
     """The initSignalSlot method connects signals and slots."""
 
-  @abstractmethod
   def initUi(self) -> None:
     """The initUi method initializes the user interface."""
 

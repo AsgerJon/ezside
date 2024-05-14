@@ -7,18 +7,13 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
-from PySide6.QtCore import QEvent, QMargins, Signal, Slot
+from PySide6.QtCore import QEvent, QMargins, Signal, QPointF
 from PySide6.QtGui import QMouseEvent, QEnterEvent, QColor, QFontMetrics
-from PySide6.QtWidgets import QWidget
 from icecream import ic
 
-from ezside.core import EZTimer, \
-  Precise, \
-  SolidLine, \
-  parseBrush, \
-  SolidFill, Tight
-from ezside.core import LeftClick, Click
-from ezside.widgets import Label, BaseWidget
+from ezside.core import Precise, AlignFlag, Click, CursorVector, NoClick
+from ezside.core import parseBrush, SolidFill, Tight, EZTimer, AlignHCenter
+from ezside.widgets import Label
 
 ic.configureOutput(includeContext=True)
 
@@ -30,6 +25,14 @@ class StaticState(Enum):
   NORMAL = 0
   CHECKED = 1
 
+  def __str__(self, ) -> str:
+    """String representation"""
+    return self.name
+
+  def __repr__(self, ) -> str:
+    """String representation"""
+    return '%s.%s' % (self.__class__.__name__, self.name)
+
 
 class DynamicState(Enum):
   """DynamicState describes the possible states of a widget relative to
@@ -39,27 +42,43 @@ class DynamicState(Enum):
   PRESSED = 2
   MOVING = 3
 
+  def __str__(self, ) -> str:
+    """String representation"""
+    return self.name
+
+  def __repr__(self, ) -> str:
+    """String representation"""
+    return '%s.%s' % (self.__class__.__name__, self.name)
+
 
 class PushButton(Label):
   """PushButton is a subclass of CanvasWidget providing push button
   functionality. """
 
   _moveTimer = EZTimer(100, Precise, singleShot=True)
+  _pressHoldTimer = EZTimer(500, Precise, singleShot=True)
   _releaseTimer = EZTimer(125, Precise, singleShot=True)
+  _clickTimer = EZTimer(125, Precise, singleShot=True)
+  _doubleReleaseTimer = EZTimer(125, Precise, singleShot=True)
+  _doubleClickTimer = EZTimer(125, Precise, singleShot=True)
 
   __is_enabled__ = True
   __is_checked__ = None
   __is_hovered__ = None
   __is_pressed__ = None
-  __click_press__ = None
   __is_moving__ = None
-  __cursor_x__ = None
-  __cursor_y__ = None
-  __press_x__ = None
-  __press_y__ = None
   __active_button__ = None
+  __recent_mouse__ = None
+  __recent_vector__ = None
 
+  mouseEnter = Signal(QPointF)
+  mouseLeave = Signal(QPointF)
+  mouseMove = Signal(CursorVector)
   singleClick = Signal()
+  singleButtonClick = Signal(Click)
+  doubleClick = Signal()
+  doubleButtonClick = Signal(Click)
+  pressHoldButton = Signal(Click)
 
   def setEnabled(self, enabled: bool) -> None:
     """This method sets the enabled state of the button. """
@@ -74,9 +93,52 @@ class PushButton(Label):
     outerRect += self.getStyle('borders')
     outerRect += self.getStyle('margins')
     self.setMouseTracking(True)
+    self.initSignalSlot()
 
   def initSignalSlot(self, ) -> None:
     """Initialize the signal slot."""
+    self._moveTimer.timeout.connect(self._movingStop)
+    self._pressHoldTimer.timeout.connect(self._pressHoldStop)
+    self._releaseTimer.timeout.connect(self._releaseStop)
+    self._clickTimer.timeout.connect(self._singleClickStop)
+    self._doubleReleaseTimer.timeout.connect(self._doubleReleaseStop)
+    self._doubleClickTimer.timeout.connect(self._doubleClickStop)
+
+  def _doubleClickStop(self, ) -> None:
+    """If two mouse clicks occur within the double click time limit,
+    this timer provides a delay allowing further elevation. Moving the
+    mouse during this time emits the double click signal immediately."""
+    self.doubleButtonClick.emit(self.__active_button__)
+    self._resetState()
+
+  def _doubleReleaseStop(self, ) -> None:
+    """If a mouse release event has not occurred for the time set in the
+    double release timer, this method is called to stop the double
+    release state. Please note, that the 'mouseReleaseEvent' is
+    responsible for starting and stopping the timer. """
+    self.__is_pressed__ = False
+
+  def _singleClickStop(self) -> None:
+    """If a mouse button is clicked, this timer provides a delay that
+    allows a second click to elevate to a double click. However, moving
+    during this time prevents the double click, which then allows the
+    single click to be emitted immediately."""
+    self.singleButtonClick.emit(self.__active_button__)
+    self._resetState()
+
+  def _pressHoldStop(self) -> None:
+    """If a mouse button is held down for the duration of the press hold
+    timer, it emits the press hold signal. """
+    self.pressHoldButton.emit(self.__active_button__)
+    self._resetState()
+
+  def _releaseStop(self) -> None:
+    """If a mouse release event has not occurred for the time set in the
+    release timer, this method is called to stop the pressed state. Please
+    note, that the 'mouseReleaseEvent' is responsible for starting and
+    stopping the timer. """
+    self.__is_pressed__ = False
+    self._pressHoldTimer.start()
 
   def _movingStop(self) -> None:
     """If a mouse move event has not occurred for the time set in the
@@ -85,23 +147,21 @@ class PushButton(Label):
     stopping the timer. """
     self.__is_moving__ = False
 
-  @classmethod
-  def styleTypes(cls) -> dict[str, type]:
+  @staticmethod
+  def getStyleTypes() -> dict[str, type]:
     """The styleTypes method provides the type expected at each name. """
-    return {**Label.styleTypes(), **{
-      'driftLimit': int,
-    }}
+    LabelStyleTypes = Label.getStyleTypes()
+    ButtonStyleTypes = {'driftLimit': int, 'hAlign': AlignFlag}
+    return {**LabelStyleTypes, **ButtonStyleTypes}
 
   @classmethod
-  def staticStyles(cls, ) -> dict[str, Any]:
-    """This method returns the current static state of the button. """
-    borderBrush = parseBrush(QColor(0, 0, 63, 255), SolidLine)
-    buttonStyles = {
-      'driftLimit': 4,
-    }
-    return {**Label.staticStyles(), **buttonStyles}
+  def getFallbackStyles(cls) -> dict[str, Any]:
+    """The fallbackStyles method provides the default values for the
+    styles."""
+    fallbackStyles = {'driftLimit': 4, 'hAlign': AlignHCenter}
+    return {**Label.getFallbackStyles(), **fallbackStyles}
 
-  def getState(self, ) -> tuple[StaticState, DynamicState]:
+  def getState(self, ) -> str:
     """This method returns the current state of the button. """
     staticState = StaticState.NORMAL
     if not self.__is_enabled__:
@@ -115,19 +175,19 @@ class PushButton(Label):
       dynamicState = DynamicState.PRESSED
     elif self.__is_moving__:
       dynamicState = DynamicState.MOVING
-    return staticState, dynamicState
+    return '%s-%s' % (staticState, dynamicState)
 
-  def dynStyles(self, ) -> dict[str, Any]:
+  def getDefaultStyles(self, ) -> dict[str, Any]:
     """This implementation defines how the button is rendered depending
     on its current state. The BaseWidget class does not provide state
     awareness on the instance level at runtime, so this method returns the
     dictionary that matches the current state. """
     state = self.getState()
     borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
-    normalNormal = (StaticState.NORMAL, DynamicState.NORMAL)
-    normalHover = (StaticState.NORMAL, DynamicState.HOVER)
-    normalPressed = (StaticState.NORMAL, DynamicState.PRESSED)
-    normalMoving = (StaticState.NORMAL, DynamicState.MOVING)
+    normalNormal = '%s-%s' % (StaticState.NORMAL, DynamicState.NORMAL)
+    normalHover = '%s-%s' % (StaticState.NORMAL, DynamicState.HOVER)
+    normalPressed = '%s-%s' % (StaticState.NORMAL, DynamicState.PRESSED)
+    normalMoving = '%s-%s' % (StaticState.NORMAL, DynamicState.MOVING)
 
     if state == normalNormal:
       return {
@@ -153,59 +213,83 @@ class PushButton(Label):
 
   def enterEvent(self, event: QEnterEvent) -> None:
     """This method is called when the mouse enters the button. """
+    type_ = QEvent.Type.MouseMove
+    lcl = event.position()
+    scn = event.scenePosition()
+    glb = event.globalPosition()
+    btn = event.button()
+    btns = event.buttons()
+    mds = event.modifiers()
+    event = QMouseEvent(type_, lcl, scn, btn, btns, mds)
     self._updateCursor(event)
     self.__is_hovered__ = True
+    self.__is_moving__ = True
+    self.mouseEnter.emit(lcl)
     self.update()
 
   def leaveEvent(self, event: QEvent) -> None:
     """This method is called when the mouse leaves the button. """
-    self._updateCursor(event)
+    self.mouseLeave.emit(self.__recent_mouse__.position())
     self.__is_hovered__ = False
-    self.__is_pressed__ = False
     self.__is_moving__ = False
+    self.__is_pressed__ = False
+    self._resetState()
     self.update()
 
   def mousePressEvent(self, event: QMouseEvent) -> None:
     """This method is called when the mouse is pressed on the button. """
+    self.__is_moving__ = False
     self.__is_pressed__ = True
     self.__is_hovered__ = True
+    self.__active_button__ = event.button()
+    if self._clickTimer.isActive():
+      self._clickTimer.stop()
+      self._doubleReleaseTimer.start()
+    self._releaseTimer.stop()
+    self._releaseTimer.start()
     self.update()
-    self.__press_x__, self.__press_y__ = event.pos().x(), event.pos().y()
 
   def mouseReleaseEvent(self, event: QMouseEvent) -> None:
     """This method is called when the mouse is released on the button. """
     self.__is_pressed__ = False
     self.__is_hovered__ = True
+    if event.button() != self.__active_button__:
+      return self._resetState()
+    if self._doubleReleaseTimer.isActive():
+      self._doubleReleaseTimer.stop()
+      self._doubleClickTimer.stop()
+      self._doubleClickTimer.start()
+    elif self._releaseTimer.isActive():
+      self._releaseTimer.stop()
+      self._clickTimer.stop()
+      self._clickTimer.start()
+    elif self._pressHoldTimer.isActive():
+      self._pressHoldTimer.stop()
     self.update()
-    x, y = event.pos().x(), event.pos().y()
-    x0, y0 = self.__press_x__, self.__press_y__
-    if (x - x0) ** 2 + (y - y0) ** 2 < self.getStyle('driftLimit') ** 2:
-      self.singleClick.emit()
 
   def mouseMoveEvent(self, event: QMouseEvent) -> None:
     """This method is called when the mouse is moved over the button. """
-    if self._cursorDrift(event) < self.getStyle('driftLimit') ** 2:
-      return  # Ignore small drifts
-    self.__is_moving__ = True
-    self._moveTimer.stop()
     self._updateCursor(event)
-    self._moveTimer.start()
 
-  def _updateCursor(self, event: QEvent) -> None:
+  def _updateCursor(self, event: QMouseEvent) -> None:
     """This method updates the cursor position. """
-    if isinstance(event, (QMouseEvent, QEnterEvent)):
-      self.__cursor_x__ = event.pos().x()
-      self.__cursor_y__ = event.pos().y()
-    elif event.type() == QEvent.Type.Leave:
-      self.__cursor_x__ = None
-      self.__cursor_y__ = None
+    if self.__recent_mouse__ is not None:
+      event = QMouseEvent(event)
+      recent = QMouseEvent(self.__recent_mouse__)
+      timer = self._moveTimer
+      if isinstance(recent, QMouseEvent):
+        self.__recent_vector__ = CursorVector(recent, event, timer)
+        self.mouseMove.emit(self.__recent_vector__)
+    self.__recent_mouse__ = QMouseEvent(event)
 
-  def _cursorDrift(self, event: QMouseEvent) -> float:
-    """This method calculates the distance between the cursor position in
-    the event and the most recent cursor position stored in the widget.
-    Please note, that the squared value is returned."""
-    if self.__cursor_x__ is None or self.__cursor_y__ is None:
-      return 99999.
-    x0, y0 = self.__cursor_x__, self.__cursor_y__
-    ex, ey = event.pos().x(), event.pos().y()
-    return (ex - x0) ** 2 + (ey - y0) ** 2
+  def _resetState(self, ) -> None:
+    """Method should be triggered in case of unexpected behaviour."""
+    self._clickTimer.stop()
+    self._doubleReleaseTimer.stop()
+    self._doubleClickTimer.stop()
+    self._releaseTimer.stop()
+    self._moveTimer.stop()
+    self._pressHoldTimer.stop()
+    self.__is_pressed__ = False
+    self.__active_button__ = NoClick
+    self.update()

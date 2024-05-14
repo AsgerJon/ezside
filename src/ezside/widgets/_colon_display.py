@@ -30,7 +30,7 @@ class ColonDisplay(SevenSegmentDigit):
       self.setFixedSize(6, 32)
 
   @classmethod
-  def staticStyles(cls) -> dict[str, Any]:
+  def getFallbackStyles(cls) -> dict[str, Any]:
     """Register the fields."""
     highBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
     lowBrush = parseBrush(QColor(215, 215, 215, 255), SolidFill)
@@ -38,8 +38,7 @@ class ColonDisplay(SevenSegmentDigit):
     lowPen = parsePen(QColor(255, 255, 255, 255), 0, SolidLine)
     backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
-    canvasWidgetStyles = CanvasWidget.staticStyles()
-    canvasWidgetStyles = SevenSegmentDigit.staticStyles()
+    SevenSegmentDigitStyles = SevenSegmentDigit.getFallbackStyles()
     colonStyles = {
       'highBrush'      : highBrush,
       'lowBrush'       : lowBrush,
@@ -50,28 +49,12 @@ class ColonDisplay(SevenSegmentDigit):
       'aspect'         : 0.25,
       'spacing'        : 0,
     }
-    return {**canvasWidgetStyles, **colonStyles}
+    return {**SevenSegmentDigitStyles, **colonStyles}
 
-  @classmethod
-  def registerStates(cls) -> list[str]:
-    """Register the states."""
-    return ['base', ]
-
-  def dynStyles(self) -> dict[str, Any]:
-    """Implementation of dynamic fields"""
+  def getDefaultStyles(self) -> dict[str, Any]:
+    """Getter-function for the default styles"""
     if self.getId() == 'clock':
-      return {
-        'borders': QMargins(0, 0, 0, 0, ),
-      }
-
-  @classmethod
-  def registerStyleIds(cls) -> list[str]:
-    """Registers the supported style IDs for Label."""
-    return ['normal', ]
-
-  def detectState(self) -> str:
-    """Detect the state."""
-    return 'base'
+      return {'borders': QMargins(0, 0, 0, 0, ), }
 
   def getStyle(self, name: str) -> Any:
     """Get the style."""

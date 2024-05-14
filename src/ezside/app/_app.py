@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtCore import Qt, Signal, Slot, QRect
 from PySide6.QtWidgets import QApplication, QMainWindow
 from icecream import ic
 from vistutils.text import monoSpace
@@ -80,6 +80,8 @@ class App(QApplication):
   @Slot()
   def initiateQuit(self) -> None:
     """Initialize the quit signal."""
+    winGeometry = self.mainWindow.geometry()
+    self.getSettings().setValue('/window/geometry', winGeometry)
     if not self.maybeQuit():
       self.stopThreads.emit()
 
@@ -117,11 +119,17 @@ class App(QApplication):
 
   def exec(self) -> int:
     """Executes the application."""
-    # ic(self.mainWindow.__class__.__name__)
-    # here = os.path.abspath(__file__)
-    # icon = QIcon(os.path.join(here, 'iconfiles', 'pogchamp.png'))
+    winGeometry = self.getSettings().value('/window/geometry')
+    if isinstance(winGeometry, QRect):
+      winGeometry = QRect(winGeometry)
+      self.mainWindow.setGeometry(winGeometry)
+    else:
+      ic(winGeometry)
     self.mainWindow.show()
     self.mainWindow.requestQuit.connect(self.initiateQuit)
     self.mainWindow.setWindowIcon(self.getSettings().value('icon/pogchamp'))
     self.pulseThread.start()
-    return super().exec()
+    retCode = super().exec()
+    if not retCode:
+      AppSettings().setValue('/window/geometry', self.mainWindow.geometry())
+    return retCode

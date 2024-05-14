@@ -4,9 +4,6 @@ application business logic."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from cmath import sin
-import time
-
 from PySide6.QtCore import QPointF, QSizeF, QRectF
 from PySide6.QtGui import QAction
 from icecream import ic
@@ -61,7 +58,6 @@ class MainWindow(LayoutWindow):
     """Initialize the actions."""
     LayoutWindow.initSignalSlot(self)
     self.debug1.triggered.connect(self.debug1Func)
-    self.realTimeView.cursorPos.connect(self.debug1Func)
     self.debug2.triggered.connect(self.debug2Func)
     self.debug3.triggered.connect(self.debug3Func)
     self.debug4.triggered.connect(self.debug4Func)
@@ -70,6 +66,11 @@ class MainWindow(LayoutWindow):
     self.debug7.triggered.connect(self.debug7Func)
     self.debug8.triggered.connect(self.debug8Func)
     self.debug9.triggered.connect(self.debug9Func)
+    self.buttonWidget.singleClick.connect(self.confirmBox(self.lmao))
+
+  def lmao(self) -> None:
+    """CUNT"""
+    ic('lmao')
 
   def debug1Func(self, *args) -> None:
     """Debug1 function."""
@@ -80,29 +81,15 @@ class MainWindow(LayoutWindow):
     """Debug2 function."""
     note = 'Debug2 function called'
     self.mainStatusBar.showMessage(note, )
-    vAxis = self.realTimeView.chart().axes(VERTICAL)[0]
-    hAxis = self.realTimeView.chart().axes(HORIZONTAL)[0]
-    vMin, vMax = vAxis.min(), vAxis.max()
-    hMin, hMax = hAxis.min(), hAxis.max()
-    vSpan, hSpan = vMax - vMin, hMax - hMin
-    topLeft = QPointF(hMin, vMin)
-    size = QSizeF(hSpan, vSpan)
-    rect = QRectF(topLeft, size)
-    self.realTimeView.overLay(rect)
-    self.realTimeView.update()
-    self.realTimeView.viewport().update()
 
   def debug3Func(self, *args) -> None:
     """Debug3 function."""
-    point = args[0]
-    note = 'Debug1: (%03d, %03d)' % (point.x(), point.y())
-    print(note)
+    note = 'Debug3 function called'
     self.statusBar().showMessage(note)
 
   def debug4Func(self, ) -> None:
     """Debug4 function."""
     note = 'Debug4 function called'
-    print(note)
     self.statusBar().showMessage(note)
 
   def debug5Func(self, ) -> None:

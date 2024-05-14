@@ -4,16 +4,14 @@ application."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
 
+from PySide6.QtCore import QCoreApplication
 from PySide6.QtWidgets import QWidget
 from icecream import ic
-from vistutils.text import monoSpace
-from vistutils.waitaminute import typeMsg
 
 if TYPE_CHECKING:
-  pass
+  from ezside.app import AppSettings, App
 
 ic.configureOutput(includeContext=True)
 
@@ -23,6 +21,7 @@ class BaseWidget(QWidget):
   application."""
 
   __style_id__ = None
+  __forced_styles__ = None
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the BaseWidget.
@@ -45,13 +44,20 @@ class BaseWidget(QWidget):
     else:
       self.__style_id__ = 'normal'
 
-  @abstractmethod
+  def _getForcedStyle(self, name: str) -> Any:
+    """Getter-function for forced styles."""
+    return (self.__forced_styles__ or {}).get(name, None)
+
+  def __setitem__(self, name: str, styleVal: Any) -> None:
+    """Alias for forceStyle"""
+    self.__forced_styles__ = {**(self.__forced_styles__ or {}),
+                              name: styleVal}
+
   def initUi(self, ) -> None:
     """Initializes the user interface for the widget. This is where
     subclasses should organize nested widgets and layouts. Standalone
     widgets may return an empty reimplementation. """
 
-  @abstractmethod
   def initSignalSlot(self) -> None:
     """Initializes the signal/slot connections for the widget. Subclasses
     with nested widgets and internal signal and slot logic, should
@@ -62,57 +68,72 @@ class BaseWidget(QWidget):
     method."""
 
   @classmethod
-  @abstractmethod
-  def styleTypes(cls) -> dict[str, type]:
-    """Subclasses are required to implement this method,
-    the 'staticStyles' method and the 'dynStyles' method. This method
-    should provide the type expected at each name. The 'staticStyles'
-    method should return fallback values for the styles. Please note that
-    these are defined on the class level, meaning that these are not
-    sensitive to the instance state. Finally, the 'dynStyles' provides
-    the styles that are sensitive to the instance state. Styles not
-    sensitive to the instance state, should be defined in the
-    'staticStyles' method."""
+  def typeGuard(cls, name: str, value: Any) -> Any:
+    """Subclasses can reimplement this method to provide fine control of
+    the allowable types for the style values. If the name is not
+    recognized, this method should return 'None'. In this case, the type
+    check compares against the type of the fallback style. If the name is
+    recognized and the given value is not of acceptable type, this method
+    must raise a TypeError. This method is ignored unless it raises an
+    error. """
 
   @classmethod
-  @abstractmethod
-  def staticStyles(cls, ) -> dict[str, Any]:
-    """Returns the static styles for the widget. """
+  def fallbackStyles(cls, name: str) -> Any:
+    """Subclasses are required to implement this method for every style
+    name. It should provide the single fallback value that is insensitive
+    to instance state and id. """
 
-  @abstractmethod
-  def dynStyles(self, ) -> dict[str, Any]:
-    """Returns the dynamic styles for the widget."""
+  def defaultStyles(self, name: str) -> Any:
+    """Subclasses may implement this method to provide id and state based
+    styles at the given name. This method is attempted if the AppSettings
+    class does not provide a value. If a name is not recognized,
+    this method should return 'None'. """
+
+  def getState(self) -> str:
+    """Getter-function for the state of the widget. Classes should
+    implement this method to implement state awareness. """
+    return 'base'
 
   def getId(self, ) -> str:
     """Returns the styleId given to this widget at instantiation time.
     Subclasses may use this value in the 'dynStyles' method to let some
     styles depend on the styleId. By default, the styleId is 'normal'. """
-    return self.__style_id__ or 'normal'
+    return self.__style_id__
+
+  def forceStyle(self, name: str, value: Any) -> None:
+    """Forces the style value for the given style name. This method takes
+    precedence."""
+    self.__forced_styles__[name] = value
+
+  def _getStylePrefix(self) -> str:
+    """Getter-function for style prefix. This is defined by the name of
+    the class, the style-id of the widget, the state of the widget and the
+    name of the style. THis method returns only the prefix."""
+    clsName = self.__class__.__name__
+    styleId = self.getId()
+    state = self.getState()
+    partKeys = [i for i in [clsName, styleId, state] if i]
+    return '/%s/' % '/'.join(partKeys)
 
   def getStyle(self, name: str) -> Any:
     """Returns the style value for the given style name. """
-    try:
-      styleType = (self.styleTypes() or {}).get(name, None)
-      staticValue = (self.staticStyles() or {}).get(name, None)
-      dynamicValue = (self.dynStyles() or {}).get(name, None)
-    except Exception as exception:
-      print(self.__class__.__name__)
-      print(self.staticStyles)
-      print(exception)
-      raise SystemExit from exception
-    if styleType is None:
-      e = """The styleType at key: '%s' is not defined by the current 
-      class: '%s'!""" % (name, self.__class__.__name__)
-      raise ValueError(monoSpace(e))
-    if not isinstance(staticValue, styleType):
-      e = typeMsg('staticValue', staticValue, styleType)
-      e2 = """When attempting to retrieve style at key: '%s' from widget 
-      class: '%s', the following error was encountered: \n'%s'!"""
-      raise TypeError(monoSpace(e2 % (name, self.__class__.__name__, e)))
-    if dynamicValue is None:
-      return staticValue
-    if isinstance(dynamicValue, styleType):
-      if isinstance(dynamicValue, styleType):
-        return dynamicValue
-    e = typeMsg('dynamicValue', dynamicValue, styleType)
-    raise TypeError(e)
+    forcedStyle = self._getForcedStyle(name)
+    if forcedStyle is not None:
+      return forcedStyle
+    defaultKey = name
+    styleKey = '%s%s' % (self._getStylePrefix(), name)
+    app = QCoreApplication.instance()
+    if TYPE_CHECKING:
+      assert isinstance(app, App)
+    settings = app.getSettings()
+    if TYPE_CHECKING:
+      assert isinstance(settings, AppSettings)
+    settingsValue = settings.value(styleKey)
+    if settingsValue is not None:
+      self.typeGuard(name, settingsValue)
+      return settingsValue
+    defaultStyle = self.defaultStyles(name)
+    if defaultStyle is not None:
+      self.typeGuard(name, defaultStyle)
+      return defaultStyle
+    return self.fallbackStyles(name)

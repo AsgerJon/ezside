@@ -3,8 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCharts import QChart, QValueAxis, QXYSeries
-from PySide6.QtGui import QColor
+from PySide6.QtCharts import QChart, QValueAxis
 
 from ezside.core import AlignBottom, AlignLeft
 from ezside.widgets.charts import RollSeries

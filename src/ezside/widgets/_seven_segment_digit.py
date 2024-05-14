@@ -56,10 +56,10 @@ class SevenSegmentDigit(CanvasWidget):
   def initSignalSlot(self) -> None:
     """Initialize the signal slot."""
 
-  @classmethod
-  def styleTypes(cls) -> dict[str, type]:
+  @staticmethod
+  def getStyleTypes() -> dict[str, type]:
     """The styleTypes method provides the type expected at each name."""
-    canvasWidgetStyles = CanvasWidget.styleTypes()
+    canvasWidgetStyles = CanvasWidget.getStyleTypes()
     sevenSegmentDigitStyles = {
       'highBrush'      : QBrush,
       'lowBrush'       : QBrush,
@@ -79,7 +79,7 @@ class SevenSegmentDigit(CanvasWidget):
     return {**canvasWidgetStyles, **sevenSegmentDigitStyles}
 
   @classmethod
-  def staticStyles(cls) -> dict[str, Any]:
+  def getFallbackStyles(cls) -> dict[str, Any]:
     """Register the fields."""
     highBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
     lowBrush = parseBrush(QColor(215, 215, 215, 255), SolidFill)
@@ -87,8 +87,8 @@ class SevenSegmentDigit(CanvasWidget):
     lowPen = parsePen(QColor(255, 255, 255, 255), 0, SolidLine)
     backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
-    canvasWidgetStyles = CanvasWidget.staticStyles()
-    return {**{
+    canvasWidgetStyles = CanvasWidget.getFallbackStyles()
+    SevenSegmentDigitStyles = {
       'highBrush'      : highBrush,
       'lowBrush'       : lowBrush,
       'highPen'        : highPen,
@@ -103,9 +103,10 @@ class SevenSegmentDigit(CanvasWidget):
       'hAlign'         : AlignHCenter,
       'aspect'         : 0.2,
       'spacing'        : 2,
-    }, **canvasWidgetStyles}
+    }
+    return {**canvasWidgetStyles, **SevenSegmentDigitStyles}
 
-  def dynStyles(self, ) -> dict[str, Any]:
+  def getDefaultStyles(self, ) -> dict[str, Any]:
     """Implementation of dynamic fields"""
     if self.getId() in ['clock', 'statusBarClock']:
       highBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
@@ -127,6 +128,11 @@ class SevenSegmentDigit(CanvasWidget):
         'borders'        : QMargins(0, 0, 0, 0, ),
         'paddings'       : QMargins(0, 0, 0, 0, ),
       }
+
+  def defaultStyles(self, name: str) -> Any:
+    """Implementation of dynamic fields"""
+    data = maybe(self.getDefaultStyles(), {})
+    return data.get(name, None)
 
   def __int__(self, ) -> int:
     """Returns the inner value."""

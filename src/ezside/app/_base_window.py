@@ -69,20 +69,45 @@ class BaseWindow(QMainWindow):
 
   def _initCoreConnections(self) -> None:
     """Initialize the core actions for the main window."""
-    self.statusBar()
-    self.statusBar().showMessage('Initiating core connections...')
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting File Menu Actions
+    self.new = self.mainMenuBar.file.new
+    self.open = self.mainMenuBar.file.open
+    self.save = self.mainMenuBar.file.save
+    self.saveAs = self.mainMenuBar.file.saveAs
+    self.preferences = self.mainMenuBar.file.preferences
+    self.exit = self.mainMenuBar.file.exit
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting Edit Menu Actions
+    self.selectAll = self.mainMenuBar.edit.selectAll
+    self.copy = self.mainMenuBar.edit.copy
+    self.cut = self.mainMenuBar.edit.cut
+    self.paste = self.mainMenuBar.edit.paste
+    self.undo = self.mainMenuBar.edit.undo
+    self.redo = self.mainMenuBar.edit.redo
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting Help Menu Actions
+    self.aboutQt = self.mainMenuBar.help.aboutQt
+    self.aboutConda = self.mainMenuBar.help.aboutConda
+    self.aboutPython = self.mainMenuBar.help.aboutPython
+    self.aboutPySide6 = self.mainMenuBar.help.aboutPySide6
+    self.help = self.mainMenuBar.help.help
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting pulse signal
     self.pulse.connect(self.mainStatusBar.updateTime)
-    self.mainMenuBar.file.exit.triggered.connect(self.requestQuit)
-    self.mainMenuBar.help.help.triggered.connect(self.requestHelp)
-    self.mainMenuBar.help.aboutQt.triggered.connect(QApplication.aboutQt)
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting general signals
+    self.exit.triggered.connect(self.requestQuit)
+    self.exit.triggered.connect(self.close)
+    self.help.triggered.connect(self.requestHelp)
+    self.aboutQt.triggered.connect(QApplication.aboutQt)
     condaLink = self.link('https://conda.io')
     pythonLink = self.link('https://python.org')
     pysideLink = self.link('https://doc.qt.io/qtforpython/')
     helpLink = self.link('https://www.youtube.com/watch?v=l60MnDJklnM')
-    self.mainMenuBar.help.aboutConda.triggered.connect(condaLink)
-    self.mainMenuBar.help.aboutPython.triggered.connect(pythonLink)
-    self.mainMenuBar.help.aboutPySide6.triggered.connect(pysideLink)
-    self.mainMenuBar.help.help.triggered.connect(helpLink)
+    self.aboutConda.triggered.connect(condaLink)
+    self.aboutPython.triggered.connect(pythonLink)
+    self.aboutPySide6.triggered.connect(pysideLink)
 
   @Slot(str)
   def _announceHover(self, message) -> None:

@@ -11,9 +11,9 @@ from PySide6.QtWidgets import QVBoxLayout
 from icecream import ic
 
 from ezside.app import BaseWindow
-from ezside.core import AlignTop, AlignLeft
-from ezside.widgets import Label, BaseWidget, DigitalClock
-from ezside.widgets.charts import RealTimeView
+from ezside.app.menus import ConfirmBox
+from ezside.core import AlignTop, AlignLeft, CursorVector
+from ezside.widgets import BaseWidget, Label, PushButton
 
 ic.configureOutput(includeContext=True, )
 
@@ -22,12 +22,18 @@ class LayoutWindow(BaseWindow):
   """LayoutWindow subclasses BaseWindow and implements the layout of
   widgets."""
 
+  confirmBox = ConfirmBox()
+
   def __init__(self, *args, **kwargs) -> None:
     """The constructor of the LayoutWindow class."""
     BaseWindow.__init__(self, *args, **kwargs)
     self.baseLayout = QVBoxLayout()
     self.baseWidget = BaseWidget()
-    self.realTimeView = RealTimeView()
+    self.titleWidget = Label('Title', id='title')
+    self.headerWidget = Label('Header', id='header')
+    self.buttonWidget = PushButton('Click Me', )
+    self.vectorLabel = Label('LMAO', id='info')
+    self.velocityIndicator = Label('Velocity', id='info')
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -35,11 +41,21 @@ class LayoutWindow(BaseWindow):
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.setMinimumSize(QSize(640, 480))
     self.baseWidget.__debug_flag__ = True
     self.baseLayout.setAlignment(AlignTop | AlignLeft)
-    self.realTimeView.initUi()
-    self.baseLayout.addWidget(self.realTimeView)
+    self.baseLayout.addWidget(self.titleWidget)
+    self.baseLayout.addWidget(self.headerWidget)
+    self.buttonWidget.setMinimumSize(QSize(384, 384))
+    self.buttonWidget.initUi()
+    self.baseLayout.addWidget(self.buttonWidget)
+    self.vectorLabel.initUi()
+    self.buttonWidget.mouseMove.connect(self.vectorLabel.echo)
+    self.buttonWidget.mouseMove.connect(self.velocity)
+    self.baseLayout.addWidget(self.vectorLabel)
+    self.velocityIndicator.prefix = '| > '
+    self.velocityIndicator.suffix = ' < |'
+    self.velocityIndicator.initUi()
+    self.baseLayout.addWidget(self.velocityIndicator)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
 
@@ -47,10 +63,8 @@ class LayoutWindow(BaseWindow):
   def initSignalSlot(self) -> None:
     """The initActions method initializes the actions of the window."""
 
-  def testPauseButton(self) -> None:
-    """Test the pause button."""
-    self.mainStatusBar.showMessage('Pause button clicked.', 5000)
-
-  def testResumeButton(self) -> None:
-    """Test the resume button."""
-    self.mainStatusBar.showMessage('Resume button clicked.', 5000)
+  def velocity(self, *args) -> None:
+    """The velocity method updates the velocity of the window."""
+    if args:
+      if isinstance(args[0], CursorVector):
+        self.velocityIndicator.text = '%.3f' % abs(args[0])
