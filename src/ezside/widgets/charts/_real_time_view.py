@@ -31,7 +31,7 @@ from ezside.core import AlignBottom, \
   AlignLeft, \
   AlignFlag, \
   parseBrush, \
-  SolidFill, parseFont, SHIFT, CTRL
+  SolidFill, parseFont, SHIFT, CTRL, HORIZONTAL, VERTICAL
 from ezside.widgets.charts import DataChart
 
 ic.configureOutput(includeContext=True, )
@@ -231,10 +231,13 @@ class RealTimeView(QChartView):
     newVMin = vMin + scroll * f * vSpan
     newVMax = vMax + scroll * f * vSpan
     if event.modifiers() == SHIFT:
-      self.chart().axes(Qt.Orientation.Horizontal)[0].setRange(newHMin, hMax)
+      if (hMax - hMouse) ** 2 > (hMouse - hMin) ** 2:
+        self.chart().axes(HORIZONTAL)[0].setRange(hMin, newHMin)
+      if (hMax - hMouse) ** 2 < (hMouse - hMin) ** 2:
+        self.chart().axes(HORIZONTAL)[0].setRange(newHMin, hMax)
     if event.modifiers() != CTRL:
       return
     if (vMax - vMouse) ** 2 > (vMouse - vMin) ** 2:
-      self.chart().axes(Qt.Orientation.Vertical)[0].setRange(newVMin, vMax)
+      self.chart().axes(VERTICAL)[0].setRange(newVMin, vMax)
     elif (vMax - vMouse) ** 2 < (vMouse - vMin) ** 2:
-      self.chart().axes(Qt.Orientation.Vertical)[0].setRange(vMin, newVMax)
+      self.chart().axes(VERTICAL)[0].setRange(vMin, newVMax)

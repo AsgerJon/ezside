@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtWidgets import QWidget
 from icecream import ic
 
@@ -43,6 +43,7 @@ class BaseWidget(QWidget):
         break
     else:
       self.__style_id__ = 'normal'
+    self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
   def _getForcedStyle(self, name: str) -> Any:
     """Getter-function for forced styles."""
@@ -112,7 +113,7 @@ class BaseWidget(QWidget):
     clsName = self.__class__.__name__
     styleId = self.getId()
     state = self.getState()
-    partKeys = [i for i in [clsName, styleId, state] if i]
+    partKeys = [str(i) for i in [clsName, styleId, state] if i]
     return '/%s/' % '/'.join(partKeys)
 
   def getStyle(self, name: str) -> Any:

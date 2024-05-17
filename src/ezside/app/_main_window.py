@@ -5,7 +5,8 @@ application business logic."""
 from __future__ import annotations
 
 from PySide6.QtCore import QPointF, QSizeF, QRectF
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QColor
+from PySide6.QtWidgets import QColorDialog
 from icecream import ic
 
 from ezside.app import LayoutWindow
@@ -13,6 +14,7 @@ from ezside.app.menus import EditMenu, FileMenu, HelpMenu, DebugMenu
 from ezside.core import VERTICAL, HORIZONTAL
 
 ic.configureOutput(includeContext=True, )
+NativeCol = QColorDialog.ColorDialogOption.DontUseNativeDialog
 
 
 class MainWindow(LayoutWindow):
@@ -66,43 +68,49 @@ class MainWindow(LayoutWindow):
     self.debug7.triggered.connect(self.debug7Func)
     self.debug8.triggered.connect(self.debug8Func)
     self.debug9.triggered.connect(self.debug9Func)
-    self.buttonWidget.singleClick.connect(self.confirmBox(self.lmao))
-
-  def lmao(self) -> None:
-    """CUNT"""
-    ic('lmao')
+    self.colorDialog.colorSelected.connect(self.tester.selectBackground)
+    self.buttonWidget.singleLeft.connect(self.colorDialog.show)
+    self.buttonWidget.singleLeft.connect(self.debug1Func)
+    self.buttonWidget.singleRight.connect(self.fontDialog.show)
+    self.buttonWidget.singleRight.connect(self.debug2Func)
 
   def debug1Func(self, *args) -> None:
     """Debug1 function."""
     note = 'Debug1 function called'
     self.statusBar().showMessage(note)
+    self.colorDialog.show()
 
   def debug2Func(self, ) -> None:
     """Debug2 function."""
     note = 'Debug2 function called'
     self.mainStatusBar.showMessage(note, )
+    self.fontDialog.show()
 
   def debug3Func(self, *args) -> None:
     """Debug3 function."""
     note = 'Debug3 function called'
     self.statusBar().showMessage(note)
+    self.openFileDialog.show()
 
   def debug4Func(self, ) -> None:
     """Debug4 function."""
     note = 'Debug4 function called'
     self.statusBar().showMessage(note)
+    self.saveFileDialog.show()
 
   def debug5Func(self, ) -> None:
     """Debug5 function."""
     note = 'Debug5 function called'
     print(note)
     self.statusBar().showMessage(note)
+    self.folderDialog.show()
 
   def debug6Func(self, ) -> None:
     """Debug6 function."""
     note = 'Debug6 function called'
     print(note)
     self.statusBar().showMessage(note)
+    self.cunt.show()
 
   def debug7Func(self, ) -> None:
     """Debug7 function."""

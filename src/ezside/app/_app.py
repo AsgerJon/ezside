@@ -37,6 +37,7 @@ class App(QApplication):
     """Initializes the App instance."""
     strArgs = [arg for arg in args if isinstance(arg, str)]
     QApplication.__init__(self, strArgs)
+    self.setStyle('Fusion')
     for arg in args:
       if isinstance(arg, type):
         if issubclass(arg, QMainWindow):

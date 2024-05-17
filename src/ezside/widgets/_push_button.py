@@ -4,51 +4,18 @@ functionality. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from enum import Enum
 from typing import Any
 
-from PySide6.QtCore import QEvent, QMargins, Signal, QPointF
+from PySide6.QtCore import QEvent, QMargins, Signal, QPointF, Qt
 from PySide6.QtGui import QMouseEvent, QEnterEvent, QColor, QFontMetrics
 from icecream import ic
 
 from ezside.core import Precise, AlignFlag, Click, CursorVector, NoClick
+from ezside.core import RightClick, LeftClick, MiddleClick
 from ezside.core import parseBrush, SolidFill, Tight, EZTimer, AlignHCenter
-from ezside.widgets import Label
+from ezside.widgets import Label, ButtonState
 
 ic.configureOutput(includeContext=True)
-
-
-class StaticState(Enum):
-  """StaticState describes the possible states of a widget that can change
-  at runtime, but which are not dependent on user interaction. """
-  DISABLED = -1
-  NORMAL = 0
-  CHECKED = 1
-
-  def __str__(self, ) -> str:
-    """String representation"""
-    return self.name
-
-  def __repr__(self, ) -> str:
-    """String representation"""
-    return '%s.%s' % (self.__class__.__name__, self.name)
-
-
-class DynamicState(Enum):
-  """DynamicState describes the possible states of a widget relative to
-  immediate user input, such as hover or pressed. """
-  NORMAL = 0
-  HOVER = 1
-  PRESSED = 2
-  MOVING = 3
-
-  def __str__(self, ) -> str:
-    """String representation"""
-    return self.name
-
-  def __repr__(self, ) -> str:
-    """String representation"""
-    return '%s.%s' % (self.__class__.__name__, self.name)
 
 
 class PushButton(Label):
@@ -63,7 +30,6 @@ class PushButton(Label):
   _doubleClickTimer = EZTimer(125, Precise, singleShot=True)
 
   __is_enabled__ = True
-  __is_checked__ = None
   __is_hovered__ = None
   __is_pressed__ = None
   __is_moving__ = None
@@ -71,6 +37,7 @@ class PushButton(Label):
   __recent_mouse__ = None
   __recent_vector__ = None
 
+  returnPressed = Signal()
   mouseEnter = Signal(QPointF)
   mouseLeave = Signal(QPointF)
   mouseMove = Signal(CursorVector)
@@ -79,6 +46,27 @@ class PushButton(Label):
   doubleClick = Signal()
   doubleButtonClick = Signal(Click)
   pressHoldButton = Signal(Click)
+  singleLeft = Signal()
+  singleRight = Signal()
+  singleMiddle = Signal()
+  doubleLeft = Signal()
+  doubleRight = Signal()
+  doubleMiddle = Signal()
+  pressHoldLeft = Signal()
+  pressHoldRight = Signal()
+  pressHoldMiddle = Signal()
+
+  def enable(self, ) -> None:
+    """Enables the button"""
+    if self.__is_enabled__:
+      return
+    self.__is_enabled__ = True
+
+  def disable(self, ) -> None:
+    """Disables the button"""
+    if not self.__is_enabled__:
+      return
+    self.__is_enabled__ = False
 
   def setEnabled(self, enabled: bool) -> None:
     """This method sets the enabled state of the button. """
@@ -87,6 +75,7 @@ class PushButton(Label):
 
   def initUi(self, ) -> None:
     """Initialize the user interface."""
+    self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
     self.setSizePolicy(Tight, Tight)
     textRect = QFontMetrics(self.getStyle('font')).boundingRect(self.text)
     outerRect = textRect + self.getStyle('paddings')
@@ -124,13 +113,24 @@ class PushButton(Label):
     during this time prevents the double click, which then allows the
     single click to be emitted immediately."""
     self.singleButtonClick.emit(self.__active_button__)
+    if self.__active_button__ == LeftClick:
+      self.singleLeft.emit()
+    elif self.__active_button__ == RightClick:
+      self.singleRight.emit()
+    elif self.__active_button__ == MiddleClick:
+      self.singleMiddle.emit()
     self._resetState()
 
   def _pressHoldStop(self) -> None:
     """If a mouse button is held down for the duration of the press hold
     timer, it emits the press hold signal. """
     self.pressHoldButton.emit(self.__active_button__)
-    self._resetState()
+    if self.__active_button__ == LeftClick:
+      self.pressHoldLeft.emit()
+    elif self.__active_button__ == RightClick:
+      self.pressHoldRight.emit()
+    elif self.__active_button__ == MiddleClick:
+      self.pressHoldMiddle.emit()
 
   def _releaseStop(self) -> None:
     """If a mouse release event has not occurred for the time set in the
@@ -161,21 +161,9 @@ class PushButton(Label):
     fallbackStyles = {'driftLimit': 4, 'hAlign': AlignHCenter}
     return {**Label.getFallbackStyles(), **fallbackStyles}
 
-  def getState(self, ) -> str:
+  def getState(self, ) -> ButtonState:
     """This method returns the current state of the button. """
-    staticState = StaticState.NORMAL
-    if not self.__is_enabled__:
-      staticState = StaticState.DISABLED
-    elif self.__is_checked__:
-      staticState = StaticState.CHECKED
-    dynamicState = DynamicState.NORMAL
-    if self.__is_hovered__:
-      dynamicState = DynamicState.HOVER
-    if self.__is_pressed__:
-      dynamicState = DynamicState.PRESSED
-    elif self.__is_moving__:
-      dynamicState = DynamicState.MOVING
-    return '%s-%s' % (staticState, dynamicState)
+    return ButtonState(self)
 
   def getDefaultStyles(self, ) -> dict[str, Any]:
     """This implementation defines how the button is rendered depending
@@ -183,33 +171,28 @@ class PushButton(Label):
     awareness on the instance level at runtime, so this method returns the
     dictionary that matches the current state. """
     state = self.getState()
-    borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
-    normalNormal = '%s-%s' % (StaticState.NORMAL, DynamicState.NORMAL)
-    normalHover = '%s-%s' % (StaticState.NORMAL, DynamicState.HOVER)
-    normalPressed = '%s-%s' % (StaticState.NORMAL, DynamicState.PRESSED)
-    normalMoving = '%s-%s' % (StaticState.NORMAL, DynamicState.MOVING)
-
-    if state == normalNormal:
-      return {
-        'padding'        : QMargins(2, 2, 2, 2),
-        'borders'        : QMargins(2, 2, 2, 2),
-        'borderBrush'    : parseBrush(QColor(0, 0, 0, 144), SolidFill),
-        'backgroundBrush': parseBrush(QColor(223, 223, 223, 255), SolidFill),
-      }
-    if state in [normalHover, normalMoving]:
-      return {
-        'padding'        : QMargins(2, 2, 2, 2),
-        'borders'        : QMargins(2, 2, 2, 2, ),
-        'borderBrush'    : parseBrush(QColor(0, 0, 0, 191), SolidFill),
-        'backgroundBrush': parseBrush(QColor(191, 191, 191, 255), SolidFill),
-      }
-    if state in [normalPressed, ]:
-      return {
-        'padding'        : QMargins(2, 4, 2, 0),
-        'borders'        : QMargins(2, 0, 2, 4, ),
-        'borderBrush'    : parseBrush(QColor(0, 0, 0, 255), SolidFill),
-        'backgroundBrush': parseBrush(QColor(169, 169, 169, 255), SolidFill),
-      }
+    base = self.getFallbackStyles()
+    bgColor = base['backgroundBrush'].color()
+    bgGrey = 191 if self.__is_enabled__ else 247
+    border = 0 if self.__is_enabled__ else 144
+    bgColor = QColor(bgGrey, bgGrey, bgGrey, 255)
+    borderColor = QColor(border, border, border, 255)
+    f = 100
+    f = 125 if self.__is_hovered__ else f
+    f = 150 if self.__is_pressed__ else f
+    bgBrush = parseBrush(bgColor.darker(f), SolidFill)
+    borderBrush = parseBrush(borderColor.darker(f), SolidFill)
+    base['backgroundBrush'] = bgBrush
+    base['borderBrush'] = borderBrush
+    bw = 2
+    bw = 4 if self.__is_hovered__ else bw
+    bw = 6 if self.__is_pressed__ else bw
+    mw = 8 - bw
+    pw = 4
+    base['margins'] = QMargins(mw, mw, mw, mw)
+    base['borders'] = QMargins(bw, bw, bw, bw)
+    base['paddings'] = QMargins(pw, pw, pw, pw)
+    return base
 
   def enterEvent(self, event: QEnterEvent) -> None:
     """This method is called when the mouse enters the button. """
@@ -292,4 +275,9 @@ class PushButton(Label):
     self._pressHoldTimer.stop()
     self.__is_pressed__ = False
     self.__active_button__ = NoClick
-    self.update()
+
+  def keyPressEvent(self, event) -> None:
+    """This method is called when a key is pressed. """
+    if event.key() in [Qt.Key.Key_Enter, Qt.Key.Key_Return]:
+      self.singleLeft.emit()
+      self.update()

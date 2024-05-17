@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QTextOption
-from PySide6.QtWidgets import QSizePolicy
+from PySide6.QtWidgets import QSizePolicy, QColorDialog
 
 SolidFill = Qt.BrushStyle.SolidPattern
 BlankFill = Qt.BrushStyle.NoBrush
@@ -87,6 +87,8 @@ ForwardClick = Qt.MouseButton.ForwardButton
 VERTICAL = Qt.Orientation.Vertical
 HORIZONTAL = Qt.Orientation.Horizontal
 
+QtRGB = QColorDialog.ColorDialogOption.DontUseNativeDialog
+
 __all__ = [
   'SolidFill', 'BlankFill', 'SolidLine', 'DashLine', 'DotLine', 'DashDot',
   'BlankLine', 'FlatCap', 'SquareCap', 'RoundCap', 'MiterJoin', 'BevelJoin',
@@ -97,4 +99,4 @@ __all__ = [
   'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
   'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
   'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer', 'Weight', 'Cap',
-  'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click']
+  'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click', 'QtRGB']

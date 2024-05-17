@@ -9,11 +9,15 @@ from abc import abstractmethod
 from typing import Any, Callable
 
 from PySide6.QtCore import Signal, QUrl, Slot
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtGui import QDesktopServices, QColor
 from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 
 from ezside.app.menus import MainMenuBar, MainStatusBar
+from ezside.dialogs import ColorSelection, \
+  FontSelection, \
+  OpenFile, \
+  FolderSelection, SaveFile, UserInt
 
 ic.configureOutput(includeContext=True, )
 
@@ -23,6 +27,20 @@ class BaseWindow(QMainWindow):
 
   mainMenuBar: MainMenuBar
   mainStatusBar: MainStatusBar
+  colorSelected: Signal
+  fontSelected: Signal
+  openFileSelected: Signal
+  saveFileSelected: Signal
+  folderSelected: Signal
+
+  intSelected: Signal
+
+  colorDialog = ColorSelection()
+  fontDialog = FontSelection()
+  openFileDialog = OpenFile()
+  saveFileDialog = SaveFile()
+  folderDialog = FolderSelection()
+  cunt = UserInt()
 
   __allow_close__ = False
   __debug_flag__ = None
@@ -69,6 +87,7 @@ class BaseWindow(QMainWindow):
 
   def _initCoreConnections(self) -> None:
     """Initialize the core actions for the main window."""
+    ic('Initializing core connections')
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Connecting File Menu Actions
     self.new = self.mainMenuBar.file.new
@@ -93,6 +112,13 @@ class BaseWindow(QMainWindow):
     self.aboutPySide6 = self.mainMenuBar.help.aboutPySide6
     self.help = self.mainMenuBar.help.help
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting dialogs
+    self.colorSelected.connect(lambda color: print(color))
+    self.fontSelected.connect(lambda font: print(font))
+    self.openFileSelected.connect(lambda file: print(file))
+    self.saveFileSelected.connect(lambda file: print(file))
+    self.folderSelected.connect(lambda folder: print(folder))
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Connecting pulse signal
     self.pulse.connect(self.mainStatusBar.updateTime)
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -108,6 +134,8 @@ class BaseWindow(QMainWindow):
     self.aboutConda.triggered.connect(condaLink)
     self.aboutPython.triggered.connect(pythonLink)
     self.aboutPySide6.triggered.connect(pysideLink)
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #  Connecting debug signals
 
   @Slot(str)
   def _announceHover(self, message) -> None:
