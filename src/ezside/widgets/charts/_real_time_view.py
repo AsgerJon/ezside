@@ -228,13 +228,14 @@ class RealTimeView(QChartView):
     hSpan, vSpan = hMax - hMin, vMax - vMin
     f = self.__scroll_factor__
     newHMin = hMin + scroll * f * hSpan
+    newHMax = hMax + scroll * f * hSpan
     newVMin = vMin + scroll * f * vSpan
     newVMax = vMax + scroll * f * vSpan
     if event.modifiers() == SHIFT:
       if (hMax - hMouse) ** 2 > (hMouse - hMin) ** 2:
         self.chart().axes(HORIZONTAL)[0].setRange(hMin, newHMin)
       if (hMax - hMouse) ** 2 < (hMouse - hMin) ** 2:
-        self.chart().axes(HORIZONTAL)[0].setRange(newHMin, hMax)
+        self.chart().axes(HORIZONTAL)[0].setRange(hMax, newHMax)
     if event.modifiers() != CTRL:
       return
     if (vMax - vMouse) ** 2 > (vMouse - vMin) ** 2:
