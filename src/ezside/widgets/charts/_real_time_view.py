@@ -183,6 +183,9 @@ class RealTimeView(QChartView):
     self.__inner_chart__.setTitleBrush(titleBrush)
     self.__inner_chart__.setTitleFont(titleFont)
 
+  def initSignalSlot(self) -> None:
+    """Initializes the signal-slot connections."""
+
   def overLay(self, rect: QRect, brush: QBrush = None) -> None:
     """Overlay a value to the chart."""
     topLeft = self.chart().mapToPosition(rect.topLeft())
@@ -233,9 +236,9 @@ class RealTimeView(QChartView):
     newVMax = vMax + scroll * f * vSpan
     if event.modifiers() == SHIFT:
       if (hMax - hMouse) ** 2 > (hMouse - hMin) ** 2:
-        self.chart().axes(HORIZONTAL)[0].setRange(hMin, newHMin)
+        self.chart().axes(HORIZONTAL)[0].setRange(newHMin, hMax)
       if (hMax - hMouse) ** 2 < (hMouse - hMin) ** 2:
-        self.chart().axes(HORIZONTAL)[0].setRange(hMax, newHMax)
+        self.chart().axes(HORIZONTAL)[0].setRange(hMin, newHMax)
     if event.modifiers() != CTRL:
       return
     if (vMax - vMouse) ** 2 > (vMouse - vMin) ** 2:

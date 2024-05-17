@@ -8,6 +8,7 @@ from abc import abstractmethod
 
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QVBoxLayout, QWidget
+from attribox import AttriBox
 from icecream import ic
 
 from ezside import TestCanvas
@@ -20,6 +21,7 @@ from ezside.widgets import BaseWidget, \
   CheckButton, \
   VerticalSlider
 from ezside.widgets import HorizontalSlider
+from ezside.widgets.charts import RealTimeView
 
 ic.configureOutput(includeContext=True, )
 
@@ -30,17 +32,10 @@ class LayoutWindow(BaseWindow):
 
   confirmBox = ConfirmBox()
 
-  def __init__(self, *args, **kwargs) -> None:
-    """The constructor of the LayoutWindow class."""
-    BaseWindow.__init__(self, *args, **kwargs)
-    self.baseLayout = QVBoxLayout()
-    self.baseWidget = BaseWidget()
-    self.titleWidget = Label('Title', id='title')
-    self.headerWidget = Label('Header', id='header')
-    self.buttonWidget = PushButton('Click Me', )
-    self.slider = VerticalSlider()
-    self.positionIndicator = Label('Position', id='info')
-    self.tester = TestCanvas()
+  baseLayout = AttriBox[QVBoxLayout]()
+  baseWidget = AttriBox[BaseWidget]()
+  titleWidget = AttriBox[Label]('EZSide title', id='title')
+  liveChart = AttriBox[RealTimeView]()
 
   def initStyle(self) -> None:
     """The initStyle method initializes the style of the window and the
@@ -48,24 +43,15 @@ class LayoutWindow(BaseWindow):
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
-    self.baseWidget.__debug_flag__ = True
-    self.baseLayout.setAlignment(AlignTop | AlignLeft)
+    self.baseLayout.setSpacing(2)
+    self.baseLayout.setContentsMargins(0, 0, 0, 0)
+    self.titleWidget.initUi()
     self.baseLayout.addWidget(self.titleWidget)
-    self.baseLayout.addWidget(self.headerWidget)
-    self.buttonWidget.initUi()
-    self.baseLayout.addWidget(self.buttonWidget)
-    self.slider.setFixedSize(QSize(48, 256))
-    self.slider.initUi()
-    self.baseLayout.addWidget(self.slider)
-    self.positionIndicator.initUi()
-    self.baseLayout.addWidget(self.positionIndicator)
-    self.slider.positionChanged.connect(self.positionIndicator.echo)
-    self.tester.setMinimumSize(64, 64)
-    self.tester.initUi()
-    self.baseLayout.addWidget(self.tester)
+    self.liveChart.initUi()
+    self.baseLayout.addWidget(self.liveChart)
+    self.baseWidget.initUi()
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)
-    QWidget.setTabOrder(self.slider, self.buttonWidget, )
 
   @abstractmethod  # MainWindow
   def initSignalSlot(self) -> None:

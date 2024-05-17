@@ -68,11 +68,8 @@ class MainWindow(LayoutWindow):
     self.debug7.triggered.connect(self.debug7Func)
     self.debug8.triggered.connect(self.debug8Func)
     self.debug9.triggered.connect(self.debug9Func)
-    self.colorDialog.colorSelected.connect(self.tester.selectBackground)
-    self.buttonWidget.singleLeft.connect(self.colorDialog.show)
-    self.buttonWidget.singleLeft.connect(self.debug1Func)
-    self.buttonWidget.singleRight.connect(self.fontDialog.show)
-    self.buttonWidget.singleRight.connect(self.debug2Func)
+    self.titleWidget.initSignalSlot()
+    self.liveChart.initSignalSlot()
 
   def debug1Func(self, *args) -> None:
     """Debug1 function."""
