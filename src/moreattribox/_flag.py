@@ -36,8 +36,7 @@ class Flag(AbstractDescriptor):
 
   def __set__(self, instance: object, value: Any) -> None:
     """Implementation of setter function"""
-    pvtName = self._getPrivateName()
-    setattr(instance, pvtName, True if value else False)
+    setattr(instance, self._getPrivateName(), True if value else False)
 
   def activate(self) -> None:
     """Activates the flag"""

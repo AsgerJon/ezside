@@ -4,4 +4,11 @@ the pyside6 framework."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ._test_canvas import TestCanvas
+import ezside.app.iconfiles
+import ezside.app
+import ezside.core
+import ezside.widgets
+import ezside.menus
+import ezside.dialogs
+import ezside.windows
+from ._test import Test

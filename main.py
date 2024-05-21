@@ -4,34 +4,44 @@
 from __future__ import annotations
 
 import sys
+import os
 import time
 from typing import Callable
 
-from ezside.app import App, MainWindow
+from icecream import ic
+
+ic.configureOutput(includeContext=True, )
+
+
+def tester00() -> int:
+  """Main Tester Script"""
+  stuff = [os, sys, ic, 'hello world']
+  return 0
 
 
 def tester01() -> int:
   """Main Tester Script"""
-  return App(MainWindow, ).exec()
 
 
 def main(callMeMaybe: Callable) -> None:
   """Main Tester Script"""
-  tic = time.time()
+  tic = time.perf_counter_ns()
   print('Running python script located at: \n%s' % sys.argv[0])
   print('Started at: %s' % time.ctime())
   print(77 * '-')
   retCode = 0
   try:
     retCode = callMeMaybe()
-  except Exception as exception:
+  except BaseException as exception:
     print('Exception: %s' % exception)
+    retCode = -1
     raise exception
   retCode = 0 if retCode is None else retCode
   print(77 * '-')
   print('Return Code: %s' % retCode)
-  print('Runtime: %.3f seconds' % (time.time() - tic))
+  toc = time.perf_counter_ns() - tic
+  print('Runtime: %.3E seconds' % (toc * 1e-09,))
 
 
 if __name__ == '__main__':
-  main(tester01)
+  main(tester00)

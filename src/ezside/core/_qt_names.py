@@ -4,7 +4,16 @@ enum values and classes."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
+from typing import Union
+
+from PySide6.QtCore import Qt, \
+  QRect, \
+  QRectF, \
+  QSize, \
+  QSizeF, \
+  QPointF, \
+  QPoint, \
+  QLine, QLineF
 from PySide6.QtGui import QFont, QTextOption
 from PySide6.QtWidgets import QSizePolicy, QColorDialog
 
@@ -61,6 +70,11 @@ alignDict = {
   'bottom' : AlignBottom
 }
 
+AspectMode = Qt.AspectRatioMode
+IgnoreAspect = Qt.AspectRatioMode.IgnoreAspectRatio
+KeepAspect = Qt.AspectRatioMode.KeepAspectRatio
+ExpandAspect = Qt.AspectRatioMode.KeepAspectRatioByExpanding
+
 Expand = QSizePolicy.Policy.MinimumExpanding
 Tight = QSizePolicy.Policy.Maximum
 Fixed = QSizePolicy.Policy.Fixed
@@ -84,10 +98,32 @@ NoClick = Qt.MouseButton.NoButton
 BackClick = Qt.MouseButton.BackButton
 ForwardClick = Qt.MouseButton.ForwardButton
 
+ORIENTATION = Qt.Orientation
 VERTICAL = Qt.Orientation.Vertical
 HORIZONTAL = Qt.Orientation.Horizontal
 
 QtRGB = QColorDialog.ColorDialogOption.DontUseNativeDialog
+
+FAST = Qt.TransformationMode.FastTransformation
+SMOOTH = Qt.TransformationMode.SmoothTransformation
+
+FocusPolicy = Qt.FocusPolicy
+NoPolicy = Qt.FocusPolicy.NoFocus
+StrongPolicy = Qt.FocusPolicy.StrongFocus
+TabPolicy = Qt.FocusPolicy.TabFocus
+ClickPolicy = Qt.FocusPolicy.ClickFocus
+
+FocusReason = Qt.FocusReason
+MouseReason = Qt.FocusReason.MouseFocusReason
+TabReason = Qt.FocusReason.TabFocusReason
+BacktabReason = Qt.FocusReason.BacktabFocusReason
+WindowReason = Qt.FocusReason.ActiveWindowFocusReason
+PopupReason = Qt.FocusReason.PopupFocusReason
+
+Point = Union[QPoint, QPointF]
+Size = Union[QSize, QSizeF]
+Line = Union[QLine, QLineF]
+Rect = Union[QRect, QRectF]
 
 __all__ = [
   'SolidFill', 'BlankFill', 'SolidLine', 'DashLine', 'DotLine', 'DashDot',
@@ -99,4 +135,9 @@ __all__ = [
   'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
   'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
   'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer', 'Weight', 'Cap',
-  'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click', 'QtRGB']
+  'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click', 'QtRGB',
+  'ORIENTATION', 'IgnoreAspect', 'KeepAspect', 'ExpandAspect', 'AspectMode',
+  'FAST', 'SMOOTH', 'FocusPolicy', 'NoPolicy', 'StrongPolicy', 'TabPolicy',
+  'ClickPolicy', 'FocusReason', 'MouseReason', 'TabReason', 'BacktabReason',
+  'WindowReason', 'PopupReason', 'Point', 'Size', 'Line', 'Rect'
+]
