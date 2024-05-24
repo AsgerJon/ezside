@@ -1,20 +1,20 @@
-"""SaveFile provides a descriptor class for creating a file dialog for
-save files. """
-#  GPL-3.0 license
+"""OpenFile provides the open file dialog for the application by
+implementing the descriptor protocol."""
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QFileDialog
 from attribox import AbstractDescriptor
+from vistutils.parse import maybe
 
+from ezside.desc import parseFilter
 from ezside.dialogs import OpenFile
+from ezside.windows import BaseWindow
 
-if TYPE_CHECKING:
-  from ezside.app import BaseWindow
-Shiboken = type(QObject)
+BASE = BaseWindow
+SCOPE = type(QObject)
 
 
 class SaveFile(OpenFile):
@@ -24,20 +24,19 @@ class SaveFile(OpenFile):
   __name_filter__ = None
   __fallback_filter__ = 'All Files (*)'
 
-  def __set_name__(self, owner: type, name: str) -> None:
-    """The __set_name__ method is called when the descriptor is assigned to
-    a class attribute. """
-    AbstractDescriptor.__set_name__(self, owner, name)
-    setattr(owner, 'saveFileSelected', Signal(str))
+  def __init__(self, *args, **kwargs) -> None:
+    AbstractDescriptor.__init__(self)
+    nameFilter = parseFilter(*args, **kwargs)
+    self._setNameFilter(maybe(nameFilter, self.__fallback_filter__))
 
-  def _createInstance(self, instance: BaseWindow, owner: Shiboken) -> None:
+  def _create(self, instance: BASE, owner: SCOPE) -> None:
     """Creates the FileDialog instance. """
     dialog = QFileDialog()
     dialog.setViewMode(QFileDialog.ViewMode.Detail)
     dialog.setOption(QFileDialog.Option.DontUseNativeDialog)
-    dialog.setFileMode(QFileDialog.FileMode.AnyFile)
+    dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
     dialog.setNameFilter(self._getNameFilter())
     dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
-    dialog.fileSelected.connect(instance.saveFileSelected)
+    dialog.fileSelected.connect(instance.saveFileSlot)
     pvtName = self._getPrivateName()
     setattr(instance, pvtName, dialog)

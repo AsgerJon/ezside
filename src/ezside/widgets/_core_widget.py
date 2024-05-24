@@ -1,6 +1,6 @@
 """CoreWidget provides the widget entry point by inheriting from both
 QWidget and EZObject."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QWidget
 from icecream import ic
 
 from ezside.app import EZObject
-from ezside.core import parseParent
+from ezside.desc import parseParent
 
 if TYPE_CHECKING:
   pass
@@ -24,6 +24,6 @@ class CoreWidget(QWidget, EZObject):
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the CoreWidget."""
+    EZObject.__init__(self, *args, **kwargs)
     parent = parseParent(*args, **kwargs)
     QWidget.__init__(self, parent)
-    EZObject.__init__(self, *args, **kwargs)

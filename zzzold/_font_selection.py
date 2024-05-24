@@ -1,52 +1,49 @@
-"""FontSelection provides a descriptor class for the QFontDialog class. """
-#  GPL-3.0 license
+"""FontSelection provides the font selection dialog window for the main
+application window implementing the descriptor protocol."""
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import Any, Union
 
-from PySide6.QtCore import QObject, Signal
-from PySide6.QtWidgets import QFontDialog
-from PySide6.QtGui import QFont
+from PySide6.QtCore import QObject
+from PySide6.QtWidgets import QFontDialog, QWidget
 from attribox import AbstractDescriptor
-from vistutils.waitaminute import typeMsg
 
-if TYPE_CHECKING:
-  from ezside.app import BaseWindow
-Shiboken = type(QObject)
+from ezside.app import EZObject
+from ezside.desc import Normal, parseFont
+from moreattribox import Wait
+
+THIS = Union[QWidget, EZObject]
+SCOPE = type(QObject)
 
 
-class FontSelection(QObject, AbstractDescriptor):
-  """FontSelection provides a descriptor class for the QFontDialog class. """
+class FontSelection(AbstractDescriptor):
+  """FontSelection provides the font selection dialog window for the main
+  application window implementing the descriptor protocol."""
 
-  def __set_name__(self, owner: Shiboken, name: str) -> None:
-    """Expands the parent method by setting a signal on the owner."""
-    AbstractDescriptor.__set_name__(self, owner, name)
-    setattr(owner, 'fontSelected', Signal(QFont))
+  __initial_font__ = None
+  __fallback_font__ = Wait('MesloLGS', 12, Normal) @ parseFont
 
-  def _createInstance(self, instance: BaseWindow, owner: Shiboken) -> None:
-    """Create the font dialog."""
-    dialog = QFontDialog()
+  @staticmethod
+  def _create(instance: THIS, owner: SCOPE, ) -> QFontDialog:
+    """Creates an instance of the dialog window."""
+    fbFont = parseFont('MesloLGS', 12, Normal)
+    currentFont = instance.settings.value('font', fbFont)
+    if isinstance(instance, QWidget):
+      dialog = QFontDialog(currentFont, instance)
+    else:
+      dialog = QFontDialog(currentFont)
     dialog.setOption(QFontDialog.FontDialogOption.DontUseNativeDialog)
-    dialog.fontSelected.connect(instance.fontSelected)
-    pvtName = self._getPrivateName()
-    setattr(instance, pvtName, dialog)
+    return dialog
 
   def __instance_get__(self,
-                       instance: BaseWindow,
-                       owner: Shiboken,
-                       **kwargs) -> QFontDialog | Self:
-    """Explicit getter-function for the font dialog."""
+                       instance: THIS,
+                       owner: SCOPE,
+                       **kwargs) -> Any:
+    """Implementation of the getter. The remaining functionality required
+    by the descriptor protocol is implemented in the AbstractDescriptor
+    class. """
     if instance is None:
       return self
-    pvtName = self._getPrivateName()
-    if getattr(instance, pvtName, None) is None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      self._createInstance(instance, owner)
-      return self.__instance_get__(instance, owner, _recursion=True)
-    dialog = getattr(instance, pvtName)
-    if isinstance(dialog, QFontDialog):
-      return dialog
-    e = typeMsg('dialog', dialog, QFontDialog)
-    raise TypeError(e)
+    return self._create(instance, owner)

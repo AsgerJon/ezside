@@ -3,7 +3,7 @@ defined in both numpy and torch. For data types, lower case names denote
 numpy version and upper case the torch version. For functions, the most
 common functions the torch versions have special names, and the numpy
 versions receive no special treatment."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -42,3 +42,8 @@ i8 = numpy.int8
 u64 = numpy.uint64
 u32 = numpy.uint32
 u16 = numpy.uint16
+
+__all__ = ['Oh', 'J', 'I', 'T', 'D', 'R', 'Rn', 'F32', 'F64', 'C64', 'C128',
+           'I64', 'I32', 'I16', 'I8', 'U64', 'U32', 'U16', 'U8', 'f32',
+           'f64', 'c64', 'c128', 'i64', 'i32', 'i16', 'i8', 'u64', 'u32',
+           'u16']

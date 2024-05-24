@@ -1,5 +1,5 @@
 """Parses a QPen from given arguments."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from PySide6.QtGui import QPen, QColor
 from ezside.core import SolidLine
 
 
-def parsePen(*args) -> QPen:
+def parsePen(*args, **kwargs) -> QPen:
   """Parses a QPen from given arguments."""
   pen = QPen()
   width, color, style, capStyle, joinStyle = None, None, None, None, None

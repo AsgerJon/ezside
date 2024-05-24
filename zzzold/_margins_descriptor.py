@@ -1,5 +1,5 @@
 """Margins implements the descriptor protocol for instances of QMargins."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ class Margins(AbstractDescriptor):
   """The Margins class implements the descriptor protocol for QMargins. """
 
   __default_margins__ = None
-  __fallback_margins__ = None
+  __fallback_margins__ = QMargins(0, 0, 0, 0, )
 
   def __init__(self, *args, **kwargs) -> None:
     margins = parseMargins(*args, **kwargs)

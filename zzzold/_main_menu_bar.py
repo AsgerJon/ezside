@@ -1,6 +1,6 @@
 """MainMenuBar subclasses QMenuBar and brings common menus with common
 actions. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -22,10 +22,8 @@ ic.configureOutput(includeContext=True, )
 class MainMenuBar(QMenuBar):
   """MainMenuBar subclasses QMenuBar and brings common menus with common
   actions. """
-
   __iter_contents__ = None
   __added_menus__ = None
-
   file: FileMenu
   fileAction: QAction
   edit: EditMenu
@@ -34,7 +32,6 @@ class MainMenuBar(QMenuBar):
   helpAction: QAction
   debug: DebugMenu
   debugAction: QAction
-
   hoverText = Signal(str)
 
   def __init__(self, *args, **kwargs) -> None:

@@ -1,13 +1,13 @@
 """CoreDialog provides the entry point for dialogs inheriting from both
 QDialog and EZObject. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from PySide6.QtWidgets import QDialog
 
 from ezside.app import EZObject
-from ezside.core import parseParent
+from ezside.desc import parseParent
 
 
 class CoreDialog(QDialog, EZObject):

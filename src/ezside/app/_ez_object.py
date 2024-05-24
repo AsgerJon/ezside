@@ -1,17 +1,19 @@
 """EZObject class should be used as the second baseclass when creating
 core class or entry point classes that inherit from fundamental classes in
 the PySide6 package."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Never, Any
+from typing import TYPE_CHECKING, Any
 
+from attribox import AttriBox
 from icecream import ic
+from vistutils.parse import maybe
 from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
-from ezside.app import Settings, AppDesc
+from ezside.app import AppDesc
 
 if TYPE_CHECKING:
   pass
@@ -25,29 +27,18 @@ class EZObject:
   the PySide6 package."""
 
   __settings_id__ = None
+  __fallback_id__ = 'normal'
+  __static_state__ = None
+  __fallback_state__ = 'base'
+  __ui_initialized__ = None
+  __signals_connected__ = None
 
   app = AppDesc()
-  settings = Settings()
+  settingsId = AttriBox[str]('__NOT_INITIALIZED__')
 
-  def __init__(self, *args, **kwargs) -> Never:
+  def __init__(self, *args, **kwargs) -> None:
     """This implementation stops arguments from reaching object.__init__
     and raising irrelevant exceptions."""
-    styleKeys = stringList("""id, settingsId""")
-    for key in styleKeys:
-      if key in kwargs:
-        val = kwargs.get(key, )
-        if isinstance(val, str):
-          self.__settings_id__ = val
-          break
-        e = typeMsg(key, val, str)
-        raise TypeError(e)
-    else:
-      for arg in args:
-        if isinstance(arg, str):
-          self.__settings_id__ = arg
-          break
-      else:
-        self.__settings_id__ = 'normal'
 
   def getId(self) -> str:
     """Return the unique identifier of the object."""
@@ -55,7 +46,7 @@ class EZObject:
 
   def getState(self) -> str:
     """Return the state of the object."""
-    return 'base'
+    return maybe(self.__static_state__, self.__fallback_state__)
 
   def getSettingsKey(self, name: str) -> Any:
     """Returns the key including the settings id and the object state."""
@@ -66,10 +57,13 @@ class EZObject:
     """Sets the settings value for the given settings name along with
     the settings id and the state of the object. """
     key = self.getSettingsKey(settingsName)
-    return self.settings(key)
+    return self.settings.value(key)
 
-  def setSettings(self, settingsName: str, value: Any) -> None:
+  def setSetting(self, settingsName: str, value: Any) -> None:
     """Sets the settings value for the given settings name along with
     the settings id and the state of the object. """
     key = self.getSettingsKey(settingsName)
     self.settings.setValue(key, value)
+
+  def initUi(self, ) -> None:
+    """Initializes the user interface of the object."""

@@ -1,7 +1,7 @@
 """BaseWindow provides the base class for the main application window. It
 implements menus and actions for the application, leaving widgets for the
 LayoutWindow class."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -15,7 +15,10 @@ from icecream import ic
 
 from ezside.menus import MainMenuBar, MainStatusBar
 from ezside.dialogs import ColorSelection, FontSelection
-from ezside.dialogs import OpenFile, FolderSelection, SaveFile, TalkerWindow
+from ezside.dialogs import OpenFileSelection, \
+  FolderSelection, \
+  SaveFile, \
+  TalkerWindow
 
 ic.configureOutput(includeContext=True, )
 
@@ -37,7 +40,7 @@ class BaseWindow(QMainWindow):
 
   colorDialog = ColorSelection()
   fontDialog = FontSelection()
-  openFileDialog = OpenFile()
+  openFileDialog = OpenFileSelection()
   saveFileDialog = SaveFile()
   folderDialog = FolderSelection()
 

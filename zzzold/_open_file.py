@@ -1,59 +1,37 @@
-"""OpenFile provide a descriptor class for creating an open file dialog. """
-#  GPL-3.0 license
+"""OpenFile provides the open file dialog for the application by
+implementing the descriptor protocol."""
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import Any
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QFileDialog
 from attribox import AbstractDescriptor
 from vistutils.parse import maybe
-from vistutils.text import stringList
 from vistutils.waitaminute import typeMsg
 
-if TYPE_CHECKING:
-  from ezside.windows import BaseWindow
-Shiboken = type(QObject)
+from ezside.desc import parseFilter
+from ezside.windows import BaseWindow
+
+BASE = BaseWindow
+SCOPE = type(QObject)
 
 
-class OpenFile(QObject, AbstractDescriptor):
-  """OpenFile provide a descriptor class for creating an open file dialog.
-  """
+class OpenFile(AbstractDescriptor):
+  """OpenFile provides the open file dialog for the application by
+  implementing the descriptor protocol."""
 
   __name_filter__ = None
   __fallback_filter__ = 'All Files (*)'
 
   def __init__(self, *args, **kwargs) -> None:
-    QObject.__init__(self)
-    filterKeys = stringList("""filter, filters, name_filter""")
-    for key in filterKeys:
-      if key in kwargs:
-        val = kwargs[key]
-        if isinstance(val, str):
-          self._setNameFilter(val)
-          break
-    else:
-      for arg in args:
-        if isinstance(arg, str):
-          self._setNameFilter(arg)
-          break
+    AbstractDescriptor.__init__(self)
+    nameFilter = parseFilter(*args, **kwargs)
+    self._setNameFilter(nameFilter)
 
-  def _setNameFilter(self, nameFilter: str) -> None:
-    """Set the name filter for the file dialog. """
-    self.__name_filter__ = nameFilter
-
-  def _getNameFilter(self, ) -> str:
-    """Getter-function for the name filter"""
-    return maybe(self.__name_filter__, self.__fallback_filter__)
-
-  def __set_name__(self, owner: type, name: str) -> None:
-    """The __set_name__ method is called when the descriptor is assigned to
-    a class attribute. """
-    AbstractDescriptor.__set_name__(self, owner, name)
-    setattr(owner, 'openFileSelected', Signal(str))
-
-  def _createInstance(self, instance: BaseWindow, owner: Shiboken) -> None:
+  def _create(self, instance: BASE, owner: SCOPE) -> None:
     """Creates the FileDialog instance. """
     dialog = QFileDialog()
     dialog.setViewMode(QFileDialog.ViewMode.Detail)
@@ -65,22 +43,27 @@ class OpenFile(QObject, AbstractDescriptor):
     pvtName = self._getPrivateName()
     setattr(instance, pvtName, dialog)
 
-  def __instance_get__(self,
-                       instance: BaseWindow,
-                       owner: Shiboken,
-                       **kwargs) -> QFileDialog | Self:
+  def _setNameFilter(self, nameFilter: str) -> None:
+    """Set the name filter for the file dialog. """
+    self.__name_filter__ = nameFilter
+
+  def _getNameFilter(self, ) -> str:
+    """Getter-function for the name filter"""
+    return maybe(self.__name_filter__, self.__fallback_filter__)
+
+  def __instance_get__(self, instance: BASE, owner: SCOPE, **kwargs) -> Any:
     """The __instance_get__ method is called when the descriptor is accessed
-    via the owning instance. """
+    from an instance."""
     if instance is None:
       return self
     pvtName = self._getPrivateName()
-    if getattr(instance, pvtName, None) is None:
+    dialog = getattr(instance, pvtName, None)
+    if dialog is None:
       if kwargs.get('_recursion', False):
         raise RecursionError
-      self._createInstance(instance, owner)
+      self._create(instance, owner)
       return self.__instance_get__(instance, owner, _recursion=True)
-    dialog = getattr(instance, pvtName)
     if isinstance(dialog, QFileDialog):
       return dialog
-    e = typeMsg('dialog', dialog, QFileDialog)
+    e = typeMsg(pvtName, dialog, QFileDialog)
     raise TypeError(e)

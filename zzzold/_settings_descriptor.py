@@ -1,5 +1,5 @@
 """SettingsDescriptor class for the ezside app."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from vistutils.waitaminute import typeMsg
 class Settings(AbstractDescriptor):
   """SettingsDescriptor class for the ezside app."""
 
-  def __instance_get__(self, instance: object, owner: type) -> Any:
+  def __instance_get__(self, instance: object, owner: type, **kwargs) -> Any:
     """Implementation of the getter. The remaining functionality required
     by the descriptor protocol is implemented in the AbstractDescriptor
     class. """

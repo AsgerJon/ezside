@@ -1,58 +1,43 @@
-"""ColorSelection provides a dialog window for selecting a color."""
-#  GPL-3.0 license
+"""ColorSelection provides the color selection dialog window for the main
+application window implementing the descriptor protocol."""
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any, Union
 
-from PySide6.QtCore import QObject, Signal
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QColorDialog
+from PySide6.QtCore import QObject
+from PySide6.QtWidgets import QColorDialog, QWidget
 from attribox import AbstractDescriptor
-from icecream import ic
-from vistutils.waitaminute import typeMsg
 
-from ezside.core import QtRGB
+from ezside.app import EZObject
+from moreattribox import Wait
 
-if TYPE_CHECKING:
-  from ezside.windows import BaseWindow
 Shiboken = type(QObject)
 
-ic.configureOutput(includeContext=True)
+THIS = Union[QWidget, EZObject]
+SCOPE = type(QObject)
 
 
-class ColorSelection(QObject, AbstractDescriptor):
-  """_ColorDialog provides a dialog window for selecting a color."""
+class ColorSelection(AbstractDescriptor):
+  """ColorSelection provides the color selection dialog window for the main
+  application window implementing the descriptor protocol."""
 
-  def __set_name__(self, owner: Shiboken, name: str) -> None:
-    """Expands the parent method by setting a signal on the owner."""
-    AbstractDescriptor.__set_name__(self, owner, name)
-    setattr(owner, 'colorSelected', Signal(QColor))
+  __initial_color__ = None
+  __fallback_color__ = Wait(0, 0, 0, 255, )
 
-  def _createInstance(self, instance: BaseWindow, owner: Shiboken) -> None:
-    """Create the instance."""
-    dialog = QColorDialog(instance)
-    dialog.setOption(QtRGB, )
-    dialog.setOption(QColorDialog.ColorDialogOption.ShowAlphaChannel)
-    dialog.colorSelected.connect(instance.colorSelected)
-    pvtName = self._getPrivateName()
-    setattr(instance, pvtName, dialog)
+  def _create(self, instance: THIS, owner: SCOPE, ) -> QColorDialog:
+    """Creates an instance of the dialog window."""
+    fbColor = self.__fallback_color__
+    currentColor = instance.settings.value('color', fbColor)
+    dialog = QColorDialog(currentColor, instance)
+    dialog.setOption(QColorDialog.ColorDialogOption.DontUseNativeDialog)
+    return dialog
 
-  def __instance_get__(self,
-                       instance: BaseWindow,
-                       owner: Shiboken,
-                       **kwargs) -> Any:
-    """Get the instance."""
+  def __instance_get__(self, instance: THIS, owner: SCOPE) -> Any:
+    """Implementation of the getter. The remaining functionality required
+    by the descriptor protocol is implemented in the AbstractDescriptor
+    class. """
     if instance is None:
       return self
-    pvtName = self._getPrivateName()
-    if getattr(instance, pvtName, None) is None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      self._createInstance(instance, owner)
-      return self.__instance_get__(instance, owner, _recursion=True)
-    dialog = getattr(instance, pvtName)
-    if isinstance(dialog, QColorDialog):
-      return dialog
-    e = typeMsg('dialog', dialog, QColorDialog)
-    raise TypeError(e)
+    return self._create(instance, owner)

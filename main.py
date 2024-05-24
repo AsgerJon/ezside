@@ -1,5 +1,5 @@
 """Main Tester Script"""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -9,6 +9,8 @@ import time
 from typing import Callable
 
 from icecream import ic
+
+from ezside.windows import MainWindow, App
 
 ic.configureOutput(includeContext=True, )
 
@@ -21,6 +23,22 @@ def tester00() -> int:
 
 def tester01() -> int:
   """Main Tester Script"""
+  return App(MainWindow, 'EZ', 'EZSide!').exec()
+
+
+def tester02() -> int:
+  """Main Tester Script"""
+  rgb = '88FF00'
+  rgb = '%sFF' % rgb.upper()
+  r = int(rgb[:2], 16)
+  g = int(rgb[2:4], 16)
+  b = int(rgb[4:6], 16)
+  a = int(rgb[6:8], 16)
+  print(r)
+  print(g)
+  print(b)
+  print(a)
+  return 0
 
 
 def main(callMeMaybe: Callable) -> None:
@@ -44,4 +62,4 @@ def main(callMeMaybe: Callable) -> None:
 
 
 if __name__ == '__main__':
-  main(tester00)
+  main(tester01)
