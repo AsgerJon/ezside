@@ -6,14 +6,32 @@ from __future__ import annotations
 import os
 import sys
 
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import QMargins, QPoint
+from PySide6.QtGui import QIcon, QFont, QColor
 from PySide6.QtWidgets import QApplication, QMainWindow
 from attribox import AttriBox
+from icecream import ic
 from vistutils.fields import EmptyField
 from vistutils.waitaminute import typeMsg
 
 from ezside.app import AppSettings
+from ezside.desc import Pen, \
+  Black, \
+  SolidLine, \
+  Brush, \
+  Gray, \
+  SolidFill, \
+  Margins, \
+  SpringGreen, \
+  Turquoise, \
+  SteelBlue, \
+  Moccasin, \
+  OldLace, \
+  FloralWhite, \
+  Font, Bold, Normal
+from ezside.dialogs import ColorSelection
 from ezside.windows import Main, MainWindow
+from moreattribox import Wait
 
 
 class App(QApplication):
@@ -94,3 +112,68 @@ class App(QApplication):
     e = typeMsg('main', self.main, QMainWindow)
     sys.stderr.write(e)
     return 1
+
+  def lmao(*args) -> QFont:
+    """lmao."""
+    family, size, weight = args
+    font = QFont()
+    font.setFamily(family)
+    font.setPointSize(size)
+    font.setWeight(weight)
+    return font
+
+  pressedEnabledTextFont = Wait('MesloLGS NF', 16, Bold) @ lmao
+  hoveredEnabledTextFont = Wait('MesloLGS NF', 16, Bold) @ lmao
+  defaultEnabledTextFont = Wait('MesloLGS NF', 12, Normal) @ lmao
+  pressedDisabledTextFont = Wait('MesloLGS NF', 12, Normal) @ lmao
+  hoveredDisabledTextFont = Wait('MesloLGS NF', 12, Normal) @ lmao
+  defaultDisabledTextFont = Wait('MesloLGS NF', 12, Normal) @ lmao
+
+  pressedEnabledTextPen = Pen(Black, 1, SolidLine)
+  hoveredEnabledTextPen = Pen(Black, 1, SolidLine)
+  defaultEnabledTextPen = Pen(Black, 1, SolidLine)
+  pressedDisabledTextPen = Pen(Black.lighter(125), 1, SolidLine)
+  hoveredDisabledTextPen = Pen(Black.lighter(125), 1, SolidLine)
+  defaultDisabledTextPen = Pen(Black.lighter(125), 1, SolidLine)
+
+  pressedEnabledBackgroundBrush = Brush(SteelBlue, SolidFill)
+  hoveredEnabledBackgroundBrush = Brush(Turquoise, SolidFill)
+  defaultEnabledBackgroundBrush = Brush(SpringGreen, SolidFill)
+  pressedDisabledBackgroundBrush = Brush(Moccasin, SolidFill)
+  hoveredDisabledBackgroundBrush = Brush(OldLace, SolidFill)
+  defaultDisabledBackgroundBrush = Brush(FloralWhite, SolidFill)
+
+  pressedEnabledMargins = Margins(2, 2, 2, 2, )
+  hoveredEnabledMargins = Margins(4, 4, 4, 4, )
+  defaultEnabledMargins = Margins(8, 8, 8, 8, )
+  pressedDisabledMargins = Margins(4, 4, 4, 4, )
+  hoveredDisabledMargins = Margins(4, 4, 4, 4, )
+  defaultDisabledMargins = Margins(4, 4, 4, 4, )
+
+  pressedEnabledPadding = Margins(2, 2, 2, 2, )
+  hoveredEnabledPadding = Margins(4, 4, 4, 4, )
+  defaultEnabledPadding = Margins(8, 8, 8, 8, )
+  pressedDisabledPadding = Margins(1, 1, 1, 1, )
+  hoveredDisabledPadding = Margins(2, 2, 2, 2, )
+  defaultDisabledPadding = Margins(4, 4, 4, 4, )
+
+  pressedEnabledBorders = Margins(16, 16, 16, 16)
+  hoveredEnabledBorders = Margins(12, 12, 12, 12, )
+  defaultEnabledBorders = Margins(4, 4, 4, 4, )
+  pressedDisabledBorders = Margins(3, 3, 3, 3, )
+  hoveredDisabledBorders = Margins(2, 2, 2, 2, )
+  defaultDisabledBorders = Margins(1, 1, 1, 1, )
+
+  pressedEnabledCornerRadius = QPoint(16, 16)
+  hoveredEnabledCornerRadius = QPoint(12, 12)
+  defaultEnabledCornerRadius = QPoint(4, 4)
+  pressedDisabledCornerRadius = QPoint(8, 8)
+  hoveredDisabledCornerRadius = QPoint(6, 6)
+  defaultDisabledCornerRadius = QPoint(4, 4)
+
+  def setBackgroundBase(self, color: QColor) -> None:
+    """Setter-function for background color"""
+    self.pressedEnabledBackgroundBrush.setColor(color.darker(125))
+    self.hoveredEnabledBackgroundBrush.setColor(color.darker(110))
+    self.defaultEnabledBackgroundBrush.setColor(color)
+    self.main.testButton.update()

@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Any
 
 from PySide6.QtCore import QRect, QSize, QSizeF, QPointF, QRectF, QPoint
-from PySide6.QtGui import QFontMetrics, QShowEvent, QResizeEvent
+from PySide6.QtGui import QFontMetrics, QResizeEvent
 from attribox import AttriBox
 from icecream import ic
 from vistutils.waitaminute import typeMsg
@@ -21,7 +21,6 @@ from ezside.desc import Pen, \
   fitText, Expand
 from ezside.desc import Font, Black, AlignBottom, AlignCenter
 from ezside.desc import AlignRight, AlignHCenter, AlignVCenter
-
 from ezside.widgets import CanvasWidget, GraffitiVandal
 
 Rect = QRect | QRectF | QSizeF | QSize
@@ -118,7 +117,6 @@ class TextBoxWidget(CanvasWidget):
     rect += self.borderGeometry
     rect += self.marginGeometry
     self.setMinimumSize(rect.size())
-    ic(self.getTotalTextSize())
 
   def update(self) -> None:
     """Updates the widget."""
@@ -175,6 +173,5 @@ class TextBox(EZDesc):
       if isinstance(arg, str) and arg != widget.text:
         posArgs.append(arg)
       if isinstance(arg, int):
-        ic(arg)
         widget.lineChars = arg
     return widget

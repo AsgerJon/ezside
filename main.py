@@ -26,21 +26,6 @@ def tester01() -> int:
   return App(MainWindow, 'EZ', 'EZSide!').exec()
 
 
-def tester02() -> int:
-  """Main Tester Script"""
-  rgb = '88FF00'
-  rgb = '%sFF' % rgb.upper()
-  r = int(rgb[:2], 16)
-  g = int(rgb[2:4], 16)
-  b = int(rgb[4:6], 16)
-  a = int(rgb[6:8], 16)
-  print(r)
-  print(g)
-  print(b)
-  print(a)
-  return 0
-
-
 def main(callMeMaybe: Callable) -> None:
   """Main Tester Script"""
   tic = time.perf_counter_ns()

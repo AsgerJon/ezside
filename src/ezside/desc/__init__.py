@@ -15,6 +15,7 @@ from ._font_weight import *
 from ._font_cap import *
 from ._font_families import *
 from ._dialog_names import *
+from ._ez_timer import EZTimer
 from ._fit_text import fitText
 from ._settings_descriptor import SettingsDescriptor
 from ._point_descriptor import Point, parsePoint

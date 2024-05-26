@@ -6,64 +6,118 @@ from __future__ import annotations
 from typing import Optional, Any
 
 from icecream import ic
+from PySide6.QtGui import QFont, QFontDatabase
+from vistutils.fields import EmptyField
+from vistutils.parse import maybe
+from vistutils.text import monoSpace
+from vistutils.waitaminute import typeMsg
 
 from ezside.app import EZObject, MissingSettingsError
-from ezside.desc import SettingsDescriptor, \
-  FontFamilies, \
-  fontWeights, \
-  FontCap, Weight, Bold, Normal
-
-from PySide6.QtGui import QFont
+from ezside.desc import SettingsDescriptor, Bold, Normal
 
 ic.configureOutput(includeContext=True)
 
 
 def parseFont(*args, **kwargs) -> Optional[QFont]:
   """Parse the font."""
-  family, fontSize, fontCap, fontWeight = None, None, None, None
-  for arg in args:
-    if isinstance(arg, QFont):
-      return arg
-  for arg in args:
-    if isinstance(arg, str):
-      if arg in FontFamilies and family is None:
-        family = arg
-        continue
-      if arg in fontWeights and fontWeight is None:
-        fontWeight = arg
-        continue
-    if isinstance(arg, int):
-      if fontSize is None:
-        fontSize = arg
-        continue
+  family, fontSize, weight = [*args][:3]
   font = QFont()
   font.setFamily(family)
   font.setPointSize(fontSize)
-  if isinstance(fontCap, FontCap):
-    font.setCapitalization(fontCap)
-  if isinstance(fontWeight, Weight):
-    font.setWeight(fontWeight)
+  font.setWeight(Normal)
   return font
 
 
-class Font(SettingsDescriptor):
+class Font(EmptyField):
   """Font implements descriptor protocol for QFont."""
 
-  def getContentClass(self) -> type:
-    return QFont
+  __field_name__ = None
+  __field_owner__ = None
 
-  def create(self, instance: EZObject, owner: type, **kwargs) -> QFont:
-    """Create the content."""
-    ic(self.getArgs())
-    font = parseFont(*self.getArgs())
+  __fallback_family__ = 'MesloLGS NF'
+  __fallback_font_size__ = 12
+  __fallback_weight__ = Normal
+
+  __default_family__ = None
+  __default_font_size__ = None
+  __default_weight__ = None
+
+  @staticmethod
+  def _loadFamilies() -> list[str]:
+    """Loads list of registered font families."""
+    writingSystem = QFontDatabase.WritingSystem.Latin
+    return QFontDatabase.families(writingSystem)
+
+  def __init__(self, *args, **kwargs) -> None:
+    family, size, weight = None, None, None
+    for arg in args:
+      if isinstance(arg, str) and family is None:
+        family = arg
+      if isinstance(arg, int) and size is None:
+        size = arg
+      if isinstance(arg, QFont.Weight):
+        weight = arg
+    self.__default_family__ = maybe(family, self.__fallback_family__)
+    self.__default_font_size__ = maybe(size, self.__fallback_font_size__)
+    self.__default_weight = maybe(weight, self.__fallback_weight__)
+
+  def _createObject(self) -> QFont:
+    """Creates an instance of QFont """
+    font = QFont()
+    font.setFamily(self.__default_family__)
+    font.setPointSize(self.__default_font_size__)
+    font.setWeight(self.__default_weight)
+    return font
+
+  def __set_name__(self, owner: type, name: str) -> None:
+    """The __set_name__ method is called when the descriptor is assigned to
+    a class attribute. """
+    self.__field_name__ = name
+    self.__field_owner__ = owner
+
+  def _getFieldName(self) -> str:
+    """Getter-functino for field name"""
+    return self.__field_name__
+
+  def _getFieldOwner(self) -> type:
+    """Getter-function for field owner"""
+    return self.__field_owner__
+
+  def _getPrivateName(self) -> str:
+    """Getter-function for private name"""
+    return '__%s_value__' % (self._getFieldName(),)
+
+  def __get__(self, instance: object, owner: type, **kwargs) -> Any:
+    """The __get__ method is called when the descriptor is accessed via the
+    owning instance. Subclasses should not override this method, but should
+    instead implement the __instance_get__ method. """
+    if instance is None:
+      return self
+    pvtName = self._getPrivateName()
+    font = getattr(instance, pvtName, None)
+    if font is None:
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      setattr(instance, pvtName, self._createObject())
+      return self.__get__(instance, owner, _recursion=True)
     if isinstance(font, QFont):
       return font
-    raise MissingSettingsError(self.__class__.__name__)
+    e = typeMsg('font', font, QFont)
+    raise TypeError(e)
 
-  def getFallbackValues(self) -> dict[str, Any]:
-    """Returns the fallback values."""
-    return {
-      'normal/font': parseFont('Montserrat', 12, Normal),
-      'header/font': parseFont('Montserrat', 16, Bold),
-      'title/font' : parseFont('Montserrat', 20, Bold),
-    }
+  def __set__(self, instance: object, value: Any) -> None:
+    """The __set__ method is called when the descriptor is assigned a value
+    via the owning instance. The default implementation raises an error."""
+    pvtName = self._getPrivateName()
+    if isinstance(value, QFont):
+      return setattr(instance, pvtName, value)
+    e = typeMsg('value', value, QFont)
+    raise TypeError(e)
+
+  def __delete__(self, instance: object) -> None:
+    """Deleter-function for the descriptor."""
+    pvtName = self._getPrivateName()
+    if getattr(instance, pvtName, None) is not None:
+      return delattr(instance, pvtName)
+    e = """The instance has no attribute at name: '%s'!"""
+    raise AttributeError(monoSpace(e % pvtName))

@@ -27,6 +27,8 @@ class BaseWindow(CoreWindow):
   selectColor = ColorSelection()
   selectFont = FontSelection()
 
+  backgroundSelection = ColorSelection()
+
   file: QMenu
   edit: QMenu
   help: QMenu
@@ -74,10 +76,13 @@ class BaseWindow(CoreWindow):
     self.aboutConda.triggered.connect(
       self.openUrlFactory("https://docs.conda.io/en/latest/"))
     self.new.triggered.connect(self.newSlot)
-    self.debug01.triggered.connect(self.selectColor.show)
+    # self.debug01.triggered.connect(self.selectColor.show)
     self.debug02.triggered.connect(self.selectFont.show)
     self.selectFont.fontSelected.connect(self.onFontSelected)
     self.selectColor.colorSelected.connect(self.onColorSelected)
+    self.debug01.triggered.connect(self.backgroundSelection.show)
+    self.backgroundSelection.colorSelected.connect(
+      self.app.setBackgroundBase)
 
   @Slot()
   def newSlot(self, ) -> None:

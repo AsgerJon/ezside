@@ -8,4 +8,6 @@ from ._graffiti_vandal import GraffitiVandal
 from ._core_widget import CoreWidget
 from ._base_widget import BaseWidget
 from ._canvas_widget import CanvasWidget
+from ._label import LabelWidget, Label
 from ._text_box import TextBox, TextBoxWidget
+from ._push_button import PushButtonWidget, PushButton

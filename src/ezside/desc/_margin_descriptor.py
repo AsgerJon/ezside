@@ -4,7 +4,9 @@ class."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QMargins, QMarginsF
+from typing import Any
+
+from PySide6.QtCore import QMargins, QMarginsF, QRectF, QRect, QSizeF, QSize
 from vistutils.waitaminute import typeMsg
 
 from ezside.desc import SettingsDescriptor
@@ -52,3 +54,36 @@ class Margins(SettingsDescriptor):
       return margins
     e = typeMsg('margins', margins, QMargins)
     raise TypeError(e)
+
+  def __set__(self, instance: object, value: Any) -> None:
+    """Setter-function for margins"""
+    if isinstance(value, QMarginsF):
+      value = value.toMargins()
+    if isinstance(value, QRectF, ):
+      value = value.toRect()
+    if isinstance(value, QRect):
+      value = QMargins(value.left(),
+                       value.top(),
+                       value.right(),
+                       value.bottom())
+    if isinstance(value, QSizeF):
+      value = value.toSize()
+    if isinstance(value, QSize):
+      value = QMargins(value.width(),
+                       value.height(),
+                       value.width(),
+                       value.height())
+    if isinstance(value, int):
+      value = QMargins(value, value, value, value)
+    if isinstance(value, (list, tuple)):
+      if len(value) == 1:
+        value = QMargins(value[0], value[0], value[0], value[0])
+      if len(value) == 2:
+        value = QMargins(value[0], value[1], value[0], value[1])
+      if len(value) == 3:
+        value = QMargins(value[0], value[1], value[2], value[1])
+      if len(value) == 4:
+        value = QMargins(*value[:4])
+    if not isinstance(value, QMargins):
+      e = typeMsg('value', value, QMargins)
+    SettingsDescriptor.__set__(self, instance, value)

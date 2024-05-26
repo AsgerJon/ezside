@@ -14,10 +14,14 @@ QPainter. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QPaintEvent
+from typing import TYPE_CHECKING
+
+from PySide6.QtCore import QMargins, QPoint
+from PySide6.QtGui import QPaintEvent, QBrush
+from vistutils.fields import EmptyField
 
 from ezside.desc import emptyPen, emptyBrush, SolidFill, parseBrush
-from ezside.desc import Black, White, Point, Margins
+from ezside.desc import Black, White
 from ezside.widgets import CoreWidget, GraffitiVandal
 
 
@@ -36,16 +40,67 @@ class CanvasWidget(CoreWidget):
   The painter is an instance of GraffitiVandal which is a subclass of
   QPainter. """
 
-  cornerRadius = Point(2, 2)
-  marginGeometry = Margins(2, 2, 2, 2)
-  borderGeometry = Margins(2, 2, 2, 2, )
-  paddingGeometry = Margins(8, 8, 8, 8, )
-  marginBrush = emptyBrush()
-  borderBrush = parseBrush(Black, SolidFill)
-  paddingBrush = parseBrush(White, SolidFill)
+  __fallback_corner_radius__ = QPoint(2, 2)
+  __fallback_margin_geometry__ = QMargins(2, 2, 2, 2)
+  __fallback_border_geometry__ = QMargins(2, 2, 2, 2)
+  __fallback_padding_geometry__ = QMargins(8, 8, 8, 8)
+  __fallback_margin_brush__ = emptyBrush()
+  __fallback_border_brush__ = parseBrush(Black, SolidFill)
+  __fallback_padding_brush__ = parseBrush(White, SolidFill)
+
+  cornerRadius = EmptyField()
+  marginGeometry = EmptyField()
+  borderGeometry = EmptyField()
+  paddingGeometry = EmptyField()
+  marginBrush = EmptyField()
+  borderBrush = EmptyField()
+  paddingBrush = EmptyField()
+
+  @cornerRadius.GET
+  def _getCornerRadius(self) -> QPoint:
+    """Getter-function for corner radius"""
+    return self.__fallback_corner_radius__
+
+  @marginGeometry.GET
+  def _getMargins(self) -> QMargins:
+    """Getter-function for margins"""
+    return self.__fallback_margin_geometry__
+
+  @borderGeometry.GET
+  def _getBorders(self) -> QMargins:
+    """Getter-function for borders"""
+    return self.__fallback_border_geometry__
+
+  @paddingGeometry.GET
+  def _getPaddings(self) -> QMargins:
+    """Getter-function for paddings"""
+    return self.__fallback_padding_geometry__
+
+  @marginBrush.GET
+  def _getMarginBrush(self, ) -> QBrush:
+    """Getter-function for margin brush"""
+    return emptyBrush()
+
+  @borderBrush.GET
+  def _getBorderBrush(self, ) -> QBrush:
+    """Getter-function for border brush"""
+    return parseBrush(Black, SolidFill)
+
+  @paddingBrush.GET
+  def _getPaddingBrush(self, ) -> QBrush:
+    """Getter-function for padding brush"""
+    return parseBrush(White, SolidFill)
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """The paintEvent method paints the widget."""
+    if TYPE_CHECKING:
+      assert isinstance(self.marginBrush, QBrush)
+      assert isinstance(self.borderBrush, QBrush)
+      assert isinstance(self.paddingBrush, QBrush)
+      assert isinstance(self.marginGeometry, QMargins)
+      assert isinstance(self.borderGeometry, QMargins)
+      assert isinstance(self.paddingGeometry, QMargins)
+      assert isinstance(self.cornerRadius, QPoint)
     painter = GraffitiVandal()
     painter.begin(self)
     viewRect = painter.viewport()

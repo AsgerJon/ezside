@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from PySide6.QtGui import QBrush, QColor
+from vistutils.waitaminute import typeMsg
 
 from ezside.app import EZObject, MissingSettingsError
 from ezside.desc import SettingsDescriptor, parseColour, FillStyle
@@ -58,3 +59,17 @@ class Brush(SettingsDescriptor):
       'normal/brush/borders' : parseBrush(Black, SolidFill),
       'normal/brush/paddings': emptyBrush(),
     }
+
+  def __set__(self, instance: EZObject, value: Any) -> None:
+    """Set the value."""
+    pvtName = self._getPrivateName()
+    if isinstance(value, QBrush):
+      return setattr(instance, pvtName, value)
+    if isinstance(value, QColor):
+      brush = getattr(instance, pvtName, None)
+      if brush is None:
+        brush = self.create(instance, instance.__class__)
+      brush.setColor(value)
+      return setattr(instance, pvtName, brush)
+    e = typeMsg('value', value, QBrush)
+    raise TypeError(e)

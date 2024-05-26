@@ -55,7 +55,6 @@ class CoreMenu(QMenu, EZObject):
     shortcut = self.settings.value('shortcut/%s' % camelName, None)
     action = QMenu.addAction(self, icon, title, shortcut)
     setattr(self.app.main, camelName, action)
-    ic(camelName)
     return action
 
   def initUi(self, ) -> None:
