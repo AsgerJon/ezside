@@ -1,17 +1,15 @@
 """MainWindow subclasses the LayoutWindow and provides the main
 application business logic."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QPointF, QSizeF, QRectF
-from PySide6.QtGui import QAction, QColor
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QColorDialog
 from icecream import ic
 
 from ezside.app import LayoutWindow
 from ezside.app.menus import EditMenu, FileMenu, HelpMenu, DebugMenu
-from ezside.core import VERTICAL, HORIZONTAL
 
 ic.configureOutput(includeContext=True, )
 NativeCol = QColorDialog.ColorDialogOption.DontUseNativeDialog

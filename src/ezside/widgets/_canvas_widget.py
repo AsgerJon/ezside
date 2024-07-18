@@ -2,7 +2,7 @@
 an outer margin, a border and padding. Subclasses should allow the parent
 class to paint the background and border before painting the custom
 content. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from PySide6.QtCore import QPoint, QRect, QPointF, QRectF, QSizeF, QSize
 from PySide6.QtCore import QMargins
 from PySide6.QtGui import QPaintEvent, QColor, QBrush, QFocusEvent, QPainter
 from icecream import ic
-from vistutils.text import monoSpace
+from worktoy.text import monoSpace
 
 from ezside.widgets import BaseWidget, GraffitiVandal
 from ezside.core import parseBrush, SolidFill, emptyPen, AlignTop, AlignFlag
@@ -36,14 +36,14 @@ class CanvasWidget(BaseWidget):
   def getStyleTypes() -> dict[str, type]:
     """Getter-function for the style types."""
     return {
-      'margins'        : QMargins,
-      'borders'        : QMargins,
-      'paddings'       : QMargins,
-      'borderBrush'    : QBrush,
-      'backgroundBrush': QBrush,
-      'radius'         : QPoint,
-      'vAlign'         : AlignFlag,
-      'hAlign'         : AlignFlag,
+        'margins'        : QMargins,
+        'borders'        : QMargins,
+        'paddings'       : QMargins,
+        'borderBrush'    : QBrush,
+        'backgroundBrush': QBrush,
+        'radius'         : QPoint,
+        'vAlign'         : AlignFlag,
+        'hAlign'         : AlignFlag,
     }
 
   @classmethod
@@ -64,14 +64,14 @@ class CanvasWidget(BaseWidget):
     """The fallbackStyles method provides the default values for the
     styles."""
     return {
-      'margins'        : QMargins(2, 2, 2, 2, ),
-      'borders'        : QMargins(2, 2, 2, 2, ),
-      'paddings'       : QMargins(2, 2, 2, 2, ),
-      'borderBrush'    : parseBrush(QColor(0, 0, 0, 255), SolidFill, ),
-      'backgroundBrush': parseBrush(QColor(215, 215, 215), SolidFill, ),
-      'radius'         : QPoint(8, 8, ),
-      'vAlign'         : AlignVCenter,
-      'hAlign'         : AlignHCenter,
+        'margins'        : QMargins(2, 2, 2, 2, ),
+        'borders'        : QMargins(2, 2, 2, 2, ),
+        'paddings'       : QMargins(2, 2, 2, 2, ),
+        'borderBrush'    : parseBrush(QColor(0, 0, 0, 255), SolidFill, ),
+        'backgroundBrush': parseBrush(QColor(215, 215, 215), SolidFill, ),
+        'radius'         : QPoint(8, 8, ),
+        'vAlign'         : AlignVCenter,
+        'hAlign'         : AlignHCenter,
     }
 
   @classmethod

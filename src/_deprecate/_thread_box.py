@@ -1,5 +1,5 @@
 """ThreadBox provides a descriptor class for the AppThread class."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING
 from PySide6.QtCore import QCoreApplication as QApp
 from PySide6.QtWidgets import QMainWindow as QMain
 from PySide6.QtCore import QObject, QThread
-from attribox import AbstractDescriptor
-from vistutils.parse import maybe
-from vistutils.text import monoSpace
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import AbstractDescriptor
+from worktoy.parse import maybe
+from worktoy.text import monoSpace
+from worktoy.text import typeMsg
 
 if TYPE_CHECKING:
   from ezside.app import App, AppThread

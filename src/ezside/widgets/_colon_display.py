@@ -1,5 +1,5 @@
 """ColonDisplay displays a colon. Used by digital clock widget. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -40,14 +40,14 @@ class ColonDisplay(SevenSegmentDigit):
     borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     SevenSegmentDigitStyles = SevenSegmentDigit.getFallbackStyles()
     colonStyles = {
-      'highBrush'      : highBrush,
-      'lowBrush'       : lowBrush,
-      'highPen'        : highPen,
-      'lowPen'         : lowPen,
-      'backgroundBrush': backgroundBrush,
-      'borderBrush'    : borderBrush,
-      'aspect'         : 0.25,
-      'spacing'        : 0,
+        'highBrush'      : highBrush,
+        'lowBrush'       : lowBrush,
+        'highPen'        : highPen,
+        'lowPen'         : lowPen,
+        'backgroundBrush': backgroundBrush,
+        'borderBrush'    : borderBrush,
+        'aspect'         : 0.25,
+        'spacing'        : 0,
     }
     return {**SevenSegmentDigitStyles, **colonStyles}
 

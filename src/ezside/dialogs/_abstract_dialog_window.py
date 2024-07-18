@@ -1,7 +1,7 @@
 """AbstractDialogWindow provides a base class for user input dialog windows
 that inherit from CanvasWidget. Descriptor classes should create instances of
 this class or subclasses of it. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

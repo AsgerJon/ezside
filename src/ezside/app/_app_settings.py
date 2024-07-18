@@ -1,5 +1,5 @@
 """AppSettings subclasses the QSettings class."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING, Any, Union, Dict, Callable
 from PySide6.QtCore import QSettings
 from PySide6.QtGui import QIcon, QKeySequence
 from icecream import ic
-from vistutils.text import monoSpace
-from vistutils.waitaminute import typeMsg
+from worktoy.text import monoSpace
+from worktoy.text import typeMsg
 
 from ezside.core import AlignHCenter, \
   AlignRight, \
@@ -41,29 +41,29 @@ class AppSettings(QSettings):
     """Get the keyboard shortcuts."""
     if key is None:
       return {
-        'new'      : 'CTRL+N',
-        'open'     : 'CTRL+O',
-        'save'     : 'CTRL+S',
-        'saveAs'   : 'CTRL+SHIFT+S',
-        'close'    : 'CTRL+W',
-        'undo'     : 'CTRL+Z',
-        'redo'     : 'CTRL+Y',
-        'cut'      : 'CTRL+X',
-        'copy'     : 'CTRL+C',
-        'paste'    : 'CTRL+V',
-        'selectAll': 'CTRL+A',
-        'aboutQt'  : 'F12',
-        'exit'     : 'ALT+F4',
-        'debug1'   : 'F1',
-        'debug2'   : 'F2',
-        'debug3'   : 'F3',
-        'debug4'   : 'F4',
-        'debug5'   : 'F5',
-        'debug6'   : 'F6',
-        'debug7'   : 'F7',
-        'debug8'   : 'F8',
-        'debug9'   : 'F9',
-        '__empty__': '',
+          'new'      : 'CTRL+N',
+          'open'     : 'CTRL+O',
+          'save'     : 'CTRL+S',
+          'saveAs'   : 'CTRL+SHIFT+S',
+          'close'    : 'CTRL+W',
+          'undo'     : 'CTRL+Z',
+          'redo'     : 'CTRL+Y',
+          'cut'      : 'CTRL+X',
+          'copy'     : 'CTRL+C',
+          'paste'    : 'CTRL+V',
+          'selectAll': 'CTRL+A',
+          'aboutQt'  : 'F12',
+          'exit'     : 'ALT+F4',
+          'debug1'   : 'F1',
+          'debug2'   : 'F2',
+          'debug3'   : 'F3',
+          'debug4'   : 'F4',
+          'debug5'   : 'F5',
+          'debug6'   : 'F6',
+          'debug7'   : 'F7',
+          'debug8'   : 'F8',
+          'debug9'   : 'F9',
+          '__empty__': '',
       }
     if isinstance(key, str):
       shortcuts = cls._getShortcuts()
@@ -80,40 +80,40 @@ class AppSettings(QSettings):
       here = os.path.dirname(__file__)
       there = os.path.join(here, 'iconfiles')
       fileNames = {
-        'editMenu'    : 'edit_menu',
-        'add'         : 'add',
-        'debug'       : 'debug',
-        'exitImg'     : 'exit_img',
-        'microphone'  : 'microphone',
-        'aboutPython' : 'about_python',
-        'cut'         : 'cut',
-        'exit'        : 'exit',
-        'unlocked'    : 'unlocked',
-        'aboutQt'     : 'about_qt',
-        'selectAll'   : 'select_all',
-        'paste'       : 'paste',
-        'redo'        : 'redo',
-        'preferences' : 'preferences',
-        'saveAs'      : 'save_as',
-        'minescript'  : 'minescript',
-        'screenShot'  : 'screen_shot',
-        'undo'        : 'undo',
-        'new'         : 'new',
-        'risitas'     : 'risitas',
-        'filesMenu'   : 'files_menu',
-        'locked'      : 'locked',
-        'aboutConda'  : 'about_conda',
-        'files'       : 'files',
-        'open'        : 'open',
-        'save'        : 'save',
-        'help'        : 'help',
-        'copy'        : 'copy',
-        'workside'    : 'workside',
-        'aboutPySide6': 'about_py_side6',
-        'aboutPySide' : 'about_py_side6',
-        'helpMenu'    : 'help_menu',
-        'pogchamp'    : 'pogchamp',
-        '__empty__'   : 'risitas',
+          'editMenu'    : 'edit_menu',
+          'add'         : 'add',
+          'debug'       : 'debug',
+          'exitImg'     : 'exit_img',
+          'microphone'  : 'microphone',
+          'aboutPython' : 'about_python',
+          'cut'         : 'cut',
+          'exit'        : 'exit',
+          'unlocked'    : 'unlocked',
+          'aboutQt'     : 'about_qt',
+          'selectAll'   : 'select_all',
+          'paste'       : 'paste',
+          'redo'        : 'redo',
+          'preferences' : 'preferences',
+          'saveAs'      : 'save_as',
+          'minescript'  : 'minescript',
+          'screenShot'  : 'screen_shot',
+          'undo'        : 'undo',
+          'new'         : 'new',
+          'risitas'     : 'risitas',
+          'filesMenu'   : 'files_menu',
+          'locked'      : 'locked',
+          'aboutConda'  : 'about_conda',
+          'files'       : 'files',
+          'open'        : 'open',
+          'save'        : 'save',
+          'help'        : 'help',
+          'copy'        : 'copy',
+          'workside'    : 'workside',
+          'aboutPySide6': 'about_py_side6',
+          'aboutPySide' : 'about_py_side6',
+          'helpMenu'    : 'help_menu',
+          'pogchamp'    : 'pogchamp',
+          '__empty__'   : 'risitas',
       }
       filePaths = {}
       for name, fileName in fileNames.items():

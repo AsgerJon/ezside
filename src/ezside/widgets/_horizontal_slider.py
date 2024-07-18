@@ -1,7 +1,7 @@
 """AbstractSlider provides a custom baseclass for value input widgets
 allowing the user to input values by moving a visual element with the
 mouse or other input device. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -11,16 +11,15 @@ from PySide6.QtCore import QPointF, QRectF, QSizeF, Signal, QEvent, Qt, Slot
 from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QColor, QMouseEvent, QKeyEvent
 from icecream import ic
-from vistutils.parse import maybe
-from vistutils.text import monoSpace
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import EmptyField
+from worktoy.parse import maybe
+from worktoy.text import monoSpace, typeMsg
 
 from ezside.core import parseBrush, \
   SolidFill, \
   parsePen, \
   SolidLine
 from ezside.widgets import CanvasWidget, GraffitiVandal
-from moreattribox import Flag
 
 if TYPE_CHECKING:
   from ezside.app import AppSettings, App
@@ -33,6 +32,7 @@ class HorizontalSlider(CanvasWidget):
   allowing the user to input values by moving a visual element with the
   mouse or other input device. """
 
+  __is_grabbed__ = None
   __handle_width__ = 16
   __handle_position__ = None  # in unit scale
   __grabbed_point__ = None
@@ -40,13 +40,21 @@ class HorizontalSlider(CanvasWidget):
   __top_left__ = None
   __bottom_right__ = None
 
-  grabbed = Flag(False)
+  grabbed = EmptyField()
 
   handleGrabbed = Signal()
   handleMoved = Signal(float)
   handleReleased = Signal()
   handleCancelled = Signal()
   positionChanged = Signal(float)
+
+  def _getGrabbed(self) -> bool:
+    """Getter-function for grabbed flag"""
+    return True if self.__is_grabbed__ else False
+
+  def _setGrabbed(self, flag: bool) -> None:
+    """Setter-function for grabbed flag"""
+    self.__is_grabbed__ = flag
 
   def initUi(self) -> None:
     """Initializes the user interface"""

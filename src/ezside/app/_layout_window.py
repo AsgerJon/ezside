@@ -1,26 +1,19 @@
 """LayoutWindow subclasses BaseWindow and implements the layout of
 widgets."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from abc import abstractmethod
+from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QVBoxLayout, QWidget
-from attribox import AttriBox
+from PySide6.QtWidgets import QVBoxLayout
+from worktoy.desc import AttriBox
 from icecream import ic
 
-from ezside import TestCanvas
 from ezside.app import BaseWindow
-from ezside.core import AlignTop, AlignLeft
 from ezside.dialogs import ConfirmBox
-from ezside.widgets import BaseWidget, \
-  Label, \
-  PushButton, \
-  CheckButton, \
-  VerticalSlider
-from ezside.widgets import HorizontalSlider
+from ezside.widgets import BaseWidget, Label
 from ezside.widgets.charts import RealTimeView
 
 ic.configureOutput(includeContext=True, )
@@ -43,6 +36,12 @@ class LayoutWindow(BaseWindow):
 
   def initUi(self) -> None:
     """The initUi method initializes the user interface of the window."""
+    if TYPE_CHECKING:
+      assert isinstance(self.baseLayout, QVBoxLayout)
+      assert isinstance(self.baseWidget, BaseWidget)
+      assert isinstance(self.titleWidget, Label)
+      assert isinstance(self.liveChart, RealTimeView)
+
     self.baseLayout.setSpacing(2)
     self.baseLayout.setContentsMargins(0, 0, 0, 0)
     self.titleWidget.initUi()

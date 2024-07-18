@@ -1,4 +1,9 @@
 
+#
+# AGPL-3.0 license
+# Copyright (c) 2024 Asger Jon Vistisen
+#
+
 virt-install \
   --name archVM \
   --ram 1024 \

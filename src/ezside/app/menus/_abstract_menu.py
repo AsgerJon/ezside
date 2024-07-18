@@ -1,5 +1,5 @@
 """Menu provides a simplified menu implementation"""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenu, QMenuBar
 from icecream import ic
-from vistutils.text import monoSpace
+from worktoy.text import monoSpace
 
 if TYPE_CHECKING:
   pass

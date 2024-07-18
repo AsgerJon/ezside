@@ -1,5 +1,5 @@
 """SevenSegmentDigit class for displaying numbers on a 7-segment display."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -61,20 +61,20 @@ class SevenSegmentDigit(CanvasWidget):
     """The styleTypes method provides the type expected at each name."""
     canvasWidgetStyles = CanvasWidget.getStyleTypes()
     sevenSegmentDigitStyles = {
-      'highBrush'      : QBrush,
-      'lowBrush'       : QBrush,
-      'backgroundBrush': QBrush,
-      'borderBrush'    : QBrush,
-      'highPen'        : QPen,
-      'lowPen'         : QPen,
-      'margins'        : QMargins,
-      'borders'        : QMargins,
-      'paddings'       : QMargins,
-      'radius'         : QPoint,
-      'vAlign'         : AlignFlag,
-      'hAlign'         : AlignFlag,
-      'aspect'         : float,
-      'spacing'        : int,
+        'highBrush'      : QBrush,
+        'lowBrush'       : QBrush,
+        'backgroundBrush': QBrush,
+        'borderBrush'    : QBrush,
+        'highPen'        : QPen,
+        'lowPen'         : QPen,
+        'margins'        : QMargins,
+        'borders'        : QMargins,
+        'paddings'       : QMargins,
+        'radius'         : QPoint,
+        'vAlign'         : AlignFlag,
+        'hAlign'         : AlignFlag,
+        'aspect'         : float,
+        'spacing'        : int,
     }
     return {**canvasWidgetStyles, **sevenSegmentDigitStyles}
 
@@ -89,20 +89,20 @@ class SevenSegmentDigit(CanvasWidget):
     borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     canvasWidgetStyles = CanvasWidget.getFallbackStyles()
     SevenSegmentDigitStyles = {
-      'highBrush'      : highBrush,
-      'lowBrush'       : lowBrush,
-      'highPen'        : highPen,
-      'lowPen'         : lowPen,
-      'backgroundBrush': backgroundBrush,
-      'borderBrush'    : borderBrush,
-      'margins'        : QMargins(1, 1, 1, 1, ),
-      'borders'        : QMargins(1, 1, 1, 1, ),
-      'paddings'       : QMargins(1, 1, 1, 1, ),
-      'radius'         : QPoint(1, 1, ),
-      'vAlign'         : AlignVCenter,
-      'hAlign'         : AlignHCenter,
-      'aspect'         : 0.2,
-      'spacing'        : 2,
+        'highBrush'      : highBrush,
+        'lowBrush'       : lowBrush,
+        'highPen'        : highPen,
+        'lowPen'         : lowPen,
+        'backgroundBrush': backgroundBrush,
+        'borderBrush'    : borderBrush,
+        'margins'        : QMargins(1, 1, 1, 1, ),
+        'borders'        : QMargins(1, 1, 1, 1, ),
+        'paddings'       : QMargins(1, 1, 1, 1, ),
+        'radius'         : QPoint(1, 1, ),
+        'vAlign'         : AlignVCenter,
+        'hAlign'         : AlignHCenter,
+        'aspect'         : 0.2,
+        'spacing'        : 2,
     }
     return {**canvasWidgetStyles, **SevenSegmentDigitStyles}
 
@@ -116,17 +116,17 @@ class SevenSegmentDigit(CanvasWidget):
       backgroundBrush = parseBrush(QColor(207, 207, 207, 255), SolidFill)
       borderBrush = parseBrush(QColor(0, 0, 0, 255), SolidFill)
       return {
-        'highBrush'      : highBrush,
-        'lowBrush'       : lowBrush,
-        'highPen'        : highPen,
-        'lowPen'         : lowPen,
-        'backgroundBrush': backgroundBrush,
-        'borderBrush'    : borderBrush,
-        'radius'         : QPoint(0, 0),
-        'spacing'        : 1,
-        'margins'        : QMargins(0, 0, 0, 0, ),
-        'borders'        : QMargins(0, 0, 0, 0, ),
-        'paddings'       : QMargins(0, 0, 0, 0, ),
+          'highBrush'      : highBrush,
+          'lowBrush'       : lowBrush,
+          'highPen'        : highPen,
+          'lowPen'         : lowPen,
+          'backgroundBrush': backgroundBrush,
+          'borderBrush'    : borderBrush,
+          'radius'         : QPoint(0, 0),
+          'spacing'        : 1,
+          'margins'        : QMargins(0, 0, 0, 0, ),
+          'borders'        : QMargins(0, 0, 0, 0, ),
+          'paddings'       : QMargins(0, 0, 0, 0, ),
       }
 
   def defaultStyles(self, name: str) -> Any:
@@ -184,16 +184,16 @@ class SevenSegmentDigit(CanvasWidget):
     of the outer list, there is a list of strings representing the segments
     that should be on for the corresponding digit. """
     return [
-      ['A', 'B', 'C', 'D', 'E', 'F'],
-      ['B', 'C'],
-      ['A', 'B', 'G', 'E', 'D'],
-      ['A', 'B', 'G', 'C', 'D'],
-      ['F', 'G', 'B', 'C'],
-      ['A', 'F', 'G', 'C', 'D'],
-      ['A', 'F', 'G', 'C', 'D', 'E'],
-      ['A', 'B', 'C'],
-      ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-      ['A', 'B', 'C', 'D', 'F', 'G'],
+        ['A', 'B', 'C', 'D', 'E', 'F'],
+        ['B', 'C'],
+        ['A', 'B', 'G', 'E', 'D'],
+        ['A', 'B', 'G', 'C', 'D'],
+        ['F', 'G', 'B', 'C'],
+        ['A', 'F', 'G', 'C', 'D'],
+        ['A', 'F', 'G', 'C', 'D', 'E'],
+        ['A', 'B', 'C'],
+        ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+        ['A', 'B', 'C', 'D', 'F', 'G'],
     ]
 
   def map7seg(self) -> list[str]:
@@ -234,13 +234,13 @@ class SevenSegmentDigit(CanvasWidget):
     offSet = (height - DTop - segmentHeight) / 2
 
     segments = {
-      'A': QRectF(QPointF(ADGLeft, ATop + offSet), hSize),
-      'B': QRectF(QPointF(BCLeft, BFTop + offSet), vSize),
-      'C': QRectF(QPointF(BCLeft, CETop + offSet), vSize),
-      'D': QRectF(QPointF(ADGLeft, DTop + offSet), hSize),
-      'E': QRectF(QPointF(EFLeft, CETop + offSet), vSize),
-      'F': QRectF(QPointF(EFLeft, BFTop + offSet), vSize),
-      'G': QRectF(QPointF(ADGLeft, GTop + offSet), hSize),
+        'A': QRectF(QPointF(ADGLeft, ATop + offSet), hSize),
+        'B': QRectF(QPointF(BCLeft, BFTop + offSet), vSize),
+        'C': QRectF(QPointF(BCLeft, CETop + offSet), vSize),
+        'D': QRectF(QPointF(ADGLeft, DTop + offSet), hSize),
+        'E': QRectF(QPointF(EFLeft, CETop + offSet), vSize),
+        'F': QRectF(QPointF(EFLeft, BFTop + offSet), vSize),
+        'G': QRectF(QPointF(ADGLeft, GTop + offSet), hSize),
     }
     highSegments = []
     lowSegments = []

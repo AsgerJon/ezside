@@ -1,6 +1,6 @@
 """Label provides the general class for widgets whose primary function is
 to display text. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -8,10 +8,9 @@ from typing import Any, TYPE_CHECKING
 
 from PySide6.QtCore import QMargins, QPoint, QRect, QSize, Slot
 from PySide6.QtGui import QColor, QPainter, QFontMetrics, QPen, QFont, QBrush
-from attribox import AttriBox
 from icecream import ic
-from vistutils.fields import EmptyField
-from vistutils.parse import maybe
+from worktoy.desc import EmptyField, AttriBox
+from worktoy.parse import maybe
 
 from ezside.core import AlignHCenter
 from ezside.core import SolidLine, parseFont, parsePen, AlignLeft, Center
@@ -101,16 +100,16 @@ class Label(CanvasWidget):
     """Getter-function for the style types for Label."""
     parentStyleTypes = CanvasWidget.getStyleTypes()
     LabelStyleTypes = {
-      'font'           : QFont,
-      'textPen'        : QPen,
-      'backgroundBrush': QBrush,
-      'borderBrush'    : QBrush,
-      'margins'        : QMargins,
-      'borders'        : QMargins,
-      'paddings'       : QMargins,
-      'radius'         : QPoint,
-      'vAlign'         : int,
-      'hAlign'         : int,
+        'font'           : QFont,
+        'textPen'        : QPen,
+        'backgroundBrush': QBrush,
+        'borderBrush'    : QBrush,
+        'margins'        : QMargins,
+        'borders'        : QMargins,
+        'paddings'       : QMargins,
+        'radius'         : QPoint,
+        'vAlign'         : int,
+        'hAlign'         : int,
     }
     return {**parentStyleTypes, **LabelStyleTypes}
 
@@ -120,16 +119,16 @@ class Label(CanvasWidget):
     styles."""
     parentFallbackStyles = CanvasWidget.getFallbackStyles()
     fallbackStyles = {
-      'font'           : parseFont('Montserrat', 12, Normal, MixCase),
-      'textPen'        : parsePen(QColor(0, 0, 0, 255), 1, SolidLine),
-      'backgroundBrush': parseBrush(QColor(223, 223, 223, 255), SolidFill),
-      'borderBrush'    : parseBrush(QColor(223, 223, 223, 255), SolidFill),
-      'margins'        : QMargins(2, 2, 2, 2, ),
-      'borders'        : QMargins(2, 2, 2, 2),
-      'paddings'       : QMargins(4, 4, 4, 4, ),
-      'radius'         : QPoint(4, 4),
-      'vAlign'         : AlignVCenter,
-      'hAlign'         : AlignLeft,
+        'font'           : parseFont('Montserrat', 12, Normal, MixCase),
+        'textPen'        : parsePen(QColor(0, 0, 0, 255), 1, SolidLine),
+        'backgroundBrush': parseBrush(QColor(223, 223, 223, 255), SolidFill),
+        'borderBrush'    : parseBrush(QColor(223, 223, 223, 255), SolidFill),
+        'margins'        : QMargins(2, 2, 2, 2, ),
+        'borders'        : QMargins(2, 2, 2, 2),
+        'paddings'       : QMargins(4, 4, 4, 4, ),
+        'radius'         : QPoint(4, 4),
+        'vAlign'         : AlignVCenter,
+        'hAlign'         : AlignLeft,
     }
     return {**parentFallbackStyles, **fallbackStyles}
 

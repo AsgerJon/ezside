@@ -1,6 +1,6 @@
 """The 'qt_names' package provides some shorter names for commonly used Qt
 enum values and classes."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -52,13 +52,13 @@ AlignTop = Qt.AlignmentFlag.AlignTop
 AlignBottom = Qt.AlignmentFlag.AlignBottom
 
 alignDict = {
-  'left'   : AlignLeft,
-  'right'  : AlignRight,
-  'center' : Center,
-  'hcenter': AlignHCenter,
-  'vcenter': AlignVCenter,
-  'top'    : AlignTop,
-  'bottom' : AlignBottom
+    'left'   : AlignLeft,
+    'right'  : AlignRight,
+    'center' : Center,
+    'hcenter': AlignHCenter,
+    'vcenter': AlignVCenter,
+    'top'    : AlignTop,
+    'bottom' : AlignBottom
 }
 
 Expand = QSizePolicy.Policy.MinimumExpanding
@@ -90,13 +90,14 @@ HORIZONTAL = Qt.Orientation.Horizontal
 QtRGB = QColorDialog.ColorDialogOption.DontUseNativeDialog
 
 __all__ = [
-  'SolidFill', 'BlankFill', 'SolidLine', 'DashLine', 'DotLine', 'DashDot',
-  'BlankLine', 'FlatCap', 'SquareCap', 'RoundCap', 'MiterJoin', 'BevelJoin',
-  'RoundJoin', 'SvgMiterJoin', 'Normal', 'Bold', 'DemiBold', 'WrapMode',
-  'NoWrap', 'WordWrap', 'AlignFlag', 'AlignLeft', 'AlignRight',
-  'AlignHCenter', 'AlignVCenter', 'AlignCenter', 'Center', 'AlignTop',
-  'AlignBottom', 'Expand', 'Tight', 'Fixed', 'TimerType', 'Precise',
-  'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
-  'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
-  'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer', 'Weight', 'Cap',
-  'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click', 'QtRGB']
+    'SolidFill', 'BlankFill', 'SolidLine', 'DashLine', 'DotLine', 'DashDot',
+    'BlankLine', 'FlatCap', 'SquareCap', 'RoundCap', 'MiterJoin',
+    'BevelJoin',
+    'RoundJoin', 'SvgMiterJoin', 'Normal', 'Bold', 'DemiBold', 'WrapMode',
+    'NoWrap', 'WordWrap', 'AlignFlag', 'AlignLeft', 'AlignRight',
+    'AlignHCenter', 'AlignVCenter', 'AlignCenter', 'Center', 'AlignTop',
+    'AlignBottom', 'Expand', 'Tight', 'Fixed', 'TimerType', 'Precise',
+    'Coarse', 'VeryCoarse', 'SHIFT', 'CTRL', 'ALT', 'META', 'LeftClick',
+    'RightClick', 'MiddleClick', 'NoClick', 'BackClick', 'ForwardClick',
+    'VERTICAL', 'HORIZONTAL', 'alignDict', 'Prefer', 'Weight', 'Cap',
+    'MixCase', 'SmallCaps', 'Upper', 'Lower', 'Click', 'QtRGB']

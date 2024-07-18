@@ -1,11 +1,11 @@
 """VerticalSlider provides a vertical slider widget. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from PySide6.QtCore import QRectF, QPointF, QSizeF, Qt
 from PySide6.QtGui import QMouseEvent, QColor, QKeyEvent
-from vistutils.waitaminute import typeMsg
+from worktoy.text import typeMsg
 
 from ezside.core import SolidFill, parseBrush, parsePen, SolidLine
 from ezside.widgets import HorizontalSlider, GraffitiVandal

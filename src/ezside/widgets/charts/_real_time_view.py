@@ -1,6 +1,6 @@
 """RealTimeView provides a widget displaying real time data using the
 QChart framework."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -179,7 +179,7 @@ class RealTimeView(QChartView):
     self.__inner_chart__.setTheme(self.__chart_theme__)
     titleBrush = parseBrush(QColor(63, 0, 0), SolidFill)
     titleFont = parseFont(
-      'Montserrat', 16, QFont.Capitalization.Capitalize, )
+        'Montserrat', 16, QFont.Capitalization.Capitalize, )
     self.__inner_chart__.setTitleBrush(titleBrush)
     self.__inner_chart__.setTitleFont(titleFont)
 

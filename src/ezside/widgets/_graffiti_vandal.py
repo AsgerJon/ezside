@@ -1,6 +1,6 @@
 """GraffitiVandal provides a subclass of QPainter that allows for
 sequential painting functions to react to the same QPaintEvent."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

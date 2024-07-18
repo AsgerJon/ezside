@@ -6,7 +6,7 @@ between a slot and a signal requiring confirmation. For example:
 When the source signals the target, an instance of ConfirmBox will open,
 and its accepted signal will be connected to the target. User interaction
 is then required to invoke target slot. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ from typing import Any, Callable, Never, TYPE_CHECKING
 from PySide6.QtCore import QCoreApplication, QObject
 from PySide6.QtGui import QFontMetrics
 from PySide6.QtWidgets import QDialog, QWidget, QGridLayout
-from attribox import AttriBox
+from worktoy.desc import AttriBox
 from icecream import ic
-from vistutils.parse import maybe
-from vistutils.waitaminute import typeMsg
+from worktoy.parse import maybe
+from worktoy.text import typeMsg
 
 from ezside.core import parseFont, Normal, AlignHCenter
 from ezside.widgets import BaseWidget, PushButton, Label

@@ -1,16 +1,14 @@
 """EZTimer provides a descriptor class for QTimer."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import Never, Any
 
 from PySide6.QtCore import QTimer
-from attribox import AbstractDescriptor, AttriBox
-from vistutils.fields import EmptyField
-from vistutils.parse import maybe
-from vistutils.text import monoSpace, stringList
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import EmptyField, AbstractDescriptor, AttriBox
+from worktoy.parse import maybe
+from worktoy.text import monoSpace, stringList, typeMsg
 
 from ezside.core import Precise, TimerType
 

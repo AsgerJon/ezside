@@ -1,16 +1,16 @@
 """ButtonStates instances enumerate different states of a button."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import Any, TYPE_CHECKING, Self
 
-from attribox import AbstractDescriptor
 from icecream import ic
-from vistutils.waitaminute import typeMsg
 
 from ezside.widgets import Label
-from moreattribox import Flag
+
+from worktoy.desc import AttriBox, EmptyField, AbstractDescriptor
+from worktoy.text import typeMsg
 
 ic.configureOutput(includeContext=True)
 

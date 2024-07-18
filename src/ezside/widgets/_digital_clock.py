@@ -1,6 +1,6 @@
 """DigitalClock widget uses the SevenSegmentDigit class to display the
 current time in a digital clock format. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -36,14 +36,14 @@ class DigitalClock(CanvasWidget):
     backgroundBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     borderBrush = parseBrush(QColor(223, 223, 223, 255), SolidFill)
     return {
-      'margins'        : QMargins(0, 0, 0, 0, ),
-      'borders'        : QMargins(2, 2, 2, 2, ),
-      'paddings'       : QMargins(0, 0, 0, 0, ),
-      'borderBrush'    : borderBrush,
-      'backgroundBrush': backgroundBrush,
-      'radius'         : QPoint(2, 2, ),
-      'vAlign'         : AlignVCenter,
-      'hAlign'         : AlignHCenter,
+        'margins'        : QMargins(0, 0, 0, 0, ),
+        'borders'        : QMargins(2, 2, 2, 2, ),
+        'paddings'       : QMargins(0, 0, 0, 0, ),
+        'borderBrush'    : borderBrush,
+        'backgroundBrush': backgroundBrush,
+        'radius'         : QPoint(2, 2, ),
+        'vAlign'         : AlignVCenter,
+        'hAlign'         : AlignHCenter,
     }
 
   @classmethod
@@ -51,20 +51,20 @@ class DigitalClock(CanvasWidget):
     """The styleTypes method provides the type expected at each name. """
     canvasWidgetStyles = CanvasWidget.styleTypes()
     digitalClockStyles = {
-      'highBrush'      : QBrush,
-      'lowBrush'       : QBrush,
-      'backgroundBrush': QBrush,
-      'borderBrush'    : QBrush,
-      'highPen'        : QPen,
-      'lowPen'         : QPen,
-      'margins'        : QMargins,
-      'borders'        : QMargins,
-      'paddings'       : QMargins,
-      'radius'         : QPoint,
-      'vAlign'         : int,
-      'hAlign'         : int,
-      'aspect'         : float,
-      'spacing'        : int,
+        'highBrush'      : QBrush,
+        'lowBrush'       : QBrush,
+        'backgroundBrush': QBrush,
+        'borderBrush'    : QBrush,
+        'highPen'        : QPen,
+        'lowPen'         : QPen,
+        'margins'        : QMargins,
+        'borders'        : QMargins,
+        'paddings'       : QMargins,
+        'radius'         : QPoint,
+        'vAlign'         : int,
+        'hAlign'         : int,
+        'aspect'         : float,
+        'spacing'        : int,
     }
     return {**canvasWidgetStyles, **digitalClockStyles}
 

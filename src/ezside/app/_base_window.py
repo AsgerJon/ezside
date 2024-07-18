@@ -1,7 +1,7 @@
 """BaseWindow provides the base class for the main application window. It
 implements menus and actions for the application, leaving widgets for the
 LayoutWindow class."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 

@@ -1,14 +1,14 @@
 """WindowBox provides a descriptor class for the main application window."""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Never
 
 from PySide6.QtWidgets import QMainWindow as QMain
-from attribox import AbstractDescriptor
-from vistutils.text import monoSpace
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import AbstractDescriptor
+from worktoy.text import monoSpace
+from worktoy.text import typeMsg
 
 if TYPE_CHECKING:
   from PySide6.QtCore import QObject

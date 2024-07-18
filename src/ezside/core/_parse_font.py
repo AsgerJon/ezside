@@ -1,5 +1,5 @@
 """The 'parseFont' function creates instances of QFont. """
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ class _FontParser:
     fontSize = 12 if fontSize is None else fontSize
     fontWeight = QFont.Weight.Normal if fontWeight is None else fontWeight
     fontCase = QFont.Capitalization.MixedCase if fontCase is None else (
-      fontCase)
+        fontCase)
     font = QFont()
     font.setFamily(family)
     font.setPointSize(fontSize)

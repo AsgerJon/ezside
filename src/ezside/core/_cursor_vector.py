@@ -17,7 +17,7 @@ Based on the above, the following properties are inferred:
   ax: float horizontal acceleration in pixels per second squared
   ay: float vertical acceleration in pixels per second squared
   a: float total acceleration in pixels per second squared"""
-#  GPL-3.0 license
+#  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
@@ -25,9 +25,8 @@ from typing import Callable
 
 from PySide6.QtCore import QPointF, QPoint, QTimer
 from PySide6.QtGui import QMouseEvent
-from attribox import AttriBox
-from vistutils.fields import EmptyField
-from vistutils.parse import maybe
+from worktoy.desc import AttriBox, EmptyField
+from worktoy.parse import maybe
 
 
 class CursorVector:
