@@ -16,6 +16,11 @@ ParsedArgs: TypeAlias = tuple[object, tuple[object], dict[str, object]]
 class Action(QAction):
   """Action subclasses QAction"""
 
+  __action_title__ = None
+  __keyboard_shortcut__ = None
+  __action_icon__ = None
+  __action_parent__ = None
+
   @staticmethod
   def _resolveIcon(name: str) -> QIcon:
     """Resolves the icon from the name. """
@@ -122,19 +127,27 @@ class Action(QAction):
         return None, (*tempArgs,), {**kwargs, }
 
   def __init__(self, *args, **kwargs) -> None:
+    __action_title__ = None
+    __keyboard_shortcut__ = None
+    __action_icon__ = None
+    __action_parent__ = None
     title, args, kwargs = self._parseTitle(*args, **kwargs)
-    tooltip, args, kwargs = self._parseTooltip(*args, **kwargs)
     shortcut, args, kwargs = self._parseShortcut(*args, **kwargs)
     icon, args, kwargs = self._parseIcon(*args, **kwargs)
     parent, args, kwargs = self._parseParent(*args, **kwargs)
     QAction.__init__(self, )
     if isinstance(title, str):
-      self.setText(title)
-    if isinstance(tooltip, str):
-      self.setToolTip(tooltip)
+      self.__action_title__ = title
     if isinstance(shortcut, QKeySequence):
-      self.setShortcut(shortcut)
+      self.__action_title__ = shortcut
     if isinstance(icon, QIcon):
-      self.setIcon(icon)
+      self.__action_title__ = icon
     if isinstance(parent, QObject):
-      self.setParent(parent)
+      self.__action_title__ = parent
+
+  def initUi(self) -> None:
+    """Initialize the user interface for the widget. """
+    self.setText(self.__action_title__)
+    self.setShortcut(self.__keyboard_shortcut__)
+    self.setIcon(self.__action_icon__)
+    self.setParent(self.__action_parent__)
