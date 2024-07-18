@@ -3,6 +3,8 @@
 # Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from PySide6.QtCharts import QScatterSeries
 
-class RollSeries:
+
+class RollSeries(QScatterSeries):
   """RollData provides a pythonic data structure for a FIFO buffered data."""

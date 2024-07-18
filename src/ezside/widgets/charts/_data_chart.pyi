@@ -3,6 +3,8 @@
 # Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from PySide6.QtCharts import QChart
 
-class DataChart:
+
+class DataChart(QChart):
   """Chart provides a base class for the real-time chart widgets."""
