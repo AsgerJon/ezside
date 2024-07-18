@@ -9,7 +9,7 @@ from icecream import ic
 
 from ezside.widgets import Label
 
-from worktoy.desc import AttriBox, EmptyField, AbstractDescriptor
+from worktoy.desc import AttriBox, EmptyField, AbstractDescriptor, Flag
 from worktoy.text import typeMsg
 
 ic.configureOutput(includeContext=True)

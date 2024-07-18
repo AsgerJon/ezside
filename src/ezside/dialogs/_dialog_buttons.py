@@ -6,11 +6,10 @@ from __future__ import annotations
 
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QHBoxLayout
-from attribox import AttriBox
+from worktoy.desc import AttriBox, Flag
 
 from ezside.core import AlignLeft, Tight
 from ezside.widgets import PushButton, CanvasWidget
-from moreattribox import Flag
 
 
 class DialogButtons(CanvasWidget):

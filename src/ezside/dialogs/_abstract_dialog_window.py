@@ -7,15 +7,16 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from typing import TYPE_CHECKING
+
 from PySide6.QtCore import Signal, QCoreApplication
 from PySide6.QtWidgets import QVBoxLayout, QDialog, QHBoxLayout
-from attribox import AttriBox
+from worktoy.desc import AttriBox
 from icecream import ic
-from vistutils.parse import maybe
+from worktoy.parse import maybe
 
 from ezside.core import Tight, AlignTop
 from ezside.dialogs import DialogButtons
-from ezside.widgets import CanvasWidget, Label, BaseWidget
+from ezside.widgets import Label, BaseWidget
 
 if TYPE_CHECKING:
   from ezside.app import App, AppSettings

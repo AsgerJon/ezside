@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING, Any
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QColorDialog, QWidget
-from attribox import AbstractDescriptor
+from worktoy.desc import AbstractDescriptor
 from icecream import ic
-from vistutils.waitaminute import typeMsg
+from worktoy.text import typeMsg
 
 from ezside.core import QtRGB
 

@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QSpinBox
-from attribox import AttriBox
+from worktoy.desc import AttriBox
 from icecream import ic
 
 from ezside.core import Tight, parseFont, Expand

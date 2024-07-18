@@ -7,13 +7,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from PySide6.QtCharts import QChartView, QChart, QValueAxis
-from PySide6.QtCore import QPointF, \
-  Signal, \
+from PySide6.QtCore import Signal, \
   QPoint, \
-  QEvent, \
   Qt, \
   QRect, \
-  QSize, \
   QSizeF, QRectF, Slot
 from PySide6.QtGui import QPainter, \
   QColor, \
@@ -23,9 +20,9 @@ from PySide6.QtGui import QPainter, \
   QBrush
 from PySide6.QtWidgets import QGraphicsRectItem
 from icecream import ic
-from vistutils.fields import EmptyField
-from vistutils.parse import maybe
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import EmptyField
+from worktoy.parse import maybe
+from worktoy.text import typeMsg
 
 from ezside.core import AlignBottom, \
   AlignLeft, \

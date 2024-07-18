@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog
-from attribox import AbstractDescriptor
+from worktoy.desc import AbstractDescriptor
 
 from ezside.dialogs import OpenFile
 

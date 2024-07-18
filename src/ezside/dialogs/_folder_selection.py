@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Self
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFileDialog
-from attribox import AbstractDescriptor
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import AbstractDescriptor
+from worktoy.text import typeMsg
 
 if TYPE_CHECKING:
   from ezside.app import BaseWindow

@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, Self
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QFontDialog, QColorDialog
 from PySide6.QtGui import QFont
-from attribox import AbstractDescriptor
-from vistutils.waitaminute import typeMsg
+from worktoy.desc import AbstractDescriptor
+from worktoy.text import typeMsg
 
 if TYPE_CHECKING:
   from ezside.app import BaseWindow

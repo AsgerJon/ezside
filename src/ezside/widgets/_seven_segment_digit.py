@@ -9,8 +9,8 @@ from PySide6.QtCore import QSizeF, QPointF, QRectF, QMargins, QPoint
 from PySide6.QtGui import QPainter, QBrush, QColor, QPen
 from PySide6.QtWidgets import QWidget
 from icecream import ic
-from vistutils.parse import maybe
-from vistutils.waitaminute import typeMsg
+from worktoy.parse import maybe
+from worktoy.text import typeMsg
 
 from ezside.core import SolidLine, \
   AlignHCenter, \
