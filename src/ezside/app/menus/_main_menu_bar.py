@@ -4,12 +4,13 @@ actions. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenuBar, QMenu
 from icecream import ic
+from worktoy.desc import AttriBox
 
 from ezside.app.menus import FileMenu, EditMenu, HelpMenu, \
   DebugMenu, AbstractMenu
@@ -26,14 +27,10 @@ class MainMenuBar(QMenuBar):
   __iter_contents__ = None
   __added_menus__ = None
 
-  file: FileMenu
-  fileAction: QAction
-  edit: EditMenu
-  editAction: QAction
-  help: HelpMenu
-  helpAction: QAction
-  debug: DebugMenu
-  debugAction: QAction
+  fileMenu = AttriBox[FileMenu]()
+  editMenu = AttriBox[EditMenu]()
+  helpMenu = AttriBox[HelpMenu]()
+  debugMenu = AttriBox[DebugMenu]()
 
   hoverText = Signal(str)
 
@@ -41,23 +38,15 @@ class MainMenuBar(QMenuBar):
     """Initializes the MainMenuBar."""
     QMenuBar.__init__(self, *args, **kwargs)
     self.initUi()
-    self.initDebug()
     self.initSignalSlot()
 
   def initUi(self, ) -> None:
     """Initializes the user interface for the widget. Required for subclasses
     to implement. """
-    self.file = FileMenu(self, 'File')
-    self.fileAction = self.addMenu(self.file)
-    self.edit = EditMenu(self, 'Edit')
-    self.editAction = self.addMenu(self.edit)
-    self.help = HelpMenu(self, 'Help')
-    self.helpAction = self.addMenu(self.help)
-
-  def initDebug(self) -> None:
-    """Initializes the debug menu. Optional for subclasses to implement."""
-    self.debug = DebugMenu(self, 'Debug')
-    self.addMenu(self.debug)
+    self.addMenu(self.fileMenu)
+    self.addMenu(self.editMenu)
+    self.addMenu(self.helpMenu)
+    self.addMenu(self.debugMenu)
 
   def initSignalSlot(self) -> None:
     """Initializes the signal/slot connections for the widget. Optional for
@@ -73,20 +62,11 @@ class MainMenuBar(QMenuBar):
     """Add a menu to the menu bar. """
     for arg in args:
       if isinstance(arg, AbstractMenu):
-        self._getMenuList().append(arg)
-        return QMenuBar.addMenu(self, arg)
+        existing = self._getMenuList()
+        self.__added_menus__ = [*existing, arg]
+        return super().addMenu(arg)
     else:
       return QMenuBar.addMenu(self, *args)
-
-  def hoverFactory(self, menu: AbstractMenu) -> Callable:
-    """Factory for hover handling"""
-
-    def hoverMenu(text: str) -> None:
-      """Handle hover action."""
-      clsName = menu.__class__.__name__
-      self.hoverText.emit('%s/%s' % (clsName, text))
-
-    return hoverMenu
 
   def __iter__(self) -> MainMenuBar:
     """Iterate over the contents of the menu bar."""
@@ -95,14 +75,13 @@ class MainMenuBar(QMenuBar):
 
   def __next__(self, ) -> AbstractMenu:
     """Implementation of iteration protocol"""
-    try:
+    if self.__iter_contents__:
       return self.__iter_contents__.pop(0)
-    except IndexError:
-      raise StopIteration
+    raise StopIteration
 
   def __len__(self) -> int:
     """Return the number of menus in the menu bar."""
-    return len(self._getMenuList())
+    return len(self.__added_menus__)
 
   def __contains__(self, other: QMenu) -> bool:
     """Check if a menu is in the menu bar."""

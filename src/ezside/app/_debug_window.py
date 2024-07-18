@@ -17,6 +17,7 @@ class DebugWindow(MainWindow):
   """DebugWindow subclasses the MainWindow class allowing for debugging."""
 
   __debug_flag__ = True
+  __paused_time__ = None
   debug1: QAction
   debug2: QAction
   debug3: QAction

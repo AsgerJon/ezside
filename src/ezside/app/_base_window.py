@@ -12,6 +12,7 @@ from PySide6.QtCore import Signal, QUrl, Slot
 from PySide6.QtGui import QDesktopServices, QColor
 from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
+from worktoy.desc import Instance, AttriBox
 
 from ezside.app.menus import MainMenuBar, MainStatusBar
 from ezside.dialogs import ColorSelection, \
@@ -25,34 +26,10 @@ ic.configureOutput(includeContext=True, )
 class BaseWindow(QMainWindow):
   """BaseWindow class provides menus and actions for the application."""
 
-  mainMenuBar: MainMenuBar
-  mainStatusBar: MainStatusBar
-  colorSelected: Signal
-  fontSelected: Signal
-  openFileSelected: Signal
-  saveFileSelected: Signal
-  folderSelected: Signal
-
-  intSelected: Signal
-
-  colorDialog = ColorSelection()
-  fontDialog = FontSelection()
-  openFileDialog = OpenFile()
-  saveFileDialog = SaveFile()
-  folderDialog = FolderSelection()
-  cunt = UserInt()
-
-  __allow_close__ = False
-  __debug_flag__ = None
-  __paused_time__ = None
-
   __is_initialized__ = None
-  __is_closing__ = False
 
-  requestQuit = Signal()
-  confirmQuit = Signal()
-  requestHelp = Signal()
-  pulse = Signal()
+  mainMenuBar = AttriBox[MainMenuBar](Instance, )
+  mainStatusBar = AttriBox[MainStatusBar](Instance, )
 
   @staticmethod
   def link(url: Any) -> Callable:
@@ -75,8 +52,6 @@ class BaseWindow(QMainWindow):
   def show(self) -> None:
     """Show the window."""
     if self.__is_initialized__ is None:  # Initialize the menu bar
-      self.mainMenuBar = MainMenuBar(self)
-      self.mainStatusBar = MainStatusBar(self)
       self.setMenuBar(self.mainMenuBar)
       self.setStatusBar(self.mainStatusBar)
       self.initUi()
