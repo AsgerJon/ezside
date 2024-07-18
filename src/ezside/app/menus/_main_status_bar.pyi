@@ -8,3 +8,4 @@ from PySide6.QtWidgets import QStatusBar
 
 class MainStatusBar(QStatusBar):
   """StatusBar provides a status bar for the main application window."""
+

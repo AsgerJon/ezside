@@ -7,4 +7,6 @@ from PySide6.QtCharts import QChartView
 
 
 class RealTimeView(QChartView):
-  """RealTimeView provides a widget displaying real time data using the QChart framework."""
+  """RealTimeView provides a widget displaying real time data using the
+   QChart framework."""
+

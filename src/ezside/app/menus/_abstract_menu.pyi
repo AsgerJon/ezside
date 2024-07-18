@@ -8,3 +8,4 @@ from PySide6.QtWidgets import QMenu
 
 class AbstractMenu(QMenu):
   """A class for managing menus in the application."""
+

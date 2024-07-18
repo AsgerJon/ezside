@@ -3,32 +3,32 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QAction
+from worktoy.desc import AttriBox, Instance
 
-from ezside.app.menus import AbstractMenu
+from ezside.app.menus import AbstractMenu, Action
 
 
 class DebugMenu(AbstractMenu):
   """DebugMenu provides a debug menu for the main application window. """
 
-  debug1: QAction
-  debug2: QAction
-  debug3: QAction
-  debug4: QAction
-  debug5: QAction
-  debug6: QAction
-  debug7: QAction
-  debug8: QAction
-  debug9: QAction
+  debug01Action = AttriBox[Action](Instance, 'Debug01', icon='risitas')
+  debug02Action = AttriBox[Action](Instance, 'Debug02', icon='risitas')
+  debug03Action = AttriBox[Action](Instance, 'Debug03', icon='risitas')
+  debug04Action = AttriBox[Action](Instance, 'Debug04', icon='risitas')
+  debug05Action = AttriBox[Action](Instance, 'Debug05', icon='risitas')
+  debug06Action = AttriBox[Action](Instance, 'Debug06', icon='risitas')
+  debug07Action = AttriBox[Action](Instance, 'Debug07', icon='risitas')
+  debug08Action = AttriBox[Action](Instance, 'Debug08', icon='risitas')
+  debug09Action = AttriBox[Action](Instance, 'Debug09', icon='risitas')
 
   def initUi(self) -> None:
     """Initialize the user interface."""
-    self.debug1 = self.addAction(self.tr('Debug1'), 'debug1')
-    self.debug2 = self.addAction(self.tr('Debug2'), 'debug2')
-    self.debug3 = self.addAction(self.tr('Debug3'), 'debug3')
-    self.debug4 = self.addAction(self.tr('Debug4'), 'debug4')
-    self.debug5 = self.addAction(self.tr('Debug5'), 'debug5')
-    self.debug6 = self.addAction(self.tr('Debug6'), 'debug6')
-    self.debug7 = self.addAction(self.tr('Debug7'), 'debug7')
-    self.debug8 = self.addAction(self.tr('Debug8'), 'debug8')
-    self.debug9 = self.addAction(self.tr('Debug9'), 'debug9')
+    self.addAction(self.debug01Action)
+    self.addAction(self.debug02Action)
+    self.addAction(self.debug03Action)
+    self.addAction(self.debug04Action)
+    self.addAction(self.debug05Action)
+    self.addAction(self.debug06Action)
+    self.addAction(self.debug07Action)
+    self.addAction(self.debug08Action)
+    self.addAction(self.debug09Action)

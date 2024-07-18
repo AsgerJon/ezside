@@ -3,9 +3,9 @@
 # Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCharts import QChart
+from PySide6.QtGui import QAction
 
 
-class DataChart(QChart):
-  """Chart provides a base class for the real-time chart widgets."""
+class Action(QAction):
+  """Action subclasses QAction"""
 

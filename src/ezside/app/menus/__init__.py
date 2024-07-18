@@ -4,6 +4,7 @@ application window."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from ._action import Action
 from ._abstract_menu import AbstractMenu
 from ._file_menu import FileMenu
 from ._edit_menu import EditMenu

@@ -3,26 +3,28 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtGui import QAction
+from worktoy.desc import AttriBox, Instance
 
-from ezside.app.menus import AbstractMenu
+from ezside.app.menus import AbstractMenu, Action
 
 
 class HelpMenu(AbstractMenu):
   """HelpMenu provides a help menu for the main application window. """
 
-  aboutQt: QAction
-  aboutPySide6: QAction
-  aboutConda: QAction
-  aboutPython: QAction
-  help: QAction
+  aboutQtAction = AttriBox[Action](Instance, 'About Qt', icon='aboutQt')
+  aboutPySide6Action = AttriBox[Action](Instance,
+                                        'About PySide6',
+                                        icon='about_py_side6')
+  aboutCondaAction = AttriBox[Action](Instance,
+                                      'About Conda',
+                                      icon='aboutConda')
+  aboutPythonAction = AttriBox[Action](Instance,
+                                       'About Python',
+                                       icon='aboutPython')
 
   def initUi(self) -> None:
     """Initialize the user interface."""
-    self.aboutQt = self.addAction(self.tr('About Qt'), 'aboutQt')
-    self.aboutPySide6 = self.addAction(self.tr('About PySide6'),
-                                       'aboutPySide6')
-    self.aboutConda = self.addAction(self.tr('About Conda'), 'aboutConda')
-    self.aboutPython = self.addAction(self.tr('About Python'),
-                                      'aboutPython')
-    self.help = self.addAction(self.tr('Help'), 'help')
+    self.addAction(self.aboutQtAction)
+    self.addAction(self.aboutPySide6Action)
+    self.addAction(self.aboutCondaAction)
+    self.addAction(self.aboutPythonAction)

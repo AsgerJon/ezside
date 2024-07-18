@@ -4,7 +4,14 @@
 from __future__ import annotations
 
 from ezside.app.menus import AbstractMenu
+from ezside.app.menus import Action
 
 
 class EditMenu(AbstractMenu):
-  """EditMenu provides the Edit menu for the main application. """
+  """EditMenu provides the Edit menu for the main application."""
+  selectAllAction: Action
+  copyAction: Action
+  cutAction: Action
+  pasteAction: Action
+  undoAction: Action
+  redoAction: Action

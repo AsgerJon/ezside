@@ -4,7 +4,17 @@
 from __future__ import annotations
 
 from ezside.app.menus import AbstractMenu
+from ezside.app.menus import Action
 
 
 class DebugMenu(AbstractMenu):
-  """DebugMenu provides a debug menu for the main application window. """
+  """DebugMenu provides a debug menu for the main application window."""
+  debug01Action: Action
+  debug02Action: Action
+  debug03Action: Action
+  debug04Action: Action
+  debug05Action: Action
+  debug06Action: Action
+  debug07Action: Action
+  debug08Action: Action
+  debug09Action: Action

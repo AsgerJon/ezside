@@ -7,4 +7,6 @@ from PySide6.QtCharts import QScatterSeries
 
 
 class RollSeries(QScatterSeries):
-  """RollData provides a pythonic data structure for a FIFO buffered data."""
+  """RollData provides a pythonic data structure for a FIFO buffered
+   data."""
+

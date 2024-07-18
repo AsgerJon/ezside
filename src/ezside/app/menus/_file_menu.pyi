@@ -4,7 +4,15 @@
 from __future__ import annotations
 
 from ezside.app.menus import AbstractMenu
+from ezside.app.menus import Action
 
 
 class FileMenu(AbstractMenu):
-  """FileMenu provides the file menu for the main application window. It subclasses the AbstractMenu class. """
+  """FileMenu provides the file menu for the main application window. It
+   subclasses the AbstractMenu class."""
+  newAction: Action
+  openAction: Action
+  saveAction: Action
+  saveAsAction: Action
+  prefAction: Action
+  exitAction: Action

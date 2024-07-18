@@ -4,7 +4,12 @@
 from __future__ import annotations
 
 from ezside.app.menus import AbstractMenu
+from ezside.app.menus import Action
 
 
 class HelpMenu(AbstractMenu):
-  """HelpMenu provides a help menu for the main application window. """
+  """HelpMenu provides a help menu for the main application window."""
+  aboutQtAction: Action
+  aboutPySide6Action: Action
+  aboutCondaAction: Action
+  aboutPythonAction: Action

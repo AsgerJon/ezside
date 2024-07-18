@@ -43,9 +43,13 @@ class MainMenuBar(QMenuBar):
   def initUi(self, ) -> None:
     """Initializes the user interface for the widget. Required for subclasses
     to implement. """
+    self.fileMenu.initUi()
     self.addMenu(self.fileMenu)
+    self.editMenu.initUi()
     self.addMenu(self.editMenu)
+    self.helpMenu.initUi()
     self.addMenu(self.helpMenu)
+    self.debugMenu.initUi()
     self.addMenu(self.debugMenu)
 
   def initSignalSlot(self) -> None:

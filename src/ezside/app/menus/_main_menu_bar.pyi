@@ -11,7 +11,8 @@ from ezside.app.menus import DebugMenu
 
 
 class MainMenuBar(QMenuBar):
-  """MainMenuBar subclasses QMenuBar and brings common menus with common actions. """
+  """MainMenuBar subclasses QMenuBar and brings common menus with common
+   actions."""
   fileMenu: FileMenu
   editMenu: EditMenu
   helpMenu: HelpMenu
