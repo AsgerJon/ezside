@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import Qt, QThread
+from PySide6.QtCore import Qt, QThread, QSettings
 from PySide6.QtWidgets import QApplication, QMainWindow
 from icecream import ic
 from worktoy.desc import EmptyField
@@ -25,7 +25,7 @@ class App(QApplication):
   __main_window_class__ = None  # QMainWindow
   __main_window_instance__ = None
 
-  main = EmptyField()
+  mainWindow = EmptyField()
 
   def _createMainWindow(self) -> None:
     """Creator-function for the main window instance."""
@@ -41,7 +41,7 @@ class App(QApplication):
       raise TypeError(e)
     self.__main_window_instance__ = cls()
 
-  @main.GET
+  @mainWindow.GET
   def _getMain(self, **kwargs) -> QMainWindow:
     """Getter-function for the main window instance. """
     if self.__main_window_instance__ is None:
@@ -69,3 +69,12 @@ class App(QApplication):
 
   def registerThread(self, thread: QThread) -> None:
     """Method responsible for registering threads."""
+
+  def getSettings(self) -> QSettings:
+    """Method responsible for getting settings."""
+    return QSettings()
+
+  def exec(self) -> int:
+    """Method responsible for executing the application."""
+    self.mainWindow.show()
+    return QApplication.exec_(self)
