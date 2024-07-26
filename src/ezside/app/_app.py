@@ -9,6 +9,7 @@ from PySide6.QtCore import Qt, QThread, QSettings
 from PySide6.QtWidgets import QApplication, QMainWindow
 from icecream import ic
 from worktoy.desc import EmptyField
+from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
 ic.configureOutput(includeContext=True, )
@@ -26,6 +27,31 @@ class App(QApplication):
   __main_window_instance__ = None
 
   mainWindow = EmptyField()
+
+  def __init__(self, *args) -> None:
+    cls, appArgs = None, None
+    for arg in args:
+      if isinstance(arg, type):
+        if issubclass(arg, QMainWindow):
+          cls = arg
+      elif isinstance(arg, list):
+        appArgs = arg
+    QApplication.__init__(self, maybe(appArgs, []))
+    if not issubclass(cls, QMainWindow):
+      e = """The class must be a subclass of QMainWindow!"""
+      raise TypeError(e)
+    if cls is not None:
+      self.setMainWindowClass(cls)
+
+  def setMainWindowClass(self, cls: type) -> None:
+    """Setter-function for the main window class."""
+    if self.__main_window_class__ is not None:
+      e = """Main window class already exists!"""
+      raise AttributeError(e)
+    if not issubclass(cls, QMainWindow):
+      e = """The class must be a subclass of QMainWindow!"""
+      raise TypeError(e)
+    self.__main_window_class__ = cls
 
   def _createMainWindow(self) -> None:
     """Creator-function for the main window instance."""
@@ -53,13 +79,6 @@ class App(QApplication):
       return self.__main_window_instance__
     e = typeMsg('mainWindow', self.__main_window_instance__, QMainWindow)
     raise TypeError(e)
-
-  def __init__(self, cls: type, ) -> None:
-    QApplication.__init__(self, [])
-    if not issubclass(cls, QMainWindow):
-      e = """The class must be a subclass of QMainWindow!"""
-      raise TypeError(e)
-    self.__main_window_class__ = cls
 
   def closeThreads(self, ) -> None:
     """Method responsible for closing threads. """

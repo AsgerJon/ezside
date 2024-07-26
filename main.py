@@ -7,7 +7,7 @@ from types import ModuleType
 import inspect
 
 from PySide6.QtWidgets import QWidget
-from worktoy.yolo import yolo, stubGen
+from worktoy.yolo import yolo
 
 import ezside
 from ezside.app import App, MainWindow
@@ -15,25 +15,8 @@ from ezside.app import App, MainWindow
 
 def tester01() -> int:
   """Main Tester Script"""
-  return App(MainWindow, ).exec()
-
-
-def tester02() -> int:
-  """Rubbing stub generation"""
-
-  for (key, val) in ezside.__dict__.items():
-    if isinstance(val, ModuleType):
-      for (key, val) in val.__dict__.items():
-        if isinstance(val, ModuleType):
-          for (key2, val2) in val.__dict__.items():
-            if isinstance(val2, type(QWidget)):
-              if 'ezside' in val2.__module__:
-                stubGen(val2)
-        if isinstance(val, type(QWidget)):
-          if 'ezside' in val.__module__:
-            stubGen(val)
-  return 0
+  return App(MainWindow).exec()
 
 
 if __name__ == '__main__':
-  yolo(tester02)
+  yolo(tester01)

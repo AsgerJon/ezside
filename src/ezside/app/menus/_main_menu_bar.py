@@ -10,7 +10,7 @@ from PySide6.QtCore import Signal
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenuBar, QMenu
 from icecream import ic
-from worktoy.desc import AttriBox
+from worktoy.desc import AttriBox, Instance
 
 from ezside.app.menus import FileMenu, EditMenu, HelpMenu, \
   DebugMenu, AbstractMenu
@@ -27,10 +27,10 @@ class MainMenuBar(QMenuBar):
   __iter_contents__ = None
   __added_menus__ = None
 
-  fileMenu = AttriBox[FileMenu]()
-  editMenu = AttriBox[EditMenu]()
-  helpMenu = AttriBox[HelpMenu]()
-  debugMenu = AttriBox[DebugMenu]()
+  fileMenu = AttriBox[FileMenu]('File', Instance)
+  editMenu = AttriBox[EditMenu]('Edit', Instance)
+  helpMenu = AttriBox[HelpMenu]('Help', Instance)
+  debugMenu = AttriBox[DebugMenu]('DEBUG', Instance)
 
   hoverText = Signal(str)
 
