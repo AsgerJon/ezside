@@ -21,6 +21,7 @@ class HelpMenu(AbstractMenu):
   aboutPythonAction = AttriBox[Action](Instance,
                                        'About Python',
                                        icon='aboutPython')
+  helpAction = AttriBox[Action](Instance, 'Help', icon='help')
 
   def initUi(self) -> None:
     """Initialize the user interface."""

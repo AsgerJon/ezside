@@ -10,6 +10,7 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenu, QMenuBar
 from icecream import ic
+from worktoy.parse import maybe
 from worktoy.text import monoSpace
 
 if TYPE_CHECKING:
@@ -65,8 +66,18 @@ class AbstractMenu(QMenu):
 
   def addAction(self, *args) -> QAction:
     """Add an action to the menu."""
+    if args:
+      if isinstance(args[0], QAction):
+        icon = QAction.icon(args[0])
+        title = QAction.text(args[0])
+        shortcut = QAction.shortcut(args[0])
+        action = QMenu.addAction(self, icon, title, shortcut)
+        if isinstance(action, QAction):
+          return action
     strArgs = [arg for arg in args if isinstance(arg, str)]
     title, name = [*strArgs, None, None][:2]
+    print('lmao', args, strArgs)
+    name = maybe(name, title).lower()
     app = QCoreApplication.instance()
     settings = getattr(app, 'getSettings', )()
     icon = settings.value('icon/%s' % name, None)

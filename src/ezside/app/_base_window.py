@@ -8,17 +8,13 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import Any, Callable
 
-from PySide6.QtCore import Signal, QUrl, Slot
-from PySide6.QtGui import QDesktopServices, QColor
+from PySide6.QtCore import QUrl, Slot, Signal
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QApplication
 from icecream import ic
 from worktoy.desc import Instance, AttriBox
 
 from ezside.app.menus import MainMenuBar, MainStatusBar
-from ezside.dialogs import ColorSelection, \
-  FontSelection, \
-  OpenFile, \
-  FolderSelection, SaveFile, UserInt
 
 ic.configureOutput(includeContext=True, )
 
@@ -27,6 +23,12 @@ class BaseWindow(QMainWindow):
   """BaseWindow class provides menus and actions for the application."""
 
   __is_initialized__ = None
+  __is_closing__ = False
+
+  pulse = Signal()
+  requestQuit = Signal()
+  confirmQuit = Signal()
+  requestHelp = Signal()
 
   mainMenuBar = AttriBox[MainMenuBar](Instance, )
   mainStatusBar = AttriBox[MainStatusBar](Instance, )
@@ -65,34 +67,38 @@ class BaseWindow(QMainWindow):
     ic('Initializing core connections')
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Connecting File Menu Actions
-    self.new = self.mainMenuBar.file.new
-    self.open = self.mainMenuBar.file.open
-    self.save = self.mainMenuBar.file.save
-    self.saveAs = self.mainMenuBar.file.saveAs
-    self.preferences = self.mainMenuBar.file.preferences
-    self.exit = self.mainMenuBar.file.exit
+    self.new = self.mainMenuBar.fileMenu.newAction
+    self.open = self.mainMenuBar.fileMenu.openAction
+    self.save = self.mainMenuBar.fileMenu.saveAction
+    self.saveAs = self.mainMenuBar.fileMenu.saveAsAction
+    self.preferences = self.mainMenuBar.fileMenu.prefAction
+    self.exit = self.mainMenuBar.fileMenu.exitAction
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Connecting Edit Menu Actions
-    self.selectAll = self.mainMenuBar.edit.selectAll
-    self.copy = self.mainMenuBar.edit.copy
-    self.cut = self.mainMenuBar.edit.cut
-    self.paste = self.mainMenuBar.edit.paste
-    self.undo = self.mainMenuBar.edit.undo
-    self.redo = self.mainMenuBar.edit.redo
+    self.selectAll = self.mainMenuBar.editMenu.selectAllAction
+    self.copy = self.mainMenuBar.editMenu.copyAction
+    self.cut = self.mainMenuBar.editMenu.cutAction
+    self.paste = self.mainMenuBar.editMenu.pasteAction
+    self.undo = self.mainMenuBar.editMenu.undoAction
+    self.redo = self.mainMenuBar.editMenu.redoAction
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Connecting Help Menu Actions
-    self.aboutQt = self.mainMenuBar.help.aboutQt
-    self.aboutConda = self.mainMenuBar.help.aboutConda
-    self.aboutPython = self.mainMenuBar.help.aboutPython
-    self.aboutPySide6 = self.mainMenuBar.help.aboutPySide6
-    self.help = self.mainMenuBar.help.help
+    self.aboutQt = self.mainMenuBar.helpMenu.aboutQtAction
+    self.aboutConda = self.mainMenuBar.helpMenu.aboutCondaAction
+    self.aboutPython = self.mainMenuBar.helpMenu.aboutPythonAction
+    self.aboutPySide6 = self.mainMenuBar.helpMenu.aboutPySide6Action
+    self.help = self.mainMenuBar.helpMenu.helpAction
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    #  Connecting dialogs
-    self.colorSelected.connect(lambda color: print(color))
-    self.fontSelected.connect(lambda font: print(font))
-    self.openFileSelected.connect(lambda file: print(file))
-    self.saveFileSelected.connect(lambda file: print(file))
-    self.folderSelected.connect(lambda folder: print(folder))
+    #  Connecting Debug Menu Actions
+    self.debug1 = self.mainMenuBar.debugMenu.debug01Action
+    self.debug2 = self.mainMenuBar.debugMenu.debug02Action
+    self.debug3 = self.mainMenuBar.debugMenu.debug03Action
+    self.debug4 = self.mainMenuBar.debugMenu.debug04Action
+    self.debug5 = self.mainMenuBar.debugMenu.debug05Action
+    self.debug6 = self.mainMenuBar.debugMenu.debug06Action
+    self.debug7 = self.mainMenuBar.debugMenu.debug07Action
+    self.debug8 = self.mainMenuBar.debugMenu.debug08Action
+    self.debug9 = self.mainMenuBar.debugMenu.debug09Action
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     #  Connecting pulse signal
     self.pulse.connect(self.mainStatusBar.updateTime)

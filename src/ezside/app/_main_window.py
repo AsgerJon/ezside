@@ -19,40 +19,7 @@ class MainWindow(LayoutWindow):
   """MainWindow subclasses the LayoutWindow and provides the main
   application business logic."""
 
-  fileMenu: FileMenu
-  editMenu: EditMenu
-  helpMenu: HelpMenu
-
-  new: QAction
-  open: QAction
-  save: QAction
-  saveAs: QAction
-  preferences: QAction
-  exit: QAction
-  aboutQt: QAction
-  aboutPySide6: QAction
-  aboutConda: QAction
-  aboutPython: QAction
-  help: QAction
-  undo: QAction
-  redo: QAction
-  selectAll: QAction
-  copy: QAction
-  cut: QAction
-  paste: QAction
-
   __debug_flag__ = True
-  debug1: QAction
-  debug2: QAction
-  debug3: QAction
-  debug4: QAction
-  debug5: QAction
-  debug6: QAction
-  debug7: QAction
-  debug8: QAction
-  debug9: QAction
-
-  debug: DebugMenu
 
   def initSignalSlot(self) -> None:
     """Initialize the actions."""
