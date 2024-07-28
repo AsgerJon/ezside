@@ -3,19 +3,21 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from types import ModuleType
-import inspect
+import sys
 
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Qt
 from worktoy.yolo import yolo
 
-import ezside
 from ezside.app import App, MainWindow
 
 
 def tester01() -> int:
   """Main Tester Script"""
-  return App(MainWindow).exec()
+  app = App(sys.argv)
+  app.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeMenuBar)
+  window = MainWindow()
+  window.show()
+  return app.exec()
 
 
 if __name__ == '__main__':
