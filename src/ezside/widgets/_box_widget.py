@@ -16,7 +16,7 @@ class BoxWidget(QWidget):
   """BoxWidget provides a base class for other widgets that need to paint on
   a background that supports the box model."""
 
-  backgroundColor = AttriBox[QColor](QColor(127, 255, 0, 255))
+  backgroundColor = AttriBox[QColor](QColor(169, 255, 0, 255))
   textColor = AttriBox[QColor](QColor(0, 0, 0, 255))
   borderColor = AttriBox[QColor](QColor(0, 0, 0, 255))
 

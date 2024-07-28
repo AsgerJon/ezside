@@ -3,8 +3,9 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QSize
-from PySide6.QtGui import (QFont, QFontMetrics, QPaintEvent, QPainter)
+from PySide6.QtCore import QSize, QSizeF
+from PySide6.QtGui import (QFont, QFontMetrics, QPaintEvent, QPainter,
+                           QColor)
 from PySide6.QtWidgets import QWidget
 from worktoy.desc import AttriBox, EmptyField
 
@@ -33,15 +34,22 @@ class TextLabel(BoxWidget):
     """This method returns the bounding size of the text with the given
     font. """
     if isinstance(self.font, QFont):
-      return QFontMetrics(self.font).boundingRect(self.text).size()
+      rect = QFontMetrics(self.font).boundingRect(self.text)
+      rect = rect.marginsAdded(self._getPadding())
+      rect = rect.marginsAdded(self._getBorder())
+      rect = rect.marginsAdded(self._getMargin())
+      return rect.size()
 
   @text.ONSET
   def _handleNewText(self, *args) -> None:
     """This method is triggered when the text at the text field is
     changed. """
     requiredSize = self._textBoundingSize()
-    self.setFixedSize(requiredSize)
-    self.update()
+    if isinstance(requiredSize, QSizeF):
+      requiredSize = QSizeF.toSize(requiredSize)
+    if isinstance(requiredSize, QSize):
+      self.setFixedSize(requiredSize)
+      self.update()
 
   def __init__(self, *args, **kwargs) -> None:
     parent, text = None, None
@@ -51,6 +59,8 @@ class TextLabel(BoxWidget):
       if isinstance(arg, str) and text is None:
         text = arg
       if parent is not None and text is not None:
+        BoxWidget.__init__(self, parent)
+        self.text = text
         break
     else:
       if parent is None:
@@ -58,6 +68,8 @@ class TextLabel(BoxWidget):
       else:
         BoxWidget.__init__(self, parent)
     self._handleNewText()
+    self.backgroundColor = QColor(191, 191, 191, 255)
+    self.borderColor = QColor(0, 0, 0, 255)
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Implementation of the paint event"""

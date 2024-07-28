@@ -8,11 +8,10 @@ from __future__ import annotations
 import os
 
 from PySide6.QtCore import QSize
-from PySide6.QtGui import QPixmap, QIcon, QKeySequence
-from PySide6.QtWidgets import QMainWindow, QMenu
-from worktoy.desc import AttriBox, THIS
+from PySide6.QtGui import QPixmap, QIcon, QKeySequence, QShowEvent
+from PySide6.QtWidgets import QMainWindow, QMenuBar, QStatusBar
 
-from ezside.app import MenuBar
+from ezside.app import StatusBar
 
 
 class BaseWindow(QMainWindow):
@@ -31,15 +30,10 @@ class BaseWindow(QMainWindow):
 
   def __init__(self, ) -> None:
     QMainWindow.__init__(self, )
-    self.setStyleSheet("""
-      QMenu::icon {
-        width: 64px;
-        height: 64px;
-      }
-    """)
     self.setWindowTitle('EZSide')
     self.setMinimumSize(QSize(800, 600))
-    self.setMenuBar(MenuBar())
+    self.setMenuBar(QMenuBar())
+    self.setStatusBar(StatusBar(self, ))
     self.fileMenu = self.menuBar().addMenu('File')
     self.editMenu = self.menuBar().addMenu('Edit')
     self.helpMenu = self.menuBar().addMenu('Help')
@@ -98,3 +92,13 @@ class BaseWindow(QMainWindow):
     self.debugAction09 = self.debugMenu.addAction('DEBUG 09')
     self.debugAction09.setIcon(self._getIcon('risitas'))
     self.debugAction09.setShortcut(QKeySequence.fromString('F9'))
+
+  def show(self) -> None:
+    """Reimplementation setting up signals and slots before invoking
+    parent method."""
+    QMainWindow.show(self)
+
+  def showEvent(self, event: QShowEvent) -> None:
+    """Show the main window."""
+    QMainWindow.showEvent(self, event)
+    print('%s - Show event' % self.__class__.__name__)
