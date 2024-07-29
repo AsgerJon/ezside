@@ -6,10 +6,10 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QMargins, QSize, QRect, QPoint, QSizeF
+from PySide6.QtCore import Qt, QMargins, QSize, QRect, QPoint, QSizeF, QRectF
 from PySide6.QtGui import QColor, QBrush, QPaintEvent, QPainter, \
   QResizeEvent, QShowEvent
-from PySide6.QtWidgets import QHBoxLayout, QWidget, QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QHBoxLayout, QSizePolicy
 from icecream import ic
 from worktoy.desc import AttriBox, THIS, EmptyField
 
@@ -70,6 +70,8 @@ class DigitalClock(BoxWidget):
   """DigitalClock provides a widget displaying the current time using seven
   segment displays."""
 
+  __fallback_height__ = 48
+
   layout = AttriBox[QHBoxLayout](THIS)
   oneSec = AttriBox[SevenSeg]()
   tenSec = AttriBox[SevenSeg]()
@@ -100,22 +102,55 @@ class DigitalClock(BoxWidget):
     """This method returns the current second."""
     return datetime.now().second
 
-  def __init__(self, parent=None) -> None:
+  def __init__(self, parent=None, *args) -> None:
     """The constructor method for the DigitalClock widget."""
+    height = None
+    for arg in args:
+      if isinstance(arg, QSizeF):
+        height = QSizeF.toSize(arg).height()
+        break
+      if isinstance(arg, QSize):
+        height = QSize.height(arg)
+        break
+      if isinstance(arg, (int, float)):
+        height = int(arg)
+        break
+      if isinstance(arg, QRectF):
+        height = QRectF.toRect(arg).height()
+        break
+      if isinstance(arg, QRect):
+        height = QRect.height(arg)
+        break
+    else:
+      height = self.__fallback_height__
+
     BoxWidget.__init__(self, parent)
     self.backgroundColor = QColor(0, 0, 0, 255)
-    self.setMinimumWidth(int(7 * 48 / 1.5))
-    self.setMinimumHeight(int(48))
-    w, h = self.minimumWidth(), self.minimumHeight()
-    self.aspectRatio = h / w
+    width = int(6 * (height / 1.5) + 2 * (height / 2))
+    self.aspectRatio = float(height) / float(width)
     QHBoxLayout.setContentsMargins(self.layout, 0, 0, 0, 0)
     QHBoxLayout.setSpacing(self.layout, 0)
     QHBoxLayout.setAlignment(self.layout, Qt.AlignmentFlag.AlignRight)
+    segSize = QSizeF(height / 1.5, height).toSize()
+    colSize = QSizeF(height / 2, height).toSize()
+    ic(segSize)
+    ic(colSize)
     for widget in self._getWidgets():
+      if type(widget) is SevenSeg:
+        setattr(widget, 'aspectRatio', 1.5)
+        SevenSeg.setFixedSize(widget, segSize)
+      elif type(widget) is Colon:
+        setattr(widget, 'aspectRatio', 2.)
+        Colon.setFixedSize(widget, colSize)
+      else:
+        ic(type(widget))
+        ic(SevenSeg)
+        ic(Colon)
+        break
+        continue
       setattr(widget, 'lowColor', QColor(63, 0, 0, 255))
       setattr(widget, 'highColor', QColor(255, 0, 0, 255))
       setattr(widget, 'padding', QMargins(1, 1, 1, 1))
-      setattr(widget, 'aspectRatio', 1.5)
       setattr(widget, 'backgroundColor', QColor(0, 0, 0, 255))
       self.layout.addWidget(widget)
     self.refreshTime()
@@ -156,3 +191,8 @@ class DigitalClock(BoxWidget):
     """This method is responsible for showing the widget."""
     self.refreshTime(_recursion=True)
     BoxWidget.showEvent(self, event)
+
+  def resize(self, newSize: QSize) -> None:
+    """This method is responsible for resizing the widget."""
+    rect = QRectF.toRect(self._enforceAspect(QRect(QPoint(0, 0), newSize)))
+    BoxWidget.resize(self, rect.size())

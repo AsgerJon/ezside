@@ -10,6 +10,7 @@ from worktoy.keenum import auto, KeeNum
 from worktoy.yolo import yolo
 
 from ezside.app import App, MainWindow
+from main_tester_class01 import ComplexNumber
 
 
 def tester01() -> int:
@@ -21,5 +22,14 @@ def tester01() -> int:
   return app.exec()
 
 
+def tester02() -> int:
+  """Testing AttriClass/AttriBox issue"""
+
+  z = ComplexNumber()
+  print(z)
+  print(z.realPart)
+  print(type(z.realPart))
+
+
 if __name__ == '__main__':
-  yolo(tester01)
+  yolo(tester02)
