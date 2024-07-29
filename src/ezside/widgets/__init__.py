@@ -6,3 +6,5 @@ from __future__ import annotations
 
 from ._box_widget import BoxWidget
 from ._text_label import TextLabel
+from ._seven_seg import SevenSeg
+from ._digital_clock import DigitalClock

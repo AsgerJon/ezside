@@ -7,17 +7,23 @@ from __future__ import annotations
 
 import os
 
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Signal, QTimer, Qt
 from PySide6.QtGui import QPixmap, QIcon, QKeySequence, QShowEvent
 from PySide6.QtWidgets import QMainWindow, QMenuBar, QStatusBar
+from worktoy.desc import AttriBox, THIS
 
 from ezside.app import StatusBar
+from ezside.tools import Timer
 
 
 class BaseWindow(QMainWindow):
   """BaseWindow subclasses QMainWindow and provides a base window for the
   application. It implements menus, menubar and statusbar. It is intended to
   be further subclassed to implement widget layout and business logic. """
+
+  pulse = Signal()
+  timer = AttriBox[Timer](THIS, Qt.TimerType.PreciseTimer, 500, False)
+  mainStatusBar = AttriBox[StatusBar](THIS)
 
   @classmethod
   def _getIcon(cls, menu: str) -> QIcon:
@@ -31,9 +37,9 @@ class BaseWindow(QMainWindow):
   def __init__(self, ) -> None:
     QMainWindow.__init__(self, )
     self.setWindowTitle('EZSide')
-    self.setMinimumSize(QSize(800, 600))
     self.setMenuBar(QMenuBar())
-    self.setStatusBar(StatusBar(self, ))
+    self.mainStatusBar.adjustSize()
+    self.setStatusBar(self.mainStatusBar)
     self.fileMenu = self.menuBar().addMenu('File')
     self.editMenu = self.menuBar().addMenu('Edit')
     self.helpMenu = self.menuBar().addMenu('Help')
@@ -92,6 +98,7 @@ class BaseWindow(QMainWindow):
     self.debugAction09 = self.debugMenu.addAction('DEBUG 09')
     self.debugAction09.setIcon(self._getIcon('risitas'))
     self.debugAction09.setShortcut(QKeySequence.fromString('F9'))
+    self.timer.timeout.connect(self.pulse.emit)
 
   def show(self) -> None:
     """Reimplementation setting up signals and slots before invoking

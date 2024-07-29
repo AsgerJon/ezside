@@ -25,7 +25,7 @@ def textPen(color: QColor = None) -> QPen:
   return pen
 
 
-def dashPen(color: QColor = None) -> QPen:
+def dashPen(color: QColor = None, ) -> QPen:
   """Creates a QPen suitable for drawing dashed lines. The pen will default
   to black, but this can be overridden by passing a color argument."""
   pen = QPen()
@@ -40,4 +40,27 @@ def dotPen(color: QColor = None) -> QPen:
   pen = QPen()
   pen.setStyle(Qt.PenStyle.DotLine)
   pen.setColor(maybe(color, QColor(0, 0, 0, 255)))
+  return pen
+
+
+def parsePen(*args) -> QPen:
+  """Parses the given arguments to an instance of QPen. """
+  color, width, style = None, None, None
+  for arg in args:
+    if isinstance(arg, QColor) and color is None:
+      color = arg
+    elif isinstance(arg, int) and width is None:
+      width = arg
+    elif isinstance(arg, Qt.PenStyle) and style is None:
+      style = arg
+    if color is not None and width is not None and style is not None:
+      break
+  else:
+    color = maybe(color, QColor(0, 0, 0, 255))
+    width = maybe(width, 1)
+    style = maybe(style, Qt.PenStyle.SolidLine)
+  pen = QPen()
+  pen.setColor(color)
+  pen.setWidth(width)
+  pen.setStyle(style)
   return pen
