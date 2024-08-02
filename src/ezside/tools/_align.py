@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import TypeAlias, Union, Self
 
 from PySide6.QtCore import QRect, QRectF, QPointF
-from worktoy.desc import EmptyField
+from worktoy.desc import Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.text import monoSpace, typeMsg
 
@@ -16,8 +16,8 @@ Rect: TypeAlias = Union[QRect, QRectF]
 class Align(KeeNum):
   """Align provides a KeeNum enumeration of alignments."""
 
-  horizontal = EmptyField()
-  vertical = EmptyField()
+  horizontal = Field()
+  vertical = Field()
 
   CENTER = auto()
 

@@ -9,7 +9,7 @@ from PySide6.QtCore import QSize, QSizeF, QRect, QMargins, QRectF
 from PySide6.QtGui import (QFont, QFontMetrics, QPaintEvent, QPainter,
                            QColor, QPen)
 from PySide6.QtWidgets import QWidget, QSizePolicy
-from worktoy.desc import AttriBox, EmptyField
+from worktoy.desc import AttriBox, Field
 from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
@@ -29,12 +29,12 @@ class TextLabel(BoxWidget):
   fontFamily = AttriBox[str]('Courier')
   fontSize = AttriBox[int](12)
 
-  alignment = EmptyField()
-  fontWeight = EmptyField()
-  textFont = EmptyField()
-  metrics = EmptyField()
-  textRect = EmptyField()
-  pen = EmptyField()
+  alignment = Field()
+  fontWeight = Field()
+  textFont = Field()
+  metrics = Field()
+  textRect = Field()
+  pen = Field()
 
   @alignment.GET
   def _getAlignment(self) -> Align:

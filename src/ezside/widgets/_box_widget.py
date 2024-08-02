@@ -9,7 +9,7 @@ from typing import TypeAlias, Union
 from PySide6.QtCore import QMargins, QRect, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush
 from PySide6.QtWidgets import QWidget
-from worktoy.desc import AttriBox, EmptyField
+from worktoy.desc import AttriBox, Field
 from worktoy.parse import maybe
 
 from ezside.tools import fillBrush, emptyPen
@@ -33,15 +33,15 @@ class BoxWidget(QWidget):
   borderColor = AttriBox[QColor](QColor(0, 0, 0, 0))
   backgroundColor = AttriBox[QColor](QColor(0, 0, 0, 0))
 
-  viewRect = EmptyField()
-  marginedRect = EmptyField()
-  borderedRect = EmptyField()
-  paddingRect = EmptyField()
-  contentRect = EmptyField()
+  viewRect = Field()
+  marginedRect = Field()
+  borderedRect = Field()
+  paddingRect = Field()
+  contentRect = Field()
 
-  marginBrush = EmptyField()
-  borderBrush = EmptyField()
-  backgroundBrush = EmptyField()
+  marginBrush = Field()
+  borderBrush = Field()
+  backgroundBrush = Field()
 
   @marginBrush.GET
   def _getMarginBrush(self) -> QBrush:

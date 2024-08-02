@@ -5,8 +5,7 @@ in AttriBox descriptors."""
 from __future__ import annotations
 
 from PySide6.QtCore import QTimer, Qt
-from PySide6.QtWidgets import QMainWindow
-from worktoy.meta import BaseMetaclass, overload
+from PySide6.QtWidgets import QMainWindow, QWidget
 from worktoy.parse import maybe
 
 
@@ -14,29 +13,25 @@ class Timer(QTimer, ):
   """Timer provides a subclass of QTimer providing improved support for use
   in AttriBox descriptors."""
 
-  def __init__(self, parent: QMainWindow = None, *args, ) -> None:
-    QTimer.__init__(self, parent)
-    interval, timerType, singleShot = None, None, None
+  def __init__(self, *args) -> None:
+    _parent, _interval, _type, _single = None, None, None, None
     for arg in args:
-      if isinstance(arg, int) and interval is None:
-        interval = arg
-      elif isinstance(arg, Qt.TimerType) and timerType is None:
-        timerType = arg
-      elif isinstance(arg, bool) and singleShot is None:
-        singleShot = arg
-    self.setInterval(maybe(interval, 1000))
-    self.setTimerType(maybe(timerType, Qt.TimerType.CoarseTimer))
-    self.setSingleShot(maybe(singleShot, False))
-
-  def _timeout(self) -> None:
-    """This method is called when the timer times out. It is intended to be
-    overridden by subclasses."""
-    pass
-
-  def start(self, *args, **kwargs) -> None:
-    """Start the timer with the specified arguments."""
-    super().start(*args, **kwargs)
-
-  def stop(self) -> None:
-    """Stop the timer."""
-    super().stop()
+      if isinstance(arg, QWidget) and _parent is None:
+        _parent = arg
+      if isinstance(arg, int) and _interval is None:
+        _interval = arg
+      if isinstance(arg, Qt.TimerType) and _type is None:
+        _type = arg
+      if isinstance(arg, bool) and _single is None:
+        _single = arg
+      if all([i is not None for i in [_parent, _interval, _type, _single]]):
+        break
+    else:
+      _parent = maybe(_parent, None)
+      _interval = maybe(_interval, 0)
+      _type = maybe(_type, Qt.TimerType.PreciseTimer)
+      _single = maybe(_single, False)
+    QTimer.__init__(self, _parent)
+    self.setInterval(_interval)
+    self.setTimerType(_type)
+    self.setSingleShot(_single)

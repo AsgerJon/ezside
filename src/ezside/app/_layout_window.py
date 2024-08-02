@@ -6,11 +6,11 @@ for a further subclass."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy, QLayout
-from worktoy.desc import THIS, AttriBox
+from PySide6.QtWidgets import QVBoxLayout, QLayout
+from worktoy.desc import AttriBox
 
 from ezside.app import BaseWindow
-from ezside.widgets import TextLabel, BoxWidget, SevenSeg, DigitalClock
+from ezside.widgets import TextLabel, BoxWidget
 
 
 class LayoutWindow(BaseWindow):
@@ -18,9 +18,9 @@ class LayoutWindow(BaseWindow):
   organizing the widget layout of the main window, leaving business logic
   for a further subclass."""
 
-  baseWidget = AttriBox[BoxWidget](THIS)
+  baseWidget = AttriBox[BoxWidget]()
   baseLayout = AttriBox[QVBoxLayout]()
-  welcomeLabel = AttriBox[TextLabel](THIS, 'YOLO')
+  welcomeLabel = AttriBox[TextLabel]('YOLO')
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the object"""

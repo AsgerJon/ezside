@@ -8,7 +8,7 @@ from typing import TypeAlias, Union, Self
 from PySide6.QtCore import QSize, QSizeF, QPoint, QPointF, QRect, QRectF, \
   QMarginsF
 from PySide6.QtGui import QPaintEvent, QPainter, QColor, QPen, QBrush
-from worktoy.desc import AttriBox, EmptyField
+from worktoy.desc import AttriBox, Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.parse import maybe
 
@@ -23,8 +23,8 @@ class Segment(KeeNum):
   """Segment provides an enumeration of the seven segments of a seven
   segment display."""
 
-  horizontal = EmptyField()
-  vertical = EmptyField()
+  horizontal = Field()
+  vertical = Field()
 
   A = auto(0, 2, 3, 5, 6, 7, 8, 9)
   B = auto(0, 1, 2, 3, 4, 7, 8, 9)
@@ -83,11 +83,11 @@ class SevenSeg(BoxWidget):
   lowColor = AttriBox[QColor](QColor(127, 0, 0, 255))
   aspectRatio = AttriBox[float](1.5)
 
-  aspectRect = EmptyField()
-  digit = EmptyField()
-  segmentPen = EmptyField()
-  highBrush = EmptyField()
-  lowBrush = EmptyField()
+  aspectRect = Field()
+  digit = Field()
+  segmentPen = Field()
+  highBrush = Field()
+  lowBrush = Field()
 
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""

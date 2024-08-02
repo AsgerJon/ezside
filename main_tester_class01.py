@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from worktoy.desc import AttriBox, AttriClass
+from worktoy.desc import AttriBox
 from worktoy.parse import maybe
 
 

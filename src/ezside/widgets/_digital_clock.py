@@ -11,7 +11,7 @@ from PySide6.QtGui import QColor, QBrush, QPaintEvent, QPainter, \
   QResizeEvent, QShowEvent
 from PySide6.QtWidgets import QHBoxLayout, QSizePolicy
 from icecream import ic
-from worktoy.desc import AttriBox, THIS, EmptyField
+from worktoy.desc import AttriBox, Field
 
 from ezside.tools import emptyPen
 from ezside.widgets import BoxWidget, SevenSeg
@@ -36,7 +36,7 @@ class Colon(BoxWidget):
 
   color = AttriBox[QColor](QColor(255, 0, 0, 255))
 
-  brush = EmptyField()
+  brush = Field()
 
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
@@ -72,7 +72,7 @@ class DigitalClock(BoxWidget):
 
   __fallback_height__ = 48
 
-  layout = AttriBox[QHBoxLayout](THIS)
+  layout = AttriBox[QHBoxLayout]()
   oneSec = AttriBox[SevenSeg]()
   tenSec = AttriBox[SevenSeg]()
   colon1 = AttriBox[Colon]()
@@ -83,9 +83,9 @@ class DigitalClock(BoxWidget):
   tenHour = AttriBox[SevenSeg]()
   spacer = AttriBox[Spacer]()
 
-  hour = EmptyField()
-  minute = EmptyField()
-  second = EmptyField()
+  hour = Field()
+  minute = Field()
+  second = Field()
 
   @hour.GET
   def _getHour(self) -> int:

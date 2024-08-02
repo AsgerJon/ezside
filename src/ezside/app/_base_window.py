@@ -10,7 +10,7 @@ import os
 from PySide6.QtCore import QSize, Signal, QTimer, Qt
 from PySide6.QtGui import QPixmap, QIcon, QKeySequence, QShowEvent
 from PySide6.QtWidgets import QMainWindow, QMenuBar, QStatusBar
-from worktoy.desc import AttriBox, THIS
+from worktoy.desc import AttriBox
 
 from ezside.app import StatusBar
 from ezside.tools import Timer
@@ -22,8 +22,8 @@ class BaseWindow(QMainWindow):
   be further subclassed to implement widget layout and business logic. """
 
   pulse = Signal()
-  timer = AttriBox[Timer](THIS, Qt.TimerType.PreciseTimer, 500, False)
-  mainStatusBar = AttriBox[StatusBar](THIS)
+  timer = AttriBox[Timer](Qt.TimerType.PreciseTimer, 500, False)
+  mainStatusBar = AttriBox[StatusBar]()
 
   @classmethod
   def _getIcon(cls, menu: str) -> QIcon:

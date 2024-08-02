@@ -7,7 +7,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QShowEvent
 from PySide6.QtWidgets import QStatusBar, QMainWindow, QHBoxLayout, QLabel
-from worktoy.desc import THIS, AttriBox
+from worktoy.desc import AttriBox
 
 from ezside.widgets import DigitalClock
 
@@ -16,7 +16,7 @@ class StatusBar(QStatusBar):
   """StatusBar subclasses QStatusBar providing the status bar for the main
   window application."""
 
-  digitalClock = AttriBox[DigitalClock](THIS)
+  digitalClock = AttriBox[DigitalClock]()
 
   def __init__(self, *args) -> None:
     for arg in args:

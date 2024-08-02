@@ -9,8 +9,8 @@ from PySide6.QtCore import Qt
 from worktoy.keenum import auto, KeeNum
 from worktoy.yolo import yolo
 
-from ezside.app import App, MainWindow
-from main_tester_class01 import ComplexNumber
+from ezside.app import App
+from main_tester_class02 import MainWindow
 
 
 def tester01() -> int:
@@ -22,14 +22,5 @@ def tester01() -> int:
   return app.exec()
 
 
-def tester02() -> int:
-  """Testing AttriClass/AttriBox issue"""
-
-  z = ComplexNumber()
-  print(z)
-  print(z.realPart)
-  print(type(z.realPart))
-
-
 if __name__ == '__main__':
-  yolo(tester02)
+  yolo(tester01)
