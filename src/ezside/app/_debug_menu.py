@@ -3,7 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from worktoy.desc import AttriBox
+from worktoy.desc import AttriBox, THIS
 
 from ezside.app import EZAction, AbstractMenu
 
@@ -11,13 +11,13 @@ from ezside.app import EZAction, AbstractMenu
 class DebugMenu(AbstractMenu):
   """DebugMenu provides a bunch of actions meant for use in debugging."""
 
-  debug02Action = AttriBox[EZAction]('Debug 02', 'F2', 'risitas.png')
-  debug03Action = AttriBox[EZAction]('Debug 03', 'F3', 'risitas.png')
-  debug04Action = AttriBox[EZAction]('Debug 04', 'F4', 'risitas.png')
-  debug05Action = AttriBox[EZAction]('Debug 05', 'F5', 'risitas.png')
-  debug06Action = AttriBox[EZAction]('Debug 06', 'F6', 'risitas.png')
-  debug07Action = AttriBox[EZAction]('Debug 07', 'F7', 'risitas.png')
-  debug08Action = AttriBox[EZAction]('Debug 08', 'F8', 'risitas.png')
+  debug02Action = AttriBox[EZAction](THIS, 'Debug 02', 'F2', 'risitas.png')
+  debug03Action = AttriBox[EZAction](THIS, 'Debug 03', 'F3', 'risitas.png')
+  debug04Action = AttriBox[EZAction](THIS, 'Debug 04', 'F4', 'risitas.png')
+  debug05Action = AttriBox[EZAction](THIS, 'Debug 05', 'F5', 'risitas.png')
+  debug06Action = AttriBox[EZAction](THIS, 'Debug 06', 'F6', 'risitas.png')
+  debug07Action = AttriBox[EZAction](THIS, 'Debug 07', 'F7', 'risitas.png')
+  debug08Action = AttriBox[EZAction](THIS, 'Debug 08', 'F8', 'risitas.png')
 
   def initUi(self) -> None:
     """Initializes the menu"""

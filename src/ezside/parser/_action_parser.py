@@ -101,6 +101,7 @@ class ActionParser(AbstractParser):
     self.shortCut = shortCut
     self.__init__(parentWidget)
 
+  @overload()
   @overload(str, str, str)
   def __init__(self, actionTitle: str, shortCut: str, iconFile: str) -> None:
     """Constructor for the ActionParse class."""
