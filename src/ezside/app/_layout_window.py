@@ -9,8 +9,8 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QVBoxLayout, QLayout
 from worktoy.desc import AttriBox
 
-from ezside.app import BaseWindow
-from ezside.widgets import TextLabel, BoxWidget
+from ezside.app import BaseWindow, StatusBar
+from ezside.widgets import TextLabel, BoxWidget, DigitalClock
 
 
 class LayoutWindow(BaseWindow):

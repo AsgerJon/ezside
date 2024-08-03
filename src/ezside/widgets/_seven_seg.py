@@ -89,9 +89,13 @@ class SevenSeg(BoxWidget):
   highBrush = Field()
   lowBrush = Field()
 
+  def __init__(self, ) -> None:
+    BoxWidget.__init__(self)
+    self.setFixedSize(32, 24)
+
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
-    return QSize(48, 32)
+    return QSize(32, 24)
 
   @aspectRect.GET
   def _getAspectRect(self) -> QRect:

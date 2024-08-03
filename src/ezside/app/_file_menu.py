@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from typing import Self
 
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenu
 from worktoy.desc import AttriBox
 
@@ -42,3 +43,11 @@ class FileMenu(QMenu):
     if self.__iter_contents__:
       return self.__iter_contents__.pop(0)
     raise StopIteration
+
+  def initUi(self) -> None:
+    """Initializes the menu"""
+    QMenu.addMenu(self, self.newAction)
+    QMenu.addMenu(self, self.openAction)
+    QMenu.addMenu(self, self.saveAction)
+    QMenu.addMenu(self, self.saveAsAction)
+    QMenu.addMenu(self, self.exitAction)

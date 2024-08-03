@@ -5,82 +5,130 @@ objects."""
 from __future__ import annotations
 
 import os.path
-from typing import Any
 
-from PySide6.QtGui import QAction, QPixmap, QKeySequence
-from PySide6.QtWidgets import QMenu
-from worktoy.parse import maybe
-from worktoy.text import stringList
+from PySide6.QtGui import QAction, QPixmap, QKeySequence, QIcon
+from PySide6.QtWidgets import QMenu, QWidget
+from worktoy.desc import Field
+from worktoy.meta import BaseObject, overload
+
+
+class _ActionParse(BaseObject):
+  """This class implements overloading in its functions through the
+  'BaseObject' class. Since metaclass conflicts are not allowed,
+  this uses the function overloading to collect values from arguments. """
+
+  __parent_widget__ = None
+  __action_title__ = None
+  __action_icon__ = None
+  __action_shortcut__ = None
+
+  parent = Field()
+  title = Field()
+  icon = Field()
+  shortCut = Field()
+
+  @parent.SET
+  def _setParent(self, parentWidget: QWidget) -> None:
+    """Setter-function for the parent."""
+    self.__parent_widget__ = parentWidget
+
+  @title.SET
+  def _setTitle(self, actionTitle: str) -> None:
+    """Setter-function for the title."""
+    self.__action_title__ = actionTitle
+
+  @icon.SET
+  @overload(str)
+  def _setIcon(self, iconFile: str) -> None:
+    """Setter-function for the icon file."""
+    if not os.path.exists(iconFile):
+      e = """Unable to find icon file at: '%s'!""" % iconFile
+      raise FileNotFoundError(e)
+    if os.path.isdir(iconFile):
+      e = """The icon file at: '%s' is a directory!""" % iconFile
+      raise IsADirectoryError(e)
+    pix = QPixmap(iconFile)
+    self.icon = QIcon(pix)
+
+  @icon.SET
+  @overload(QIcon)
+  def _setIcon(self, icon: QIcon) -> None:
+    """Setter-function for the icon."""
+    self.__action_icon__ = icon
+
+  @shortCut.SET
+  @overload(str)
+  def _setShortCut(self, shortCut: str) -> None:
+    """Setter-function for the shortcut."""
+    self.shortCut = QKeySequence.fromString(shortCut)
+
+  @shortCut.SET
+  @overload(QKeySequence)
+  def _setShortCut(self, shortCut: QKeySequence) -> None:
+    """Setter-function for the shortcut."""
+    self.__action_shortcut__ = shortCut
+
+  @parent.GET
+  def _getParent(self) -> QWidget:
+    """Getter-function for the parent."""
+    return self.__parent_widget__
+
+  @title.GET
+  def _getTitle(self) -> str:
+    """Getter-function for the title."""
+    return self.__action_title__
+
+  @icon.GET
+  def _getIcon(self) -> QIcon:
+    """Getter-function for the icon."""
+    return self.__action_icon__
+
+  @shortCut.GET
+  def _getShortCut(self) -> QKeySequence:
+    """Getter-function for the shortcut."""
+    return self.__action_shortcut__
+
+  @overload(QWidget)
+  def __init__(self, parentWidget: QWidget) -> None:
+    """Constructor for the ActionParse class."""
+    self.parent = parentWidget
+
+  @overload(QWidget, str, str, str)
+  def __init__(self,
+               parentWidget: QWidget,
+               actionTitle: str,
+               iconFile: str,
+               shortCut: str) -> None:
+    """Constructor for the ActionParse class."""
+    self.title = actionTitle
+    self.icon = iconFile
+    self.shortCut = shortCut
+    self.__init__(parentWidget)
+
+  @overload(str, str, str)
+  def __init__(self, actionTitle: str, shortCut: str, iconFile: str) -> None:
+    """Constructor for the ActionParse class."""
+    self.title = actionTitle
+    self.icon = iconFile
+    self.shortCut = shortCut
 
 
 class Action(QAction):
   """Action subclasses QAction streamlining the creation of QAction
   objects."""
 
-  @staticmethod
-  def _parseIconFile(*args) -> Any:
-    """Parses the icon file from the arguments and returns the unused
-    arguments."""
-    unusedArgs = []
-    tempArgs = [*args, ]
-    while tempArgs:
-      arg = tempArgs.pop(0)
-      if '.png' in arg:
-        return arg, [*tempArgs, *unusedArgs]
-      unusedArgs.append(arg)
-    return None, [*args, ]
-
-  @staticmethod
-  def _parseShortCut(*args, ) -> Any:
-    """Parses the shortcut from the arguments and returns the unused
-    arguments."""
-    unusedArgs = []
-    tempArgs = [*args, ]
-    while tempArgs:
-      arg = tempArgs.pop(0)
-      if any([m in arg for m in stringList("""CTRL, SHIFT, ALT""")]):
-        return arg, [*tempArgs, *unusedArgs]
-      unusedArgs.append(arg)
-    return None, [*args, ]
-
-  @staticmethod
-  def _parseParent(*args) -> Any:
-    """Parses the parent from the arguments and returns the unused
-    arguments."""
-    unusedArgs = []
-    tempArgs = [*args, ]
-    while tempArgs:
-      arg = tempArgs.pop(0)
-      if isinstance(arg, QMenu):
-        return arg, [*tempArgs, *unusedArgs]
-      unusedArgs.append(arg)
-    return None, [*args, ]
-
-  @staticmethod
-  def _parseTitle(*args) -> Any:
-    """Parses the title from the arguments and returns the unused
-    arguments."""
-    unusedArgs = []
-    tempArgs = [*args, ]
-    while tempArgs:
-      arg = tempArgs.pop(0)
-      if isinstance(arg, str):
-        return arg, [*tempArgs, *unusedArgs]
-      unusedArgs.append(arg)
-    return None, [*args, ]
-
   def __init__(self, *args) -> None:
-    iconFile, unusedArgs = self._parseIconFile(*args)
-    shortCut, unusedArgs = self._parseShortCut(*unusedArgs)
-    parent, unusedArgs = self._parseParent(*unusedArgs)
-    title, unusedArgs = self._parseTitle(*unusedArgs)
-    if title is None or parent is None:
-      e = """Unable to parse the title and parent from the arguments."""
-      raise ValueError(e)
-    QAction.__init__(self, title, parent)
-    self.setIcon(maybe(iconFile, 'risitas.png'))
-    if shortCut is not None:
-      self.setShortcut(shortCut)
+    parsed = _ActionParse(*args)
+    if parsed.parent:
+      QAction.__init__(self, parsed.parent)
+    else:
+      QAction.__init__(self)
+    if parsed.title:
+      self.setText(parsed.title)
+    if parsed.icon:
+      self.setIcon(parsed.icon)
+    if parsed.shortCut:
+      self.setShortcut(parsed.shortCut)
 
   def setIcon(self, *args) -> None:
     """Reimplementation supporting receiving a file name"""

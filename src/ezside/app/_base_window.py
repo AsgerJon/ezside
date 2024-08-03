@@ -37,8 +37,8 @@ class BaseWindow(QMainWindow):
   def __init__(self, ) -> None:
     QMainWindow.__init__(self, )
     self.setWindowTitle('EZSide')
+    self.setMinimumSize(QSize(480, 320))
     self.setMenuBar(QMenuBar())
-    self.mainStatusBar.adjustSize()
     self.setStatusBar(self.mainStatusBar)
     self.fileMenu = self.menuBar().addMenu('File')
     self.editMenu = self.menuBar().addMenu('Edit')
@@ -47,6 +47,7 @@ class BaseWindow(QMainWindow):
     self.newAction = self.fileMenu.addAction('New')
     self.newAction.setIcon(self._getIcon('new'))
     self.newAction.setShortcut(QKeySequence.fromString('CTRL+N'))
+    self.newAction.triggered.connect(self.mainStatusBar.echoFactory('New'))
     self.openAction = self.fileMenu.addAction('Open')
     self.openAction.setIcon(self._getIcon('open'))
     self.openAction.setShortcut(QKeySequence.fromString('CTRL+O'))

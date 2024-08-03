@@ -104,27 +104,9 @@ class DigitalClock(BoxWidget):
 
   def __init__(self, parent=None, *args) -> None:
     """The constructor method for the DigitalClock widget."""
-    height = None
-    for arg in args:
-      if isinstance(arg, QSizeF):
-        height = QSizeF.toSize(arg).height()
-        break
-      if isinstance(arg, QSize):
-        height = QSize.height(arg)
-        break
-      if isinstance(arg, (int, float)):
-        height = int(arg)
-        break
-      if isinstance(arg, QRectF):
-        height = QRectF.toRect(arg).height()
-        break
-      if isinstance(arg, QRect):
-        height = QRect.height(arg)
-        break
-    else:
-      height = self.__fallback_height__
-
     BoxWidget.__init__(self, parent)
+    height = 32
+    self.setFixedHeight(height)
     self.backgroundColor = QColor(0, 0, 0, 255)
     width = int(6 * (height / 1.5) + 2 * (height / 2))
     self.aspectRatio = float(height) / float(width)
@@ -133,8 +115,6 @@ class DigitalClock(BoxWidget):
     QHBoxLayout.setAlignment(self.layout, Qt.AlignmentFlag.AlignRight)
     segSize = QSizeF(height / 1.5, height).toSize()
     colSize = QSizeF(height / 2, height).toSize()
-    ic(segSize)
-    ic(colSize)
     for widget in self._getWidgets():
       if type(widget) is SevenSeg:
         setattr(widget, 'aspectRatio', 1.5)
@@ -142,17 +122,12 @@ class DigitalClock(BoxWidget):
       elif type(widget) is Colon:
         setattr(widget, 'aspectRatio', 2.)
         Colon.setFixedSize(widget, colSize)
-      else:
-        ic(type(widget))
-        ic(SevenSeg)
-        ic(Colon)
-        break
-        continue
       setattr(widget, 'lowColor', QColor(63, 0, 0, 255))
       setattr(widget, 'highColor', QColor(255, 0, 0, 255))
       setattr(widget, 'padding', QMargins(1, 1, 1, 1))
       setattr(widget, 'backgroundColor', QColor(0, 0, 0, 255))
       self.layout.addWidget(widget)
+    self.setLayout(self.layout)
     self.refreshTime()
 
   def _getWidgets(self) -> list[BoxWidget]:
@@ -186,6 +161,7 @@ class DigitalClock(BoxWidget):
     e = QResizeEvent(QSizeF.toSize(rect.size()), event.oldSize())
     self.resize(e.size())
     BoxWidget.resizeEvent(self, e)
+    ic(e)
 
   def showEvent(self, event: QShowEvent) -> None:
     """This method is responsible for showing the widget."""
@@ -196,3 +172,5 @@ class DigitalClock(BoxWidget):
     """This method is responsible for resizing the widget."""
     rect = QRectF.toRect(self._enforceAspect(QRect(QPoint(0, 0), newSize)))
     BoxWidget.resize(self, rect.size())
+
+    ic('DigitalClock resize', newSize)

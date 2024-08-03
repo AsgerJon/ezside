@@ -15,6 +15,7 @@ class MainWindow(LayoutWindow):
     """Initialize signals and slots."""
     self.pulse.connect(self.mainStatusBar.digitalClock.refreshTime)
     self.aboutQtAction.triggered.connect(QApplication.aboutQt)
+    self.timer.timeout.connect(self.pulse)
     self.timer.start()
     self.debugAction01.triggered.connect(self.debugSlot01)
     self.debugAction02.triggered.connect(self.debugSlot02)
@@ -32,13 +33,6 @@ class MainWindow(LayoutWindow):
 
   def debugSlot02(self, ) -> None:
     """Debug slot 02"""
-    item = self.statusBar().layout().itemAt(0)
-    innerItem = item.layout()
-    print(innerItem.widget())
-    print(innerItem.layout())
-    print(innerItem.spacerItem())
-    print(innerItem.layout().layout().layout())
-    print(innerItem.layout() is innerItem.layout().layout())
 
   def debugSlot03(self) -> None:
     """Debug slot 03"""
