@@ -1,36 +1,31 @@
-"""Action subclasses QAction streamlining the creation of QAction
-objects."""
+"""ParseAction parses arguments related to QAction. """
 #  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import os.path
+import os
 
-from PySide6.QtGui import QAction, QPixmap, QKeySequence, QIcon
-from PySide6.QtWidgets import QMenu, QWidget
+from PySide6.QtWidgets import QWidget
 from worktoy.desc import Field
+from PySide6.QtGui import QIcon, QPixmap, QKeySequence
+
 from worktoy.meta import BaseObject, overload
 
+from ezside.parser import AbstractParser
 
-class _ActionParse(BaseObject):
+
+class ActionParser(AbstractParser):
   """This class implements overloading in its functions through the
   'BaseObject' class. Since metaclass conflicts are not allowed,
   this uses the function overloading to collect values from arguments. """
 
-  __parent_widget__ = None
   __action_title__ = None
   __action_icon__ = None
   __action_shortcut__ = None
 
-  parent = Field()
   title = Field()
   icon = Field()
   shortCut = Field()
-
-  @parent.SET
-  def _setParent(self, parentWidget: QWidget) -> None:
-    """Setter-function for the parent."""
-    self.__parent_widget__ = parentWidget
 
   @title.SET
   def _setTitle(self, actionTitle: str) -> None:
@@ -39,8 +34,14 @@ class _ActionParse(BaseObject):
 
   @icon.SET
   @overload(str)
-  def _setIcon(self, iconFile: str) -> None:
+  def _setIcon(self, iconFile: str, **kwargs) -> None:
     """Setter-function for the icon file."""
+    if not os.path.isabs(iconFile):
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      here = os.path.dirname(os.path.abspath(__file__))
+      iconFile = os.path.join(here, '..', 'app', 'icons', iconFile)
+      iconFile = os.path.normpath(iconFile)
     if not os.path.exists(iconFile):
       e = """Unable to find icon file at: '%s'!""" % iconFile
       raise FileNotFoundError(e)
@@ -67,11 +68,6 @@ class _ActionParse(BaseObject):
   def _setShortCut(self, shortCut: QKeySequence) -> None:
     """Setter-function for the shortcut."""
     self.__action_shortcut__ = shortCut
-
-  @parent.GET
-  def _getParent(self) -> QWidget:
-    """Getter-function for the parent."""
-    return self.__parent_widget__
 
   @title.GET
   def _getTitle(self) -> str:
@@ -111,61 +107,3 @@ class _ActionParse(BaseObject):
     self.title = actionTitle
     self.icon = iconFile
     self.shortCut = shortCut
-
-
-class Action(QAction):
-  """Action subclasses QAction streamlining the creation of QAction
-  objects."""
-
-  def __init__(self, *args) -> None:
-    parsed = _ActionParse(*args)
-    if parsed.parent:
-      QAction.__init__(self, parsed.parent)
-    else:
-      QAction.__init__(self)
-    if parsed.title:
-      self.setText(parsed.title)
-    if parsed.icon:
-      self.setIcon(parsed.icon)
-    if parsed.shortCut:
-      self.setShortcut(parsed.shortCut)
-
-  def setIcon(self, *args) -> None:
-    """Reimplementation supporting receiving a file name"""
-    for arg in args:
-      if isinstance(arg, str):
-        if '.png' in arg:
-          here = os.path.dirname(os.path.abspath(__file__))
-          iconFile = os.path.join(here, 'icons', arg)
-          if os.path.isfile(iconFile):
-            pix = QPixmap(iconFile)
-            return QAction.setIcon(self, pix)
-    else:
-      return QAction.setIcon(self, *args)
-
-  def setShortcut(self, *args) -> None:
-    """Reimplementation supporting receiving a string"""
-    for arg in args:
-      if isinstance(arg, str):
-        shortCut = QKeySequence.fromString(arg)
-        if shortCut.isEmpty():
-          continue
-        return QAction.setShortcut(self, shortCut)
-    else:
-      return QAction.setShortcut(self, *args)
-
-  def setText(self, *args) -> None:
-    """Reimplementation supporting receiving a string"""
-    for arg in args:
-      if isinstance(arg, str):
-        return QAction.setText(self, arg)
-    else:
-      return QAction.setText(self, *args)
-
-  def setParent(self, *args) -> None:
-    """Reimplementation supporting receiving a QMenu"""
-    for arg in args:
-      if isinstance(arg, QMenu):
-        return QAction.setParent(self, arg)
-    else:
-      return QAction.setParent(self, *args)

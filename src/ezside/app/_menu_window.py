@@ -4,22 +4,21 @@
 from __future__ import annotations
 
 from PySide6.QtWidgets import QMainWindow
+from icecream import ic
 from worktoy.desc import AttriBox
 
 from ezside.app import MenuBar
+
+ic.configureOutput(includeContext=True)
 
 
 class MenuWindow(QMainWindow):
   """MenuWindow implements menus as distinct classes."""
 
-  menuBar = AttriBox[MenuBar]()
+  mainMenuBar = AttriBox[MenuBar]()
 
-  def initUi(self) -> None:
-    """Initializes the main window"""
-    self.setMenuBar(self.menuBar)
-    self.menuBar.initUi()
-
-  def show(self) -> None:
-    """Shows the main window"""
-    self.initUi()
-    QMainWindow.show(self)
+  def __init__(self) -> None:
+    """Initializes the menu window"""
+    QMainWindow.__init__(self)
+    self.setWindowTitle('Menu Window')
+    self.setMenuBar(self.mainMenuBar)

@@ -4,50 +4,31 @@ main window. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import Self
-
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QMenu
+from PySide6.QtWidgets import QWidget
 from worktoy.desc import AttriBox
 
-from ezside.app import Action
+from ezside.app import EZAction, AbstractMenu
 
 
-class FileMenu(QMenu):
+class FileMenu(AbstractMenu):
   """FileMenu subclasses the QMenu class and provides the file menu for the
   main window. """
 
-  __action_list__ = None
-  __iter_contents__ = None
-
-  newAction = AttriBox[Action]('New', 'CTRL+N', 'new.png')
-  openAction = AttriBox[Action]('Open', 'CTRL+O', 'open.png')
-  saveAction = AttriBox[Action]('Save', 'CTRL+S', 'save.png')
-  saveAsAction = AttriBox[Action](
+  newAction = AttriBox[EZAction]('New', 'CTRL+N', 'new.png')
+  openAction = AttriBox[EZAction]('Open', 'CTRL+O', 'open.png')
+  saveAction = AttriBox[EZAction]('Save', 'CTRL+S', 'save.png')
+  saveAsAction = AttriBox[EZAction](
       'Save As', 'CTRL+SHIFT+S', 'save_as.png')
-  exitAction = AttriBox[Action]('Exit', 'CTRL+Q', 'exit.png')
-
-  def __iter__(self, ) -> Self:
-    """Implements the iteration protocol"""
-    self.__iter_contents__ = [
-        self.newAction,
-        self.openAction,
-        self.saveAction,
-        self.saveAsAction,
-        self.exitAction
-    ]
-    return self
-
-  def __next__(self, ) -> Action:
-    """Implements the iteration protocol"""
-    if self.__iter_contents__:
-      return self.__iter_contents__.pop(0)
-    raise StopIteration
+  exitAction = AttriBox[EZAction]('Exit', 'CTRL+Q', 'exit.png')
 
   def initUi(self) -> None:
     """Initializes the menu"""
-    QMenu.addMenu(self, self.newAction)
-    QMenu.addMenu(self, self.openAction)
-    QMenu.addMenu(self, self.saveAction)
-    QMenu.addMenu(self, self.saveAsAction)
-    QMenu.addMenu(self, self.exitAction)
+    self.addAction(self.newAction)
+    self.addAction(self.openAction)
+    self.addAction(self.saveAction)
+    self.addAction(self.saveAsAction)
+    self.addAction(self.exitAction)
+
+  def __init__(self, parent: QWidget = None, *args) -> None:
+    AbstractMenu.__init__(self, parent, 'File')
+    self.initUi()
