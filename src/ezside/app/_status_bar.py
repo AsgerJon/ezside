@@ -4,11 +4,13 @@ window application."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Callable
+
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QShowEvent
 from PySide6.QtWidgets import QStatusBar, QMainWindow, QHBoxLayout, QLabel
 from icecream import ic
-from worktoy.desc import AttriBox
+from worktoy.desc import AttriBox, THIS
 
 from ezside.widgets import DigitalClock
 
@@ -19,7 +21,7 @@ class StatusBar(QStatusBar):
   """StatusBar subclasses QStatusBar providing the status bar for the main
   window application."""
 
-  digitalClock = AttriBox[DigitalClock]()
+  digitalClock = AttriBox[DigitalClock](THIS, )
 
   def __init__(self, *args) -> None:
     for arg in args:
@@ -46,7 +48,7 @@ class StatusBar(QStatusBar):
     print('%s - Show event' % self.__class__.__name__)
 
   @Slot()
-  def _refreshTime(self) -> None:
+  def refreshTime(self) -> None:
     """This slot refreshes the time on the clock"""
     self.digitalClock.refreshTime()
 
@@ -55,7 +57,7 @@ class StatusBar(QStatusBar):
     """This slot shows the message on the status bar."""
     self.showMessage(msg, 5000)
 
-  def echoFactory(self, msg: str) -> None:
+  def echoFactory(self, msg: str) -> Callable:
     """This method creates a slot that shows the message on the status
     bar."""
 

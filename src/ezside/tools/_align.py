@@ -138,3 +138,11 @@ class Align(KeeNum):
       e = typeMsg('movingRect', movingRect, QRect)
       raise TypeError(e)
     return movingRect
+
+  def __complex__(self) -> complex:
+    """Returns a complex number representing the alignment."""
+    a, b = None, None
+    h = {Align.LEFT: -1, Align.RIGHT: 1, Align.CENTER: 0}
+    v = {Align.TOP: -1, Align.BOTTOM: 1, Align.CENTER: 0}
+
+    return h[self.horizontal] + v[self.vertical] * 1j

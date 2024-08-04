@@ -3,9 +3,15 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QLayoutItem, QApplication
+import sys
+
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from icecream import ic
 
 from ezside.app import LayoutWindow
+
+ic.configureOutput(includeContext=True)
 
 
 class MainWindow(LayoutWindow):
@@ -13,28 +19,40 @@ class MainWindow(LayoutWindow):
 
   def initSignalSlot(self) -> None:
     """Initialize signals and slots."""
-    self.pulse.connect(self.mainStatusBar.digitalClock.refreshTime)
-    self.aboutQtAction.triggered.connect(QApplication.aboutQt)
-    self.timer.timeout.connect(self.pulse)
-    self.timer.start()
-    self.debugAction01.triggered.connect(self.debugSlot01)
-    self.debugAction02.triggered.connect(self.debugSlot02)
-    self.debugAction03.triggered.connect(self.debugSlot03)
+    LayoutWindow.initSignalSlot(self)
+    self.mainMenuBar.debugMenu.debugAction02.triggered.connect(
+        self.debug02)
+    self.mainMenuBar.debugMenu.debugAction03.triggered.connect(
+        self.debug03)
 
   def show(self) -> None:
     """Reimplementation setting up signals and slots before invoking
     parent method."""
+    self.initLayout()
     self.initSignalSlot()
-    LayoutWindow.show(self)
+    self.adjustSize()
+    QMainWindow.show(self)
 
-  def debugSlot01(self) -> None:
-    """Debug slot 01"""
-    self.statusBar().showMessage('FUCK YOU!')
+  def about(self) -> None:
+    """Displays information about Python."""
+    title = """About Python"""
+    v = sys.version_info
+    msg = """Python version: %d.%d.%d""" % (v.major, v.minor, v.micro)
+    QMessageBox.about(self, title, msg)
 
-  def debugSlot02(self, ) -> None:
-    """Debug slot 02"""
+  def updateLabelColor(self, color: QColor) -> None:
+    """Updates the color of the label."""
+    self.welcomeLabel.backgroundColor = color
+    self.welcomeLabel.update()
 
-  def debugSlot03(self) -> None:
-    """Debug slot 03"""
-    for (key, val) in QLayoutItem.__dict__.items():
-      print("""%s: %20s""" % (key, type(val).__name__))
+  def debug02(self) -> None:
+    """Testing label size change"""
+    self.welcomeLabel.fontSize -= 1
+    self.welcomeLabel.adjustSize()
+    self.welcomeLabel.update()
+
+  def debug03(self) -> None:
+    """Testing label size change"""
+    self.welcomeLabel.fontSize += 1
+    self.welcomeLabel.adjustSize()
+    self.welcomeLabel.update()

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import os
 
+from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QWidget
 from worktoy.desc import Field
 from PySide6.QtGui import QIcon, QPixmap, QKeySequence
@@ -84,24 +85,23 @@ class ActionParser(AbstractParser):
     """Getter-function for the shortcut."""
     return self.__action_shortcut__
 
-  @overload(QWidget)
-  def __init__(self, parentWidget: QWidget) -> None:
+  @overload(QObject)
+  def __init__(self, parentWidget: QObject) -> None:
     """Constructor for the ActionParse class."""
     self.parent = parentWidget
 
-  @overload(QWidget, str, str, str)
+  @overload(QObject, str, str, str)
   def __init__(self,
                parentWidget: QWidget,
                actionTitle: str,
-               iconFile: str,
-               shortCut: str) -> None:
+               shortCut: str,
+               iconFile: str, ) -> None:
     """Constructor for the ActionParse class."""
     self.title = actionTitle
     self.icon = iconFile
     self.shortCut = shortCut
     self.__init__(parentWidget)
 
-  @overload()
   @overload(str, str, str)
   def __init__(self, actionTitle: str, shortCut: str, iconFile: str) -> None:
     """Constructor for the ActionParse class."""

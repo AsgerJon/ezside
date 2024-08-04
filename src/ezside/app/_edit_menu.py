@@ -3,21 +3,24 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from worktoy.desc import AttriBox
+from worktoy.desc import AttriBox, THIS
 
+from icecream import ic
 from ezside.app import AbstractMenu, EZAction
+
+ic.configureOutput(includeContext=True)
 
 
 class EditMenu(AbstractMenu):
   """EditMenu class provides the edit menu for the application."""
 
   selectAllAction = AttriBox[EZAction](
-      'Select All', 'CTRL+A', 'select_all.png')
-  copyAction = AttriBox[EZAction]('Copy', 'CTRL+C', 'copy.png')
-  cutAction = AttriBox[EZAction]('Cut', 'CTRL+X', 'cut.png')
-  pasteAction = AttriBox[EZAction]('Paste', 'CTRL+V', 'paste.png')
-  undoAction = AttriBox[EZAction]('Undo', 'CTRL+Z', 'undo.png')
-  redoAction = AttriBox[EZAction]('Redo', 'CTRL+Y', 'redo.png')
+      THIS, 'Select All', 'CTRL+A', 'select_all.png')
+  copyAction = AttriBox[EZAction](THIS, 'Copy', 'CTRL+C', 'copy.png')
+  cutAction = AttriBox[EZAction](THIS, 'Cut', 'CTRL+X', 'cut.png')
+  pasteAction = AttriBox[EZAction](THIS, 'Paste', 'CTRL+V', 'paste.png')
+  undoAction = AttriBox[EZAction](THIS, 'Undo', 'CTRL+Z', 'undo.png')
+  redoAction = AttriBox[EZAction](THIS, 'Redo', 'CTRL+Y', 'redo.png')
 
   def initUi(self) -> None:
     """Initializes the menu"""

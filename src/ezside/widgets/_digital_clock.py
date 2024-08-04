@@ -161,7 +161,6 @@ class DigitalClock(BoxWidget):
     e = QResizeEvent(QSizeF.toSize(rect.size()), event.oldSize())
     self.resize(e.size())
     BoxWidget.resizeEvent(self, e)
-    ic(e)
 
   def showEvent(self, event: QShowEvent) -> None:
     """This method is responsible for showing the widget."""
@@ -172,5 +171,3 @@ class DigitalClock(BoxWidget):
     """This method is responsible for resizing the widget."""
     rect = QRectF.toRect(self._enforceAspect(QRect(QPoint(0, 0), newSize)))
     BoxWidget.resize(self, rect.size())
-
-    ic('DigitalClock resize', newSize)

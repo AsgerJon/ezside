@@ -11,6 +11,7 @@ from abc import abstractmethod
 from typing import Never, Self
 
 from PySide6.QtWidgets import QWidget, QMenu
+from icecream import ic
 from worktoy.desc import Field
 from worktoy.meta import BaseObject, overload
 from worktoy.parse import maybe
@@ -19,6 +20,8 @@ from worktoy.text import monoSpace, typeMsg
 from ezside.app import EZAction
 from ezside.parser import MenuParser
 
+ic.configureOutput(includeContext=True)
+
 
 class AbstractMenu(QMenu):
   """AbstractMenu provides an abstract base class for the menu classes.
@@ -26,6 +29,8 @@ class AbstractMenu(QMenu):
   base class for the menu classes, a separate parser class which does
   inherit from 'BaseObject' is used to collect values from arguments. This
   parser implement function overloading. """
+
+  __is_initialized__ = None
 
   __action_list__ = None
   __iter_contents__ = None
@@ -69,18 +74,16 @@ class AbstractMenu(QMenu):
       raise TypeError(monoSpace(e))
     someArgs = [arg for arg in args if arg is not None]
     self.parsed = MenuParser(*someArgs)
-
     QMenu.__init__(self, self.parsed.parent)
     self.setTitle(self.parsed.title)
 
   def __str__(self) -> str:
     return self.parsed.title
 
-  @abstractmethod
   def initUi(self) -> None:
     """Subclasses must implement this method to add actions to the menu."""
 
-  def addAction(self, ezAction: EZAction, ) -> EZAction:
+  def addAction(self, ezAction: EZAction, ) -> None:
     """The menus support only instances of the 'EZAction'. When adding
     them to the menu, they are stored in the menu instance and are
     available for iteration."""
@@ -89,4 +92,4 @@ class AbstractMenu(QMenu):
       raise TypeError(e)
     actions = maybe(self.__action_list__, [])
     self.__action_list__ = [*actions, ezAction]
-    return ezAction
+    return QMenu.addAction(self, ezAction)

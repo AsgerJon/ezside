@@ -4,22 +4,25 @@ main window. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QWidget
-from worktoy.desc import AttriBox
+from PySide6.QtWidgets import QWidget, QMenu
+from icecream import ic
+from worktoy.desc import AttriBox, THIS
 
 from ezside.app import EZAction, AbstractMenu
+
+ic.configureOutput(includeContext=True)
 
 
 class FileMenu(AbstractMenu):
   """FileMenu subclasses the QMenu class and provides the file menu for the
   main window. """
 
-  newAction = AttriBox[EZAction]('New', 'CTRL+N', 'new.png')
-  openAction = AttriBox[EZAction]('Open', 'CTRL+O', 'open.png')
-  saveAction = AttriBox[EZAction]('Save', 'CTRL+S', 'save.png')
+  newAction = AttriBox[EZAction](THIS, 'New', 'CTRL+N', 'new.png')
+  openAction = AttriBox[EZAction](THIS, 'Open', 'CTRL+O', 'open.png')
+  saveAction = AttriBox[EZAction](THIS, 'Save', 'CTRL+S', 'save.png')
   saveAsAction = AttriBox[EZAction](
-      'Save As', 'CTRL+SHIFT+S', 'save_as.png')
-  exitAction = AttriBox[EZAction]('Exit', 'CTRL+Q', 'exit.png')
+      THIS, 'Save As', 'CTRL+SHIFT+S', 'save_as.png')
+  exitAction = AttriBox[EZAction](THIS, 'Exit', 'CTRL+Q', 'exit.png')
 
   def initUi(self) -> None:
     """Initializes the menu"""

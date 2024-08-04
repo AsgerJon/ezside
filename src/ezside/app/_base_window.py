@@ -6,14 +6,21 @@ be further subclassed to implement widget layout and business logic. """
 from __future__ import annotations
 
 import os
+from sys import executable
 
-from PySide6.QtCore import QSize, Signal, QTimer, Qt
-from PySide6.QtGui import QPixmap, QIcon, QKeySequence, QShowEvent
-from PySide6.QtWidgets import QMainWindow, QMenuBar, QStatusBar
-from worktoy.desc import AttriBox
+from PySide6.QtCore import Signal, Qt, Slot, QSize
+from PySide6.QtGui import QColor, QFont
+from PySide6.QtWidgets import QMainWindow, QColorDialog, QFontDialog
+from PySide6.QtWidgets import QApplication
+from icecream import ic
+from worktoy.desc import THIS, AttriBox
 
 from ezside.app import StatusBar, MenuBar
+from ezside.dialogs import DirectoryDialog, SaveFileDialog, OpenFileDialog, \
+  AboutPythonDialog
 from ezside.tools import Timer
+
+ic.configureOutput(includeContext=True)
 
 
 class BaseWindow(QMainWindow):
@@ -21,17 +28,70 @@ class BaseWindow(QMainWindow):
   application. It implements menus, menubar and statusbar. It is intended to
   be further subclassed to implement widget layout and business logic. """
 
+  colorWheel = AttriBox[QColorDialog](THIS)
+  fontOptions = AttriBox[QFontDialog](THIS)
+  openFile = AttriBox[OpenFileDialog](THIS)
+  saveFile = AttriBox[SaveFileDialog](THIS)
+  selDir = AttriBox[DirectoryDialog](THIS)
+  aboutPython = AttriBox[AboutPythonDialog](THIS)
+  prevColor = AttriBox[QColor](QColor(255, 255, 255, 255))
+  colorSelected = Signal(QColor)
+  fontSelected = Signal(QFont)
+  directorySelected = Signal(str)
+  openFileSelected = Signal(str)
+  saveFileSelected = Signal(str)
   pulse = Signal()
-  timer = AttriBox[Timer](Qt.TimerType.PreciseTimer, 500, False)
-  mainStatusBar = AttriBox[StatusBar]()
-  mainMenuBar = AttriBox[MenuBar]()
+  timer = AttriBox[Timer](THIS, Qt.TimerType.PreciseTimer, 500, False)
+  mainStatusBar = AttriBox[StatusBar](THIS)
+  mainMenuBar = AttriBox[MenuBar](THIS)
 
   def __init__(self, *args) -> None:
     QMainWindow.__init__(self)
+    self.setMinimumSize(QSize(320, 240))
     self.setMenuBar(self.mainMenuBar)
     self.setStatusBar(self.mainStatusBar)
 
-  def show(self) -> None:
-    """Reimplementation setting up signals and slots before invoking
-    parent method."""
-    QMainWindow.show(self)
+  @Slot()
+  def requestColor(self) -> None:
+    """Triggering this method opens the color dialog. When accepted the
+    selected color is emitted through the 'colorSelected' signal. """
+    self.colorWheel.show()
+
+  @Slot()
+  def requestFont(self) -> None:
+    """Triggering this method opens the font selection dialog."""
+    self.fontOptions.show()
+
+  @Slot()
+  def requestOpenFile(self) -> None:
+    """Triggering this method opens a file dialog for opening a file."""
+    self.openFile.show()
+
+  @Slot()
+  def requestSaveFile(self) -> None:
+    """Triggering this method opens a file dialog for saving a file."""
+    self.saveFile.show()
+
+  @Slot()
+  def requestDir(self) -> None:
+    """Triggering this method opens a directory dialog for selecting a
+    directory."""
+    self.selDir.show()
+
+  def initSignalSlot(self, ) -> None:
+    """Initializes the signal slot connections for the object."""
+    #  Connecting 'accept' signals from dialogs to relevant slots
+    self.colorWheel.colorSelected.connect(self.colorSelected)
+    self.fontOptions.fontSelected.connect(self.fontSelected)
+    self.selDir.fileSelected.connect(self.directorySelected)
+    self.openFile.fileSelected.connect(self.openFileSelected)
+    self.saveFile.fileSelected.connect(self.saveFileSelected)
+    #  Connecting pulse to status bar clock
+    self.timer.timeout.connect(self.pulse)
+    self.pulse.connect(self.mainStatusBar.refreshTime)
+    self.timer.start()
+    #  Implementing 'about' actions to relevant information dialogs
+    self.mainMenuBar.helpMenu.aboutQtAction.triggered.connect(
+        QApplication.aboutQt)
+    self.mainMenuBar.helpMenu.aboutPythonAction.triggered.connect(
+        self.aboutPython.show)

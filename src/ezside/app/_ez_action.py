@@ -6,11 +6,9 @@ from __future__ import annotations
 
 import os.path
 
-from PySide6.QtGui import QAction, QPixmap, QKeySequence, QIcon
-from PySide6.QtWidgets import QMenu, QWidget
+from PySide6.QtGui import QAction, QPixmap, QKeySequence
+from PySide6.QtWidgets import QMenu, QMainWindow
 from icecream import ic
-from worktoy.desc import Field
-from worktoy.meta import BaseObject, overload
 
 from ezside.parser import ActionParser
 
@@ -22,8 +20,11 @@ class EZAction(QAction):
   objects."""
 
   def __init__(self, *args) -> None:
-    ic(args)
-    parsed = ActionParser(*args)
+    try:
+      parsed = ActionParser(*args)
+    except ValueError as valueError:
+      ic(valueError)
+      ic(args)
     if parsed.parent:
       QAction.__init__(self, parsed.parent)
     else:

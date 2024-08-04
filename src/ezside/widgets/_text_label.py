@@ -5,16 +5,19 @@ from __future__ import annotations
 
 from typing import Never
 
-from PySide6.QtCore import QSize, QSizeF, QRect, QMargins, QRectF
+from PySide6.QtCore import QSize, QRect, QMargins, Qt
 from PySide6.QtGui import (QFont, QFontMetrics, QPaintEvent, QPainter,
-                           QColor, QPen)
-from PySide6.QtWidgets import QWidget, QSizePolicy
+                           QColor, QPen, QBrush)
+from PySide6.QtWidgets import QWidget, QSizePolicy, QVBoxLayout, QGridLayout
+from icecream import ic
 from worktoy.desc import AttriBox, Field
 from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
-from ezside.tools import textPen, Align, emptyBrush
+from ezside.tools import textPen, Align, emptyBrush, emptyPen, fillBrush
 from ezside.widgets import BoxWidget
+
+ic.configureOutput(includeContext=True)
 
 
 class TextLabel(BoxWidget):
@@ -101,6 +104,7 @@ class TextLabel(BoxWidget):
   def _getBoundingRect(self) -> QRect:
     """This method returns the bounding size of the text with the given
     font. """
+    ic(self.text)
     rect = self.metrics.boundingRect(self.contentRect, 0, self.text)
     return self.alignment.fitRect(rect, self.contentRect)
 
@@ -148,6 +152,8 @@ class TextLabel(BoxWidget):
     self.backgroundColor = QColor(191, 191, 191, 255)
     self.borderColor = QColor(0, 0, 0, 255)
     self.padding = QMargins(4, 4, 4, 4, )
+    self.border = QMargins(2, 2, 2, 2, )
+    self.margins = QMargins(4, 4, 4, 4, )
     policy = QSizePolicy()
     policy.setVerticalPolicy(QSizePolicy.Policy.Maximum)
     policy.setHorizontalPolicy(QSizePolicy.Policy.Maximum)
@@ -155,19 +161,102 @@ class TextLabel(BoxWidget):
 
   def sizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
-    return self.textRect.size()
+    rect = self.textRect.marginsAdded(self.padding)
+    rect = rect.marginsAdded(self.border)
+    rect = rect.marginsAdded(self.margins)
+    return rect.size()
 
   def minimumSizeHint(self) -> QSize:
     """This method returns the minimum size hint of the widget."""
-    return self.sizeHint()
+    return self.textRect.size()
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Implementation of the paint event"""
     BoxWidget.paintEvent(self, event)
     painter = QPainter()
     painter.begin(self)
+    viewRect = painter.viewport()
     painter.setFont(self.textFont)
     painter.setPen(self.pen)
     painter.setBrush(emptyBrush())
     painter.drawText(self.textRect, 0, self.text)
     painter.end()
+
+
+class Spacer(QWidget):
+  """Spacer provides a property driven alternative to QSpacerItem. """
+
+  def __init__(self, parent: QWidget = None) -> None:
+    """Initializes the object"""
+    QWidget.__init__(self, parent)
+    policy = QSizePolicy()
+    policy.setVerticalPolicy(QSizePolicy.Policy.Expanding)
+    policy.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
+    self.setSizePolicy(policy)
+
+  def paintEvent(self, event: QPaintEvent) -> None:
+    """Paint event implementation fill with blank paint"""
+    painter = QPainter()
+    painter.begin(self)
+    painter.setBrush(fillBrush(QColor(255, 0, 144, 31)))
+    painter.setPen(emptyPen())
+    viewRect = painter.viewport()
+    painter.drawRect(viewRect)
+    painter.end()
+
+
+class Label(QWidget):
+  """Label provides a property driven alternative to QLabel. """
+
+  baseLayout = AttriBox[QGridLayout]()
+  top = AttriBox[Spacer]()
+  topRight = AttriBox[Spacer]()
+  right = AttriBox[Spacer]()
+  bottomRight = AttriBox[Spacer]()
+  bottom = AttriBox[Spacer]()
+  bottomLeft = AttriBox[Spacer]()
+  left = AttriBox[Spacer]()
+  topLeft = AttriBox[Spacer]()
+  mid = AttriBox[Spacer]()
+  innerLabel = AttriBox[TextLabel]('YOLO')
+
+  def initUi(self) -> None:
+    """This method initializes the user interface."""
+    self.baseLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    spacerDict = {
+        (0, 0,): 'topLeft',
+        (1, 0,): 'top',
+        (2, 0,): 'topRight',
+        (0, 1,): 'left',
+        (1, 1,): 'mid',
+        (2, 1,): 'right',
+        (0, 2,): 'bottomLeft',
+        (1, 2,): 'bottom',
+        (2, 2,): 'bottomRight',
+    }
+    labelCoordinates = complex(self.innerLabel.alignment) + 1 + 1j
+    h, v = int(labelCoordinates.real), int(labelCoordinates.imag)
+    for i in range(3):
+      for j in range(3):
+        if (i - h) ** 2 + (j - v) ** 2:
+          key = spacerDict[(i, j)]
+          widget = getattr(self, key)
+          self.baseLayout.addWidget(getattr(self, key), i, j)
+          continue
+        self.baseLayout.addWidget(self.innerLabel, i, j)
+    self.setLayout(self.baseLayout)
+
+  def __init__(self, *args) -> None:
+    parent, text = None, None
+    for arg in args:
+      if isinstance(arg, QWidget) and parent is None:
+        parent = arg
+      elif isinstance(arg, str) and text is None:
+        text = arg
+      if parent is not None and text is not None:
+        break
+    else:
+      text = maybe(text, 'blabla')
+    QWidget.__init__(self, parent)
+    self.innerLabel.text = text
+    self.initUi()
