@@ -178,8 +178,13 @@ class TextLabel(BoxWidget):
     viewRect = painter.viewport()
     painter.setFont(self.textFont)
     painter.setPen(self.pen)
-    painter.setBrush(emptyBrush())
-    painter.drawText(self.textRect, 0, self.text)
+    painter.setBrush(fillBrush(QColor(144, 255, 0, 31)))
+    rect = self.textRect
+    # painter.drawRect(rect)
+    painter.drawRect(viewRect)
+    rect.moveCenter(viewRect.center())
+
+    painter.drawText(viewRect, Qt.AlignmentFlag.AlignCenter, self.text)
     painter.end()
 
 
@@ -222,28 +227,10 @@ class Label(QWidget):
 
   def initUi(self) -> None:
     """This method initializes the user interface."""
-    self.baseLayout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    spacerDict = {
-        (0, 0,): 'topLeft',
-        (1, 0,): 'top',
-        (2, 0,): 'topRight',
-        (0, 1,): 'left',
-        (1, 1,): 'mid',
-        (2, 1,): 'right',
-        (0, 2,): 'bottomLeft',
-        (1, 2,): 'bottom',
-        (2, 2,): 'bottomRight',
-    }
-    labelCoordinates = complex(self.innerLabel.alignment) + 1 + 1j
-    h, v = int(labelCoordinates.real), int(labelCoordinates.imag)
-    for i in range(3):
-      for j in range(3):
-        if (i - h) ** 2 + (j - v) ** 2:
-          key = spacerDict[(i, j)]
-          widget = getattr(self, key)
-          self.baseLayout.addWidget(getattr(self, key), i, j)
-          continue
-        self.baseLayout.addWidget(self.innerLabel, i, j)
+    self.baseLayout.setContentsMargins(0, 0, 0, 0)
+    self.baseLayout.setSpacing(0)
+    self.baseLayout.addWidget(self.innerLabel, 0, 0)
+    self.baseLayout.setAlignment(self.innerLabel.alignment)
     self.setLayout(self.baseLayout)
 
   def __init__(self, *args) -> None:
