@@ -6,6 +6,11 @@ from __future__ import annotations
 
 from ._timer import Timer
 from ._align import Align
-from ._font import parseFont
-from ._pen import emptyPen, textPen, dashPen, dotPen, parsePen
+from ._font_cap import FontCap
+from ._font_family import FontFamily
+from ._font_flag import FontFlag, Italic, StrikeOut, Underline
+from ._font_weight import FontWeight
+from ._size_rule import SizeRule
+from ._parse_font import parseFont
+from ._pen import emptyPen, textPen, dashPen, dotPen, parsePen, solidPen
 from ._brush import emptyBrush, fillBrush

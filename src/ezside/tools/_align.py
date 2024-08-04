@@ -5,12 +5,15 @@ from __future__ import annotations
 
 from typing import TypeAlias, Union, Self
 
-from PySide6.QtCore import QRect, QRectF, QPointF
+from PySide6.QtCore import QRect, QRectF, QPointF, Qt
+from icecream import ic
 from worktoy.desc import Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.text import monoSpace, typeMsg
 
 Rect: TypeAlias = Union[QRect, QRectF]
+
+ic.configureOutput(includeContext=True)
 
 
 class Align(KeeNum):
@@ -18,6 +21,7 @@ class Align(KeeNum):
 
   horizontal = Field()
   vertical = Field()
+  qt = Field()
 
   CENTER = auto()
 
@@ -50,6 +54,28 @@ class Align(KeeNum):
       return Align.Top
     if self in [Align.BOTTOM, Align.BOTTOM_LEFT, Align.BOTTOM_RIGHT]:
       return Align.Bottom
+
+  @qt.GET
+  def _getQt(self) -> Qt.AlignmentFlag:
+    """Returns the Qt version of the flag"""
+    if self is Align.CENTER:
+      return Qt.AlignmentFlag.AlignCenter
+    if self is Align.LEFT:
+      return Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+    if self is Align.RIGHT:
+      return Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+    if self is Align.TOP:
+      return Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter
+    if self is Align.BOTTOM:
+      return Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter
+    if self is Align.TOP_LEFT:
+      return Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
+    if self is Align.TOP_RIGHT:
+      return Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight
+    if self is Align.BOTTOM_RIGHT:
+      return Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight
+    if self is Align.BOTTOM_LEFT:
+      return Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft
 
   def __add__(self, other: Self) -> Self:
     """Combines horizontal and vertical alignments. """
@@ -96,9 +122,18 @@ class Align(KeeNum):
       if other is Align.RIGHT:
         return Align.BOTTOM_RIGHT
 
-  def fitRect(self, movingRect: Rect, targetRect: Rect) -> Rect:
+  def fitRect(self, movingRect: Rect, targetRect: Rect) -> QRect:
     """This method receives a moving rectangle and aligns it against a
     target rectangle according to the alignment."""
+    return self.fitRect(movingRect, targetRect)
+
+  def fitRectF(self, movingRect: Rect, targetRect: Rect) -> QRectF:
+    """This method receives a moving rectangle and aligns it against a
+    target rectangle according to the alignment."""
+    if isinstance(movingRect, QRect):
+      return self.fitRectF(QRect.toRectF(movingRect), targetRect)
+    if isinstance(targetRect, QRect):
+      return self.fitRectF(movingRect, QRect.toRectF(targetRect))
     movingSize = movingRect.size()
     movingHeight, movingWidth = movingSize.height(), movingSize.width()
     topLeft = targetRect.topLeft()
@@ -130,11 +165,5 @@ class Align(KeeNum):
     fittedCenterX = fittedLeft + movingWidth / 2
     fittedCenterY = fittedTop + movingHeight / 2
     fittedCenter = QPointF(fittedCenterX, fittedCenterY)
-    if isinstance(movingRect, QRect):
-      movingRect.moveCenter(fittedCenter.toPoint())
-    elif isinstance(movingRect, QRectF):
-      movingRect.moveCenter(fittedCenter)
-    else:
-      e = typeMsg('movingRect', movingRect, QRect)
-      raise TypeError(e)
+    movingRect.moveCenter(fittedCenter)
     return movingRect

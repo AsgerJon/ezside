@@ -8,6 +8,7 @@ from typing import TypeAlias, Union, Self
 from PySide6.QtCore import QSize, QSizeF, QPoint, QPointF, QRect, QRectF, \
   QMarginsF
 from PySide6.QtGui import QPaintEvent, QPainter, QColor, QPen, QBrush
+from icecream import ic
 from worktoy.desc import AttriBox, Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.parse import maybe
@@ -17,6 +18,8 @@ from ezside.widgets import BoxWidget
 
 Size: TypeAlias = Union[QSize, QSizeF]
 Point: TypeAlias = Union[QPoint, QPointF]
+
+ic.configureOutput(includeContext=True)
 
 
 class Segment(KeeNum):
@@ -77,8 +80,8 @@ class SevenSeg(BoxWidget):
   __fallback_digit__ = 0
   __current_digit__ = None
 
-  scale = AttriBox[float](0.1)
-  segmentMargins = AttriBox[QMarginsF](QMarginsF(0.25, 0.25, 0.25, 0.25))
+  scale = AttriBox[float](0.15)
+  segmentMargins = AttriBox[QMarginsF](QMarginsF(0.15, 0.15, 0.15, 0.15))
   highColor = AttriBox[QColor](QColor(255, 0, 0, 255))
   lowColor = AttriBox[QColor](QColor(127, 0, 0, 255))
   aspectRatio = AttriBox[float](1.5)
@@ -89,13 +92,9 @@ class SevenSeg(BoxWidget):
   highBrush = Field()
   lowBrush = Field()
 
-  def __init__(self, ) -> None:
-    BoxWidget.__init__(self)
-    self.setFixedSize(32, 24)
-
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
-    return QSize(32, 24)
+    return QSize(24, 32)
 
   @aspectRect.GET
   def _getAspectRect(self) -> QRect:
@@ -168,8 +167,10 @@ class SevenSeg(BoxWidget):
     """Returns the center of each segment."""
     if offSet is None:
       return self._getRects(size, QPoint(0, 0))
+    if isinstance(offSet, QPointF):
+      return self._getRects(size, QPointF.toPoint(offSet))
     if isinstance(size, QSizeF):
-      return self._getRects(QSizeF.toSize(size), QPointF.toPoint(offSet))
+      return self._getRects(QSizeF.toSize(size), offSet)
     H, W = size.height(), size.width()
     hScale = H / W * self.scale
     vScale = self.scale
@@ -204,7 +205,15 @@ class SevenSeg(BoxWidget):
     for segment in Segment:
       place = centers[segment]
       size = sizes[segment]
-      rect = QRectF(origin, size).marginsRemoved(self.segmentMargins)
+      size = QRectF(origin, size).marginsRemoved(self.segmentMargins).size()
+      h, w = size.height(), size.width()
+      if size.width() < 2:
+        h, w = 2 * size.height() / size.width(), 2
+        size = QSizeF(w, h)
+      if size.height() < 2:
+        h, w = 2, 2 * size.width() / size.height()
+        size = QSizeF(w, h)
+      rect = QRectF(origin, size)
       rect.moveCenter(place)
       rects[segment] = QRectF.toRect(rect)
     return rects
@@ -224,5 +233,7 @@ class SevenSeg(BoxWidget):
         painter.setBrush(self.highBrush)
       else:
         painter.setBrush(self.lowBrush)
-      painter.drawRoundedRect(rect, 5, 5)
+      # painter.drawRoundedRect(rect, 5, 5)
+      painter.drawRect(rect)
+
     painter.end()

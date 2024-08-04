@@ -25,6 +25,15 @@ def textPen(color: QColor = None) -> QPen:
   return pen
 
 
+def solidPen(color: QColor = None, ) -> QPen:
+  """Creates a QPen suitable for drawing solid lines. The pen will default
+  to black, but this can be overridden by passing a color argument."""
+  pen = QPen()
+  pen.setStyle(Qt.PenStyle.SolidLine)
+  pen.setColor(maybe(color, QColor(0, 0, 0, 255)))
+  return pen
+
+
 def dashPen(color: QColor = None, ) -> QPen:
   """Creates a QPen suitable for drawing dashed lines. The pen will default
   to black, but this can be overridden by passing a color argument."""

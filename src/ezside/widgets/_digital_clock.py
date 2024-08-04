@@ -6,14 +6,15 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QMargins, QSize, QRect, QPoint, QSizeF, QRectF
+from PySide6.QtCore import Qt, QMargins, QSize, QRect, QPoint, QSizeF, \
+  QRectF, QMarginsF
 from PySide6.QtGui import QColor, QBrush, QPaintEvent, QPainter, \
   QResizeEvent, QShowEvent
 from PySide6.QtWidgets import QHBoxLayout, QSizePolicy
 from icecream import ic
 from worktoy.desc import AttriBox, Field
 
-from ezside.tools import emptyPen
+from ezside.tools import emptyPen, Align
 from ezside.widgets import BoxWidget, SevenSeg
 
 ic.configureOutput(includeContext=True)
@@ -105,30 +106,31 @@ class DigitalClock(BoxWidget):
   def __init__(self, parent=None, *args) -> None:
     """The constructor method for the DigitalClock widget."""
     BoxWidget.__init__(self, parent)
-    height = 32
-    self.setFixedHeight(height)
     self.backgroundColor = QColor(0, 0, 0, 255)
-    width = int(6 * (height / 1.5) + 2 * (height / 2))
-    self.aspectRatio = float(height) / float(width)
-    QHBoxLayout.setContentsMargins(self.layout, 0, 0, 0, 0)
+    self.borderColor = QColor(255, 0, 169, 255)
+    self.marginColor = QColor(31, 0, 0, 255)
+    self.margins = QMarginsF(2, 1, 2, 1, ) * 3
+    ic(self.margins)
+    self.aspectRatio = 0.2
+    QHBoxLayout.setContentsMargins(self.layout, self.margins.toMargins())
     QHBoxLayout.setSpacing(self.layout, 0)
-    QHBoxLayout.setAlignment(self.layout, Qt.AlignmentFlag.AlignRight)
-    segSize = QSizeF(height / 1.5, height).toSize()
-    colSize = QSizeF(height / 2, height).toSize()
+    QHBoxLayout.setAlignment(self.layout, Align.RIGHT.qt)
     for widget in self._getWidgets():
       if type(widget) is SevenSeg:
         setattr(widget, 'aspectRatio', 1.5)
-        SevenSeg.setFixedSize(widget, segSize)
       elif type(widget) is Colon:
         setattr(widget, 'aspectRatio', 2.)
-        Colon.setFixedSize(widget, colSize)
-      setattr(widget, 'lowColor', QColor(63, 0, 0, 255))
+      # setattr(widget, 'paddings', QMarginsF(1, 1, 1, 1, ))
+      setattr(widget, 'lowColor', QColor(95, 0, 0, 255))
       setattr(widget, 'highColor', QColor(255, 0, 0, 255))
-      setattr(widget, 'padding', QMargins(1, 1, 1, 1))
       setattr(widget, 'backgroundColor', QColor(0, 0, 0, 255))
       self.layout.addWidget(widget)
     self.setLayout(self.layout)
     self.refreshTime()
+
+  def minimumSizeHint(self) -> QSize:
+    """This method returns the size hint of the widget."""
+    return QSize(160, 32)
 
   def _getWidgets(self) -> list[BoxWidget]:
     """This method returns the widgets in the layout."""
