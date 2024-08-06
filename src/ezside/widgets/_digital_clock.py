@@ -12,7 +12,7 @@ from PySide6.QtGui import QColor, QBrush, QPaintEvent, QPainter, \
   QResizeEvent, QShowEvent
 from PySide6.QtWidgets import QHBoxLayout, QSizePolicy
 from icecream import ic
-from worktoy.desc import AttriBox, Field
+from worktoy.desc import AttriBox, Field, THIS
 
 from ezside.tools import emptyPen, Align
 from ezside.widgets import BoxWidget, SevenSeg
@@ -41,7 +41,7 @@ class Colon(BoxWidget):
 
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
-    return QSize(48, 16)
+    return QSize(12, 24)
 
   @brush.GET
   def _getBrush(self) -> QBrush:
@@ -56,14 +56,19 @@ class Colon(BoxWidget):
     BoxWidget.paintEvent(self, event)
     painter = QPainter()
     painter.begin(self)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    viewRect = painter.viewport()
+    borderRect = QRectF.marginsRemoved(viewRect.toRectF(), self.borders)
+    paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
+    #
     painter.setBrush(self.brush)
     painter.setPen(emptyPen())
-    diameter = self.contentRect.height() / 5
-    x = painter.viewport().width() / 2 - diameter / 2
-    y1 = 1 * diameter + self.contentRect.top()
-    y2 = 3 * diameter + self.contentRect.top()
-    painter.drawEllipse(x, y1, diameter, diameter)
-    painter.drawEllipse(x, y2, diameter, diameter)
+    d = borderRect.height() / 5
+    x = painter.viewport().width() / 2 - d / 2
+    y1 = 1 * d + borderRect.top()
+    y2 = 3 * d + borderRect.top()
+    painter.drawEllipse(int(x), int(y1), int(d), int(d))
+    painter.drawEllipse(int(x), int(y2), int(d), int(d))
     painter.end()
 
 
@@ -71,18 +76,18 @@ class DigitalClock(BoxWidget):
   """DigitalClock provides a widget displaying the current time using seven
   segment displays."""
 
-  __fallback_height__ = 48
+  # __fallback_height__ = 48
 
   layout = AttriBox[QHBoxLayout]()
-  oneSec = AttriBox[SevenSeg]()
-  tenSec = AttriBox[SevenSeg]()
-  colon1 = AttriBox[Colon]()
-  oneMin = AttriBox[SevenSeg]()
-  tenMin = AttriBox[SevenSeg]()
-  colon2 = AttriBox[Colon]()
-  oneHour = AttriBox[SevenSeg]()
-  tenHour = AttriBox[SevenSeg]()
-  spacer = AttriBox[Spacer]()
+  oneSec = AttriBox[SevenSeg](THIS)
+  tenSec = AttriBox[SevenSeg](THIS)
+  colon1 = AttriBox[Colon](THIS)
+  oneMin = AttriBox[SevenSeg](THIS)
+  tenMin = AttriBox[SevenSeg](THIS)
+  colon2 = AttriBox[Colon](THIS)
+  oneHour = AttriBox[SevenSeg](THIS)
+  tenHour = AttriBox[SevenSeg](THIS)
+  # spacer = AttriBox[Spacer](THIS)
 
   hour = Field()
   minute = Field()
@@ -110,21 +115,24 @@ class DigitalClock(BoxWidget):
     self.borderColor = QColor(255, 0, 169, 255)
     self.marginColor = QColor(31, 0, 0, 255)
     self.margins = QMarginsF(2, 1, 2, 1, ) * 3
-    ic(self.margins)
-    self.aspectRatio = 0.2
     QHBoxLayout.setContentsMargins(self.layout, self.margins.toMargins())
     QHBoxLayout.setSpacing(self.layout, 0)
-    QHBoxLayout.setAlignment(self.layout, Align.RIGHT.qt)
+    ratio = 0
     for widget in self._getWidgets():
       if type(widget) is SevenSeg:
-        setattr(widget, 'aspectRatio', 1.5)
+        setattr(widget, 'aspectRatio', 0.5)
+        ratio += 0.5
       elif type(widget) is Colon:
-        setattr(widget, 'aspectRatio', 2.)
+        setattr(widget, 'aspectRatio', 0.5)
+        ratio += 0.5
       # setattr(widget, 'paddings', QMarginsF(1, 1, 1, 1, ))
       setattr(widget, 'lowColor', QColor(95, 0, 0, 255))
       setattr(widget, 'highColor', QColor(255, 0, 0, 255))
       setattr(widget, 'backgroundColor', QColor(0, 0, 0, 255))
       self.layout.addWidget(widget)
+    self.aspectRatio = ratio
+    self.adjustSize()
+    self.update()
     self.setLayout(self.layout)
     self.refreshTime()
 
@@ -156,20 +164,7 @@ class DigitalClock(BoxWidget):
     if not kwargs.get('_recursion', False):
       self.update()
 
-  def resizeEvent(self, event: QResizeEvent) -> None:
-    """This method is responsible for resizing the widget."""
-    size = QResizeEvent.size(event)
-    rect = self._enforceAspect(QRect(QPoint(0, 0), size))
-    e = QResizeEvent(QSizeF.toSize(rect.size()), event.oldSize())
-    self.resize(e.size())
-    BoxWidget.resizeEvent(self, e)
-
   def showEvent(self, event: QShowEvent) -> None:
     """This method is responsible for showing the widget."""
     self.refreshTime(_recursion=True)
     BoxWidget.showEvent(self, event)
-
-  def resize(self, newSize: QSize) -> None:
-    """This method is responsible for resizing the widget."""
-    rect = QRectF.toRect(self._enforceAspect(QRect(QPoint(0, 0), newSize)))
-    BoxWidget.resize(self, rect.size())

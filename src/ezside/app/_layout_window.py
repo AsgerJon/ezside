@@ -6,7 +6,8 @@ for a further subclass."""
 from __future__ import annotations
 
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QVBoxLayout, QLayout
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QVBoxLayout, QLayout, QHBoxLayout
 from worktoy.desc import AttriBox, THIS
 
 from ezside.app import BaseWindow, StatusBar
@@ -19,8 +20,14 @@ class LayoutWindow(BaseWindow):
   for a further subclass."""
 
   baseWidget = AttriBox[BoxWidget](THIS)
+  horizontalWidget = AttriBox[BoxWidget](THIS)
   baseLayout = AttriBox[QVBoxLayout]()
-  welcomeLabel = AttriBox[Label](THIS, 'YOLO')
+  horizontalLayout = AttriBox[QHBoxLayout]()
+  headerLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
+  leftLabel = AttriBox[Label](THIS, 'Left')
+  centralLabel = AttriBox[Label](THIS, 'Central')
+  rightLabel = AttriBox[Label](THIS, 'Right')
+  footerLabel = AttriBox[Label](THIS, 'Footer')
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the object"""
@@ -29,7 +36,14 @@ class LayoutWindow(BaseWindow):
 
   def initLayout(self) -> None:
     """This method is responsible for initializing the user interface."""
-    QLayout.setContentsMargins(self.baseLayout, 0, 0, 0, 0)
-    self.baseLayout.addWidget(self.welcomeLabel)
+    self.baseWidget.backgroundColor = QColor(144, 255, 0, 255)
+    self.horizontalWidget.backgroundColor = QColor(255, 144, 0, 255)
+    self.baseLayout.addWidget(self.headerLabel)
+    self.horizontalLayout.addWidget(self.leftLabel)
+    self.horizontalLayout.addWidget(self.centralLabel)
+    self.horizontalLayout.addWidget(self.rightLabel)
+    self.horizontalWidget.setLayout(self.horizontalLayout)
+    self.baseLayout.addWidget(self.horizontalWidget)
+    self.baseLayout.addWidget(self.footerLabel)
     self.baseWidget.setLayout(self.baseLayout)
     self.setCentralWidget(self.baseWidget)

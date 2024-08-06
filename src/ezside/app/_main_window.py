@@ -52,20 +52,20 @@ class MainWindow(LayoutWindow):
 
   def updateLabelColor(self, color: QColor) -> None:
     """Updates the color of the label."""
-    self.welcomeLabel.backgroundColor = color
-    self.welcomeLabel.update()
+    self.headerLabel.backgroundColor = color
+    self.headerLabel.update()
 
   def debug02(self) -> None:
     """Testing label size change"""
-    self.welcomeLabel.fontSize -= 1
-    self.welcomeLabel.adjustSize()
-    self.welcomeLabel.update()
+    self.headerLabel.fontSize -= 1
+    self.headerLabel.adjustSize()
+    self.headerLabel.update()
 
   def debug03(self) -> None:
     """Testing label size change"""
-    self.welcomeLabel.fontSize += 1
-    self.welcomeLabel.adjustSize()
-    self.welcomeLabel.update()
+    self.headerLabel.fontSize += 1
+    self.headerLabel.adjustSize()
+    self.headerLabel.update()
 
   def debug04(self) -> None:
     """Testing label size change"""

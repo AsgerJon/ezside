@@ -84,7 +84,6 @@ class SevenSeg(BoxWidget):
   segmentMargins = AttriBox[QMarginsF](QMarginsF(0.15, 0.15, 0.15, 0.15))
   highColor = AttriBox[QColor](QColor(255, 0, 0, 255))
   lowColor = AttriBox[QColor](QColor(127, 0, 0, 255))
-  aspectRatio = AttriBox[float](1.5)
 
   aspectRect = Field()
   digit = Field()
@@ -94,7 +93,7 @@ class SevenSeg(BoxWidget):
 
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
-    return QSize(24, 32)
+    return QSize(16, 24)
 
   @aspectRect.GET
   def _getAspectRect(self) -> QRect:
@@ -223,11 +222,15 @@ class SevenSeg(BoxWidget):
     BoxWidget.paintEvent(self, event)
     painter = QPainter()
     painter.begin(self)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    viewRect = painter.viewport()
+    borderRect = QRectF.marginsRemoved(viewRect.toRectF(), self.borders)
+    paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
     #  Draw padded area
     painter.setBrush(emptyBrush())
     painter.setPen(self.segmentPen)
     #  Draw the outline of every segment regardless of state
-    rects = self.getRects(self.contentRect)
+    rects = self.getRects(paddedRect)
     for segment, rect in rects.items():
       if segment.state(self.digit):
         painter.setBrush(self.highBrush)

@@ -5,10 +5,13 @@ from __future__ import annotations
 
 from PySide6.QtGui import QColor, QFont, QPen, Qt, QPainter, QFontMetrics, \
   QFontMetricsF
+from icecream import ic
 from worktoy.desc import Field, AttriBox, DEFAULT
 from worktoy.meta import BaseObject
 
 from ezside.tools import FontWeight, FontFamily, FontCap, Align, ColorBox
+
+ic.configureOutput(includeContext=True)
 
 
 class Font(BaseObject):
@@ -21,7 +24,7 @@ class Font(BaseObject):
   italic = AttriBox[bool](False)
   underline = AttriBox[bool](False)
   strike = AttriBox[bool](False)
-  align = AttriBox[Align](DEFAULT(Align.LEFT))
+  align = AttriBox[Align](DEFAULT(Align.CENTER))
   color = ColorBox(QColor(0, 0, 0, 255))
 
   asQFont = Field()
@@ -36,9 +39,6 @@ class Font(BaseObject):
     QFont.setFamily(out, self.family.value)
     QFont.setWeight(out, self.weight.qt)
     QFont.setCapitalization(out, self.cap.qt)
-    print(self.italic)
-    print(type(self.italic))
-    print(self.italic.value)
     QFont.setItalic(out, self.italic)
     QFont.setUnderline(out, self.underline)
     QFont.setStrikeOut(out, self.strike)

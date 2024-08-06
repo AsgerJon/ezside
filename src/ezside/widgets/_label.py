@@ -3,7 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import Never
+from typing import Never, Any
 
 from PySide6.QtCore import QSize, QRect, QMargins, Qt, QPoint, QMarginsF, \
   QRectF, QSizeF
@@ -14,7 +14,7 @@ from icecream import ic
 from worktoy.desc import AttriBox, Field, DEFAULT
 from worktoy.meta import overload, BaseObject
 from worktoy.parse import maybe
-from worktoy.text import typeMsg
+from worktoy.text import typeMsg, monoSpace
 
 from ezside.tools import textPen, Align, emptyBrush, fillBrush, parsePen, \
   Font
@@ -68,10 +68,33 @@ class _Parse(BaseObject):
 class Label(BoxWidget):
   """Label provides a property driven alternative to QLabel. """
 
+  __parsed_object__ = None
+
   font = AttriBox[Font]()
   text = AttriBox[str](DEFAULT('LMAO'))
 
   rectSize = Field()
+  parsed = Field()
+
+  @parsed.GET
+  def _getParsed(self, ) -> _Parse:
+    """Getter-function for the parsed."""
+    if self.__parsed_object__ is None:
+      e = """The parsed object must be set during '__init__', but was 
+      None!"""
+      raise RuntimeError(monoSpace(e))
+    if isinstance(self.__parsed_object__, _Parse):
+      return self.__parsed_object__
+    e = typeMsg('parsedObject', self.__parsed_object__, _Parse)
+    raise TypeError(e)
+
+  @parsed.SET
+  def _setParsed(self, args: tuple[Any]) -> None:
+    """Setter-function for the parsed."""
+    if self.__parsed_object__ is not None:
+      e = """The parsed object is write-once, but was set multiple times!"""
+      raise RuntimeError(monoSpace(e))
+    self.__parsed_object__ = _Parse(*args)
 
   @rectSize.GET
   def _getRectSize(self) -> QSizeF:
@@ -101,7 +124,11 @@ class Label(BoxWidget):
     painter.drawText(paddedRect, self.font.align.qt, self.text)
     painter.end()
 
-  def __init__(self, *args, ):
-    parsed = _Parse(*args)
-    BoxWidget.__init__(self, parsed.parent)
-    self.text = parsed.text
+  def __init__(self, *args, ) -> None:
+    self.parsed = (*args,)
+    if isinstance(self.parsed, _Parse):
+      BoxWidget.__init__(self, self.parsed.parent)
+      self.text = self.parsed.text
+    else:
+      e = typeMsg('parsed', self.parsed, _Parse)
+      raise TypeError(e)
