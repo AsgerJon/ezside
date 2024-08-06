@@ -30,8 +30,8 @@ class StatusBar(QStatusBar):
         break
     else:
       QStatusBar.__init__(self)
-    self.addPermanentWidget(self.digitalClock)
-    self.digitalClock.refreshTime()
+    # self.addPermanentWidget(self.digitalClock)
+    # self.digitalClock.refreshTime()
     self.setStyleSheet(
         """
         QStatusBar {

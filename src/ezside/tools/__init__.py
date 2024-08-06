@@ -4,6 +4,8 @@ of instances of QFont, QPen, QBrush and similar. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from ._margins_box import MarginsBox
+from ._color_box import ColorBox
 from ._timer import Timer
 from ._align import Align
 from ._font_cap import FontCap

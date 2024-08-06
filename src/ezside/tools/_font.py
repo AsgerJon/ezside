@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor, QFont, QPen, Qt, QPainter, QFontMetrics, \
 from worktoy.desc import Field, AttriBox, DEFAULT
 from worktoy.meta import BaseObject
 
-from ezside.tools import FontWeight, FontFamily, FontCap, Align
+from ezside.tools import FontWeight, FontFamily, FontCap, Align, ColorBox
 
 
 class Font(BaseObject):
@@ -22,7 +22,7 @@ class Font(BaseObject):
   underline = AttriBox[bool](False)
   strike = AttriBox[bool](False)
   align = AttriBox[Align](DEFAULT(Align.LEFT))
-  color = AttriBox[QColor](QColor(0, 0, 0, 255))
+  color = ColorBox(QColor(0, 0, 0, 255))
 
   asQFont = Field()
   asQPen = Field()
@@ -32,15 +32,18 @@ class Font(BaseObject):
   @asQFont.GET
   def _getQFont(self) -> QFont:
     """Getter-function for QFont representation"""
-    font = QFont()
-    QFont.setFamily(font, self.family.value)
-    QFont.setWeight(font, self.weight.qt)
-    QFont.setCapitalization(font, self.cap.qt)
-    QFont.setItalic(font, self.italic)
-    QFont.setUnderline(font, self.underline)
-    QFont.setStrikeOut(font, self.strike)
-    QFont.setPointSize(font, self.size)
-    return font
+    out = QFont()
+    QFont.setFamily(out, self.family.value)
+    QFont.setWeight(out, self.weight.qt)
+    QFont.setCapitalization(out, self.cap.qt)
+    print(self.italic)
+    print(type(self.italic))
+    print(self.italic.value)
+    QFont.setItalic(out, self.italic)
+    QFont.setUnderline(out, self.underline)
+    QFont.setStrikeOut(out, self.strike)
+    QFont.setPointSize(out, self.size)
+    return out
 
   @asQPen.GET
   def _getQPen(self) -> QPen:

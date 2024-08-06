@@ -3,7 +3,7 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Never
 
 from PySide6.QtCore import QMarginsF, QMargins
 from worktoy.desc import AbstractDescriptor
@@ -22,6 +22,13 @@ class MarginsBox(AbstractDescriptor):
     return QMarginsF(*self.__fallback_margins__, )
 
   @overload(QMargins)
+  def parse(self, margins: QMargins) -> QMarginsF:
+    """Parses arguments to QMarginsF instance"""
+    return self.parse(margins.left(),
+                      margins.top(),
+                      margins.right(),
+                      margins.bottom(), )
+
   @overload(QMarginsF)
   def parse(self, margins: QMarginsF) -> QMarginsF:
     """Parses arguments to QMarginsF instance"""
@@ -30,13 +37,11 @@ class MarginsBox(AbstractDescriptor):
                       margins.right(),
                       margins.bottom(), )
 
-  @overload(int, int)
   @overload(float, float)
   def parse(self, width: float, height: float) -> QMarginsF:
     """Parses arguments to QMarginsF instance"""
     return self.parse(width, height, width, height, )
 
-  @overload(int)
   @overload(float)
   def parse(self, value: float) -> QMarginsF:
     """Parses arguments to QMarginsF instance"""
@@ -47,7 +52,6 @@ class MarginsBox(AbstractDescriptor):
     """Parses arguments to QMarginsF instance"""
     return self.parse(*self.__fallback_margins__, )
 
-  @overload(int, int, int, int)
   @overload(float, float, float, float)
   def parse(self, *args) -> QMarginsF:
     """Parses arguments to QMarginsF instance"""
@@ -72,10 +76,6 @@ class MarginsBox(AbstractDescriptor):
     AbstractDescriptor.__init__(self)
     self.__default_margins__ = self.parse(*args, )
 
-  def _getPrivateName(self) -> str:
-    """Get the private name of the descriptor."""
-    return '__%s_value__' % self.getFieldName()
-
   def __instance_get__(self, instance: object, **kwargs) -> QMarginsF:
     """Get the value of the field."""
     pvtName = self._getPrivateName()
@@ -92,6 +92,12 @@ class MarginsBox(AbstractDescriptor):
 
   def __instance_set__(self, instance: object, value: QMarginsF) -> None:
     """Set the value of the field."""
+    print(value)
     margins = self.parse(value)
     pvtName = self._getPrivateName()
-    setattr(instance, pvtName, value)
+    setattr(instance, pvtName, margins)
+
+  def __instance_del__(self, instance: object) -> Never:
+    """Illegal deleter function"""
+    e = """%s does not implement deletion!""" % self.__class__.__name__
+    raise TypeError(e)
