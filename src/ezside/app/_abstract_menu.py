@@ -7,13 +7,11 @@ parser implement function overloading. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from abc import abstractmethod
-from typing import Never, Self
+from typing import Self
 
-from PySide6.QtWidgets import QWidget, QMenu
+from PySide6.QtWidgets import QMenu
 from icecream import ic
 from worktoy.desc import Field
-from worktoy.meta import BaseObject, overload
 from worktoy.parse import maybe
 from worktoy.text import monoSpace, typeMsg
 

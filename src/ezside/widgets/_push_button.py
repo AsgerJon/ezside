@@ -7,10 +7,10 @@ from PySide6.QtCore import Signal, QPoint
 from PySide6.QtGui import QEnterEvent, QMouseEvent
 from worktoy.desc import Field
 
-from ezside.widgets import TextLabel, ButtonState
+from ezside.widgets import Label, ButtonState
 
 
-class PushButton(TextLabel):
+class PushButton(Label):
   """This class provides the state awareness of a push button. """
 
   #  PRIVATE  # ----------------
@@ -80,14 +80,14 @@ class PushButton(TextLabel):
 
   def enterEvent(self, event: QEnterEvent) -> None:
     """Event handler for when the mouse enters the widget."""
-    TextLabel.enterEvent(self, event)
+    Label.enterEvent(self, event)
     self.__under_mouse__ = True
     self.__cursor_position__ = event.pos()
     self.mouseEnter.emit()
 
   def leaveEvent(self, event: QEnterEvent) -> None:
     """Event handler for when the mouse leaves the widget."""
-    TextLabel.leaveEvent(self, event)
+    Label.leaveEvent(self, event)
     self.__under_mouse__ = False
     self.__mouse_pressed__ = False
     self.__cursor_position__ = QPoint(-1, -1)
@@ -95,18 +95,18 @@ class PushButton(TextLabel):
 
   def mouseMoveEvent(self, event: QMouseEvent) -> None:
     """Event handler for when the mouse moves over the widget."""
-    TextLabel.mouseMoveEvent(self, event)
+    Label.mouseMoveEvent(self, event)
     self.__under_mouse__ = True
     self.__cursor_position__ = event.pos()
 
   def mousePressEvent(self, event: QMouseEvent) -> None:
     """Event handler for when the mouse is pressed over the widget."""
-    TextLabel.mousePressEvent(self, event)
+    Label.mousePressEvent(self, event)
     self.__mouse_pressed__ = True
     self.mousePress.emit()
 
   def mouseReleaseEvent(self, event: QMouseEvent) -> None:
     """Event handler for when the mouse is released over the widget."""
-    TextLabel.mouseReleaseEvent(self, event)
+    Label.mouseReleaseEvent(self, event)
     self.__mouse_pressed__ = False
     self.mouseRelease.emit()
