@@ -45,7 +45,6 @@ class StatusBar(QStatusBar):
   def showEvent(self, event: QShowEvent) -> None:
     """Show the main window."""
     QMainWindow.showEvent(self, event)
-    print('%s - Show event' % self.__class__.__name__)
 
   @Slot()
   def refreshTime(self) -> None:

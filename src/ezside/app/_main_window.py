@@ -3,10 +3,11 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+import os
 import sys
 
-from PySide6.QtCore import QMargins, QRectF, QPointF, QSizeF
-from PySide6.QtGui import QColor, QFont, QFontDatabase
+from PySide6.QtCore import QMargins, QRectF, QPointF, QSizeF, QSize, Slot
+from PySide6.QtGui import QColor, QFont, QFontDatabase, QResizeEvent
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from icecream import ic
 from pyperclip import copy
@@ -33,8 +34,40 @@ class MainWindow(LayoutWindow):
         self.debug05)
     self.mainMenuBar.debugMenu.debugAction06.triggered.connect(
         self.debug06)
-    self.mainMenuBar.debugMenu.debugAction07.triggered.connect(
-        self.debug07)
+    self.mainMenuBar.fileMenu.openAction.triggered.connect(
+        self.requestOpenFile)
+    self.mainMenuBar.fileMenu.saveAsAction.triggered.connect(
+        self.requestSaveFile)
+    self.mainMenuBar.fileMenu.saveAction.triggered.connect(
+        self.imgEdit.saveImage)
+    self.mainMenuBar.fileMenu.newAction.triggered.connect(
+        self.requestNewFile)
+    self.openFileSelected.connect(self.imgEdit.openImage)
+    self.saveFileSelected.connect(self.imgEdit.saveAsImage)
+    self.imgEdit.requestFid.connect(self.requestSaveFile)
+    self.imgEdit.requestColor.connect(self.requestColor)
+    self.colorSelected.connect(self.updateColor)
+    self.colorButton.leftClick.connect(self.requestColor)
+    self.imgEdit.newFid.connect(self.updateWindowTitle)
+    self.imgEdit.openFid.connect(self.updateWindowTitle)
+    self.imgEdit.saveFid.connect(self.updateWindowTitle)
+    self.newImage.connect(self.imgEdit.fromDialog)
+
+  @Slot(str)
+  def updateWindowTitle(self, fid: str) -> None:
+    """Shows the file name in the window title"""
+    baseName = os.path.basename(fid)
+    appName = QApplication.instance().applicationName()
+    newTitle = """ -- %s -- | %s """ % (appName, baseName)
+    self.setWindowTitle(newTitle)
+
+  @Slot(QColor)
+  def updateColor(self, color: QColor) -> None:
+    """Updates the color of the label."""
+    self.imgEdit.setPaintColor(color)
+    self.imgEdit.update()
+    self.colorButton.backgroundColor = color
+    self.colorButton.update()
 
   def show(self) -> None:
     """Reimplementation setting up signals and slots before invoking
@@ -43,6 +76,11 @@ class MainWindow(LayoutWindow):
     self.initSignalSlot()
     self.adjustSize()
     QMainWindow.show(self)
+
+  def resizeEvent(self, event: QResizeEvent) -> None:
+    """Reimplementation of resize event."""
+    ic(event)
+    LayoutWindow.resizeEvent(self, event)
 
   def about(self) -> None:
     """Displays information about Python."""
@@ -84,22 +122,3 @@ class MainWindow(LayoutWindow):
     outerMargins = QMargins(7, 7, 7, 7, )
     sumOfMargins = innerMargins + outerMargins
     self.mainStatusBar.showMessage(str(sumOfMargins))
-
-  def debug07(self) -> None:
-    """Testing SizeRule"""
-
-    class LMAO:
-      margins = MarginsBox(1)
-
-      def __str__(self) -> str:
-        left = self.margins.left()
-        top = self.margins.top()
-        right = self.margins.right()
-        bottom = self.margins.bottom()
-        out = """Left: %d, Top: %d, Right: %d, Bottom: %d"""
-        return out % (left, top, right, bottom)
-
-    rect = QRectF(QPointF(0, 0), QSizeF(100, 100))
-    print(rect.size())
-    rect += LMAO().margins
-    print(rect.size())

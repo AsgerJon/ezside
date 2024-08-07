@@ -8,7 +8,7 @@ from typing import TypeAlias, Union, Optional
 
 from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QPointF, Qt
 from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QLayout
 from icecream import ic
 from worktoy.desc import AttriBox, Field
 from worktoy.meta import BaseObject, overload
@@ -107,6 +107,8 @@ class BoxWidget(QWidget):
   def requiredSize(self) -> QSizeF:
     """Subclasses may implement this method to define minimum size
     requirements. """
+    layout = self.layout()
+    n = QLayout.count(layout)
     return QSizeF(0, 0)
 
   def minimumSizeHint(self) -> QSize:
@@ -132,3 +134,13 @@ class BoxWidget(QWidget):
         else:
           sizeRule += arg
     self.sizeRule = maybe(sizeRule, SizeRule.PREFER)
+
+  def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
+    """Subclasses should implement this method to specify how to paint
+    them. When used in a layout from 'ezside.layouts', only this method
+    can specify painting, as QWidget.paintEvent will not be called.
+
+    The painter and rectangle passed are managed by the layout and widgets
+    are expected to draw only inside the given rect. The layout ensures
+    that this rect is at least the exact size specified by the
+    'requiredSize' method on this widget. """

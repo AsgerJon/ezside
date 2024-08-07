@@ -3,7 +3,13 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtCore import QSettings, QByteArray
+from PySide6.QtGui import QCloseEvent, QMouseEvent
+from PySide6.QtWidgets import QFileDialog, QAbstractItemView, QTreeView, \
+  QListView
+from icecream import ic
+
+ic.configureOutput(includeContext=True)
 
 
 class OpenFileDialog(QFileDialog):
@@ -11,7 +17,31 @@ class OpenFileDialog(QFileDialog):
 
   def __init__(self, parent=None) -> None:
     QFileDialog.__init__(self, parent)
+    ic('LMAO')
+    self.setMouseTracking(True)
+    state = QSettings().value('OpenFileDialog/saveState', None)
+    if isinstance(state, QByteArray):
+      self.restoreState(state)
     self.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
     self.setFileMode(QFileDialog.FileMode.ExistingFile)
+    self.setViewMode(QFileDialog.ViewMode.Detail)
     self.setOption(QFileDialog.Option.DontUseNativeDialog, True)
     self.setOption(QFileDialog.Option.ShowDirsOnly, False)
+    self.setOption(QFileDialog.Option.DontUseCustomDirectoryIcons, False)
+    self.setNameFilter('Images (*.png *.xpm *.jpg *.jpeg *.bmp *.gif)')
+    self.setSizeGripEnabled(True)
+    self.setOption(QFileDialog.Option.DontResolveSymlinks, True)
+
+  def closeEvent(self, event: QCloseEvent) -> None:
+    """Reimplementation that saves the states and closes the dialog. """
+    QSettings().setValue('OpenFileDialog/saveState', self.saveState())
+    ic("LOL")
+    QFileDialog.closeEvent(self, event)
+
+  def mousePressEvent(self, event: QMouseEvent) -> None:
+    """Reimplementation that saves the states and closes the dialog. """
+    ic('LOL')
+
+  def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+    """Reimplementation that saves the states and closes the dialog. """
+    QFileDialog.mouseReleaseEvent(self, event)

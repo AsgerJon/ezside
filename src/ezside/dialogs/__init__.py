@@ -7,3 +7,4 @@ from ._select_dir import DirectoryDialog
 from ._save_file import SaveFileDialog
 from ._open_file import OpenFileDialog
 from ._about_python import AboutPythonDialog
+from ._new_dialog import NewDialog

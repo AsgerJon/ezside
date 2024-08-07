@@ -23,6 +23,8 @@ class App(QApplication):
     QApplication.__init__(self, )
     self.setAttribute(MenuFlag)
     self._setWindowClass(cls)
+    self.setApplicationName('EZSide')
+    self.setOrganizationName('EZSide')
 
   def _getWindowClass(self) -> type:
     """Returns the main window class"""

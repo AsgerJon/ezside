@@ -3,6 +3,8 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Self
+
 from PySide6.QtGui import QFont
 from worktoy.desc import Field
 from worktoy.keenum import KeeNum, auto
@@ -31,6 +33,7 @@ class FontFamily(KeeNum):
   UBUNTU_CONDENSED = auto('Ubuntu Condensed')
   UBUNTU_LIGHT = auto('Ubuntu Light')
   UBUNTU_MONO = auto('Ubuntu Mono')
+  MONTSERRAT = auto('Montserrat')
 
   def apply(self, font: QFont) -> QFont:
     """Apply the font family to the given QFont."""
@@ -43,3 +46,22 @@ class FontFamily(KeeNum):
     out = QFont()
     out.setFamily(self.value)
     return out
+
+  @classmethod
+  def __class_call__(cls, *args, **kwargs) -> Self:
+    """Class-call method for FontFamily"""
+    for arg in args:
+      if isinstance(arg, QFont):
+        arg = arg.family()
+      if isinstance(arg, str):
+        for item in cls:
+          if item.name.lower() == arg.family().lower():
+            return item
+      if isinstance(arg, cls):
+        return arg
+      if isinstance(arg, int):
+        for item in cls:
+          if int(item) == arg:
+            return item
+    e = """Unable to resolve FontFamily!"""
+    raise ValueError(e)

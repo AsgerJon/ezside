@@ -12,7 +12,8 @@ from worktoy.desc import AttriBox, THIS
 
 from ezside.app import BaseWindow, StatusBar
 from ezside.tools import SizeRule
-from ezside.widgets import Label, BoxWidget, DigitalClock, PushButton
+from ezside.widgets import Label, BoxWidget, DigitalClock, PushButton, \
+  ImgEdit
 
 
 class LayoutWindow(BaseWindow):
@@ -24,9 +25,14 @@ class LayoutWindow(BaseWindow):
   horizontalWidget = AttriBox[BoxWidget](THIS)
   baseLayout = AttriBox[QVBoxLayout]()
   horizontalLayout = AttriBox[QHBoxLayout]()
+  verticalWidget = AttriBox[BoxWidget](THIS)
+  verticalLayout = AttriBox[QVBoxLayout]()
+  updateImage = AttriBox[PushButton](THIS, 'Update Image')
+  updateTensor = AttriBox[PushButton](THIS, 'Update Tensor')
+  colorButton = AttriBox[PushButton](THIS, 'Color')
   headerLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
   leftLabel = AttriBox[Label](THIS, 'Left')
-  centralLabel = AttriBox[PushButton](THIS, 'Central')
+  imgEdit = AttriBox[ImgEdit](THIS)
   rightLabel = AttriBox[Label](THIS, 'Right')
   footerLabel = AttriBox[Label](THIS, 'Footer')
 
@@ -43,8 +49,13 @@ class LayoutWindow(BaseWindow):
     self.footerLabel.sizeRule = SizeRule.PREFER + SizeRule.CONTRACT
     self.baseLayout.addWidget(self.headerLabel)
     self.horizontalLayout.addWidget(self.leftLabel)
-    self.horizontalLayout.addWidget(self.centralLabel)
-    self.horizontalLayout.addWidget(self.rightLabel)
+    self.horizontalLayout.addWidget(self.imgEdit)
+    self.verticalLayout.addWidget(self.updateImage)
+    self.verticalLayout.addWidget(self.updateTensor)
+    self.colorButton.backgroundColor = self.imgEdit.paintColor
+    self.verticalLayout.addWidget(self.colorButton)
+    self.verticalWidget.setLayout(self.verticalLayout)
+    self.horizontalLayout.addWidget(self.verticalWidget)
     self.horizontalWidget.setLayout(self.horizontalLayout)
     self.baseLayout.addWidget(self.horizontalWidget)
     self.baseLayout.addWidget(self.footerLabel)

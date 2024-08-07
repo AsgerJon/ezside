@@ -42,7 +42,6 @@ class AboutPythonDialog(QDialog):
 
   def show(self) -> None:
     """Show the dialog. """
-    ic(self.autoFillBackground())
     self.setWindowTitle('About Python and Mamba')
     info = """Python %d.%d.%d and Conda %d.%d.%d"""
     major, minor, micro = sys.version_info[:3]

@@ -10,3 +10,4 @@ from ._label import Label, Label
 from ._push_button import PushButton
 from ._seven_seg import SevenSeg
 from ._digital_clock import DigitalClock
+from ._img_edit import ImgEdit

@@ -5,9 +5,6 @@ be further subclassed to implement widget layout and business logic. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import os
-from sys import executable
-
 from PySide6.QtCore import Signal, Qt, Slot, QSize
 from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import QMainWindow, QColorDialog, QFontDialog
@@ -17,7 +14,7 @@ from worktoy.desc import THIS, AttriBox
 
 from ezside.app import StatusBar, MenuBar
 from ezside.dialogs import DirectoryDialog, SaveFileDialog, OpenFileDialog, \
-  AboutPythonDialog
+  AboutPythonDialog, NewDialog
 from ezside.tools import Timer
 
 ic.configureOutput(includeContext=True)
@@ -28,6 +25,7 @@ class BaseWindow(QMainWindow):
   application. It implements menus, menubar and statusbar. It is intended to
   be further subclassed to implement widget layout and business logic. """
 
+  newDialog = AttriBox[NewDialog](THIS)
   colorWheel = AttriBox[QColorDialog](THIS)
   fontOptions = AttriBox[QFontDialog](THIS)
   openFile = AttriBox[OpenFileDialog](THIS)
@@ -41,6 +39,7 @@ class BaseWindow(QMainWindow):
   openFileSelected = Signal(str)
   saveFileSelected = Signal(str)
   pulse = Signal()
+  newImage = Signal(NewDialog)
   timer = AttriBox[Timer](THIS, Qt.TimerType.PreciseTimer, 500, False)
   mainStatusBar = AttriBox[StatusBar](THIS)
   mainMenuBar = AttriBox[MenuBar](THIS)
@@ -78,9 +77,20 @@ class BaseWindow(QMainWindow):
     directory."""
     self.selDir.show()
 
+  @Slot()
+  def requestNewFile(self) -> None:
+    """Triggering this method starts the 'new' wizard"""
+    self.newDialog.show()
+
+  @Slot()
+  def _relayNewImage(self) -> None:
+    """Relays the completed wizard to the main window."""
+    self.newImage.emit(self.newDialog)
+
   def initSignalSlot(self, ) -> None:
     """Initializes the signal slot connections for the object."""
     #  Connecting 'accept' signals from dialogs to relevant slots
+    self.newDialog.accepted.connect(self._relayNewImage)
     self.colorWheel.colorSelected.connect(self.colorSelected)
     self.fontOptions.fontSelected.connect(self.fontSelected)
     self.selDir.fileSelected.connect(self.directorySelected)
@@ -95,3 +105,4 @@ class BaseWindow(QMainWindow):
         QApplication.aboutQt)
     self.mainMenuBar.helpMenu.aboutPythonAction.triggered.connect(
         self.aboutPython.show)
+    self.mainMenuBar.fileMenu.exitAction.triggered.connect(self.close)

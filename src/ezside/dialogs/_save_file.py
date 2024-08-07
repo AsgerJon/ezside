@@ -18,3 +18,4 @@ class SaveFileDialog(QFileDialog):
     self.setOption(QFileDialog.Option.DontUseNativeDialog, True)
     self.setOption(QFileDialog.Option.ShowDirsOnly, False)
     self.setOption(QFileDialog.Option.DontConfirmOverwrite, False)
+    self.setNameFilter('Images (*.png *.xpm *.jpg *.jpeg *.bmp *.gif)')

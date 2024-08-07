@@ -3,14 +3,16 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import Signal, QPoint, QRectF, QPointF, QSize, QMarginsF
+from PySide6.QtCore import (Signal, QPoint, QRectF, QPointF, QSize,
+                            QMarginsF, \
+                            Qt)
 from PySide6.QtGui import QEnterEvent, QMouseEvent, QColor, QPaintEvent, \
-  QPainter
+  QPainter, QShowEvent
 from icecream import ic
 from worktoy.desc import Field, AttriBox
 from worktoy.parse import maybe
 
-from ezside.tools import emptyPen, SizeRule, Align
+from ezside.tools import emptyPen, SizeRule, Align, ColorBox
 from ezside.widgets import Label, ButtonState, BoxWidget
 
 ic.configureOutput(includeContext=True)
@@ -25,6 +27,7 @@ class PushButton(Label):
   __mouse_pressed__ = None
   __cursor_position__ = None
   __mouse_region__ = None
+  __first_show__ = True
   #  PUBLIC  # -----------------
   active = Field()
   underMouse = Field()
@@ -41,6 +44,8 @@ class PushButton(Label):
   mouseEnter = Signal()
   mousePress = Signal()
   mouseRelease = Signal()
+  leftClick = Signal()
+  rightClick = Signal()
   #  State-Boxes # ------------
   disabledHover = AttriBox[BoxWidget]()
   disabledReleased = AttriBox[BoxWidget]()
@@ -81,9 +86,9 @@ class PushButton(Label):
     self.disabledHover.backgroundColor = QColor(255, 255, 255, 255)
     self.disabledReleased.backgroundColor = QColor(255, 255, 255, 255)
     self.disabledPressed.backgroundColor = QColor(255, 255, 255, 255)
-    self.enabledHover.backgroundColor = QColor(191, 191, 191, 255)
+    self.enabledHover.backgroundColor = QColor(247, 247, 247, 255)
     self.enabledReleased.backgroundColor = QColor(255, 255, 255, 255)
-    self.enabledPressed.backgroundColor = QColor(144, 144, 144, 255)
+    self.enabledPressed.backgroundColor = QColor(247, 247, 247, 255)
 
     self.disabledHover.borderColor = QColor(127, 127, 127, 255)
     self.disabledReleased.borderColor = QColor(255, 255, 255, 255)
@@ -91,6 +96,21 @@ class PushButton(Label):
     self.enabledHover.borderColor = QColor(0, 0, 0, 255)
     self.enabledReleased.borderColor = QColor(127, 127, 127, 255)
     self.enabledPressed.borderColor = QColor(0, 0, 0, 255)
+    self.backgroundColor = QColor(255, 255, 255, 255)
+    self.update()
+
+  backgroundColor = ColorBox(QColor(255, 255, 255, 255))
+
+  @backgroundColor.PRESET
+  def _handleBGColor(self, oldVal: QColor, newVal: QColor) -> None:
+    if newVal == oldVal:
+      return
+    self.disabledHover.backgroundColor = newVal
+    self.disabledReleased.backgroundColor = newVal
+    self.disabledPressed.backgroundColor = newVal
+    self.enabledHover.backgroundColor = newVal
+    self.enabledReleased.backgroundColor = newVal
+    self.enabledPressed.backgroundColor = newVal
 
   def activate(self) -> None:
     """This method activates the button."""
@@ -122,6 +142,18 @@ class PushButton(Label):
     """This method returns the state box of the widget."""
     return self.getStateDict()[self.buttonState]
 
+  def getRadius(self, ) -> tuple[int, int]:
+    """Corner radii"""
+    radii = {
+        ButtonState.DISABLED_HOVER   : (1, 1),
+        ButtonState.DISABLED_RELEASED: (1, 1),
+        ButtonState.DISABLED_PRESSED : (1, 1),
+        ButtonState.ENABLED_HOVER    : (4, 4),
+        ButtonState.ENABLED_RELEASED : (1, 1),
+        ButtonState.ENABLED_PRESSED  : (9, 9),
+    }
+    return radii[self.buttonState]
+
   def paintEvent(self, event: QPaintEvent) -> None:
     """Reimplementation"""
     painter = QPainter()
@@ -134,9 +166,9 @@ class PushButton(Label):
     borderRect.moveCenter(viewRect.center())
     painter.setPen(emptyPen())
     painter.setBrush(self.stateBox().borderBrush)
-    painter.drawRect(borderRect)
+    painter.drawRoundedRect(borderRect, *self.getRadius())
     painter.setBrush(self.stateBox().backgroundBrush)
-    painter.drawRect(contentRect)
+    painter.drawRoundedRect(contentRect, *self.getRadius())
     self.__mouse_region__ = borderRect
     self.font @ painter
     painter.drawText(contentRect, self.font.align.qt, self.text)
@@ -261,12 +293,25 @@ class PushButton(Label):
     """Event handler for when the mouse is pressed over the widget."""
     Label.mousePressEvent(self, event)
     self.__mouse_pressed__ = True
-    self.mousePress.emit()
+    if self.underMouse:
+      self.mousePress.emit()
     self.update()
 
   def mouseReleaseEvent(self, event: QMouseEvent) -> None:
     """Event handler for when the mouse is released over the widget."""
     Label.mouseReleaseEvent(self, event)
     self.__mouse_pressed__ = False
-    self.mouseRelease.emit()
+    if self.underMouse:
+      self.mouseRelease.emit()
+      if event.button() == Qt.MouseButton.RightButton:
+        self.rightClick.emit()
+      if event.button() == Qt.MouseButton.LeftButton:
+        self.leftClick.emit()
     self.update()
+
+  def showEvent(self, event: QShowEvent) -> None:
+    """Event handler for when the widget is shown."""
+    if self.__first_show__:
+      self.backgroundColor = QColor(255, 255, 255, 255)
+      self.__first_show__ = False
+    Label.showEvent(self, event)

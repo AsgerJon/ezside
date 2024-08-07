@@ -97,7 +97,6 @@ class MarginsBox(AbstractDescriptor):
 
   def __instance_set__(self, instance: object, value: QMarginsF) -> None:
     """Set the value of the field."""
-    print(value)
     margins = self.parse(value)
     pvtName = self._getPrivateName()
     setattr(instance, pvtName, margins)
