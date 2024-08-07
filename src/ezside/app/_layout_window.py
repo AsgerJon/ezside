@@ -11,7 +11,8 @@ from PySide6.QtWidgets import QVBoxLayout, QLayout, QHBoxLayout
 from worktoy.desc import AttriBox, THIS
 
 from ezside.app import BaseWindow, StatusBar
-from ezside.widgets import Label, BoxWidget, DigitalClock
+from ezside.tools import SizeRule
+from ezside.widgets import Label, BoxWidget, DigitalClock, PushButton
 
 
 class LayoutWindow(BaseWindow):
@@ -25,7 +26,7 @@ class LayoutWindow(BaseWindow):
   horizontalLayout = AttriBox[QHBoxLayout]()
   headerLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
   leftLabel = AttriBox[Label](THIS, 'Left')
-  centralLabel = AttriBox[Label](THIS, 'Central')
+  centralLabel = AttriBox[PushButton](THIS, 'Central')
   rightLabel = AttriBox[Label](THIS, 'Right')
   footerLabel = AttriBox[Label](THIS, 'Footer')
 
@@ -38,6 +39,8 @@ class LayoutWindow(BaseWindow):
     """This method is responsible for initializing the user interface."""
     self.baseWidget.backgroundColor = QColor(144, 255, 0, 255)
     self.horizontalWidget.backgroundColor = QColor(255, 144, 0, 255)
+    self.headerLabel.sizeRule = SizeRule.PREFER + SizeRule.CONTRACT
+    self.footerLabel.sizeRule = SizeRule.PREFER + SizeRule.CONTRACT
     self.baseLayout.addWidget(self.headerLabel)
     self.horizontalLayout.addWidget(self.leftLabel)
     self.horizontalLayout.addWidget(self.centralLabel)

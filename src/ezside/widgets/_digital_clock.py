@@ -7,10 +7,10 @@ from __future__ import annotations
 from datetime import datetime
 
 from PySide6.QtCore import Qt, QMargins, QSize, QRect, QPoint, QSizeF, \
-  QRectF, QMarginsF
+  QRectF, QMarginsF, QPointF
 from PySide6.QtGui import QColor, QBrush, QPaintEvent, QPainter, \
   QResizeEvent, QShowEvent
-from PySide6.QtWidgets import QHBoxLayout, QSizePolicy
+from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QLayout
 from icecream import ic
 from worktoy.desc import AttriBox, Field, THIS
 
@@ -77,6 +77,7 @@ class DigitalClock(BoxWidget):
   segment displays."""
 
   # __fallback_height__ = 48
+  margins: QMarginsF
 
   layout = AttriBox[QHBoxLayout]()
   oneSec = AttriBox[SevenSeg](THIS)
@@ -114,9 +115,12 @@ class DigitalClock(BoxWidget):
     self.backgroundColor = QColor(0, 0, 0, 255)
     self.borderColor = QColor(255, 0, 169, 255)
     self.marginColor = QColor(31, 0, 0, 255)
-    self.margins = QMarginsF(2, 1, 2, 1, ) * 3
-    QHBoxLayout.setContentsMargins(self.layout, self.margins.toMargins())
+    self.margins = 1
+    self.paddings = 2
+    allMargins = self.paddings + self.borders + self.margins
+    QHBoxLayout.setContentsMargins(self.layout, allMargins.toMargins())
     QHBoxLayout.setSpacing(self.layout, 0)
+    self.setMinimumSize(self.minimumSizeHint())
     ratio = 0
     for widget in self._getWidgets():
       if type(widget) is SevenSeg:
@@ -136,9 +140,13 @@ class DigitalClock(BoxWidget):
     self.setLayout(self.layout)
     self.refreshTime()
 
-  def minimumSizeHint(self) -> QSize:
+  def requiredSize(self) -> QSizeF:
     """This method returns the size hint of the widget."""
-    return QSize(160, 32)
+    h = self.oneSec.requiredSize().height()
+    w = self.oneSec.requiredSize().width() * 6
+    w += self.colon1.requiredSize().width() * 2
+    rect = QRectF(QPointF(0, 0), QSizeF(w, h))
+    return rect.size()
 
   def _getWidgets(self) -> list[BoxWidget]:
     """This method returns the widgets in the layout."""

@@ -101,6 +101,12 @@ class SizeRule(KeeNum):
       return self
     return self._getNamedBase(self.name.split('_')[0])
 
+  @horizontal.SET
+  @h.SET
+  def _setHorizontal(self, value: Self) -> Self:
+    """Setter-function for the horizontal component"""
+    return self._getCombination(value, self.vertical)
+
   @vertical.GET
   @v.GET
   def _getVertical(self) -> Self:
@@ -114,13 +120,13 @@ class SizeRule(KeeNum):
     if self not in self.getBaseRules():
       e = """'%s._getBaseQt' supports only base rules!"""
       raise ValueError(monoSpace(e % self.__class__.__name__))
-    if self is self.EXPAND:
+    if 'expand' in self.name.lower():
       return QSizePolicy.Policy.MinimumExpanding
-    if self is self.PREFER:
+    if 'prefer' in self.name.lower():
       return QSizePolicy.Policy.Preferred
-    if self is self.FIXED:
+    if 'fixed' in self.name.lower():
       return QSizePolicy.Policy.Fixed
-    if self is self.CONTRACT:
+    if 'contract' in self.name.lower():
       return QSizePolicy.Policy.Maximum
 
   @qt.GET

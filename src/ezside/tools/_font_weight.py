@@ -14,7 +14,7 @@ class FontWeight(KeeNum):
   qt = Field()
 
   LIGHT = auto(QFont.Weight.Thin)
-  NORMAL = auto(QFont.Weight.Normal)
+  NORMAL = auto(QFont.Weight.Medium)
   BOLD = auto(QFont.Weight.Bold)
 
   def apply(self, font: QFont) -> QFont:

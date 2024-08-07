@@ -15,6 +15,11 @@ class ColorBox(AbstractDescriptor):
   __fallback_color__ = (255, 255, 255, 255,)
   __default_color__ = None
 
+  @overload(tuple)
+  def parse(self, color: tuple) -> QColor:
+    """Parses arguments to QColor instance"""
+    return self.parse(*color, )
+
   @overload(QPen)
   def parse(self, pen: QPen) -> QColor:
     """Parses arguments to QColor instance"""

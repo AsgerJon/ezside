@@ -21,6 +21,11 @@ class MarginsBox(AbstractDescriptor):
     """Get the fallback margins."""
     return QMarginsF(*self.__fallback_margins__, )
 
+  @overload(tuple)
+  def parse(self, margins: tuple) -> QMarginsF:
+    """Parses arguments to QMarginsF instance"""
+    return self.parse(*margins, )
+
   @overload(QMargins)
   def parse(self, margins: QMargins) -> QMarginsF:
     """Parses arguments to QMarginsF instance"""

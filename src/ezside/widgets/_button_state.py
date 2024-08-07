@@ -46,3 +46,6 @@ class ButtonState(KeeNum):
     if self.pressed:
       out *= 5
     return out
+
+  def __hash__(self, ) -> int:
+    return int(self)

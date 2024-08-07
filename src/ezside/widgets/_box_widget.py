@@ -4,81 +4,37 @@ a background that supports the box model."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TypeAlias, Union, Never, Optional
+from typing import TypeAlias, Union, Optional
 
-from PySide6.QtCore import QMargins, QRect, QRectF, QPointF, QSizeF, QSize
-from PySide6.QtCore import QMarginsF
+from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QPointF, Qt
 from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush
 from PySide6.QtWidgets import QWidget
 from icecream import ic
 from worktoy.desc import AttriBox, Field
-from worktoy.ezdata import EZData
 from worktoy.meta import BaseObject, overload
 from worktoy.parse import maybe
 from worktoy.text import monoSpace, typeMsg
 
-from ezside.tools import fillBrush, emptyPen, SizeRule, MarginsBox, Align, \
-  ColorBox
+from ezside.tools import fillBrush, emptyPen, SizeRule, MarginsBox, ColorBox
 
 Rect: TypeAlias = Union[QRect, QRectF]
 
 ic.configureOutput(includeContext=True)
 
 
-class _Parse(BaseObject):
-  """External overloading class"""
-
-  __parent_widget__ = None
-  __size_rule__ = None
-  __fallback_size_rule__ = SizeRule.PREFER
-
-  parent = Field()
-  sizeRule = Field()
-
-  @parent.GET
-  def _getParent(self) -> Optional[QWidget]:
-    """Getter-function for the parent."""
-    return maybe(self.__parent_widget__, None)
-
-  @sizeRule.GET
-  def _getSizeRule(self) -> SizeRule:
-    """Getter-function for the 'sizeRule'."""
-    return maybe(self.__size_rule__, self.__fallback_size_rule__)
-
-  @overload(SizeRule, QWidget)
-  def __init__(self, sizePolicy: SizeRule, parent: QWidget) -> None:
-    """Overloaded constructor"""
-    self.__parent_widget__ = parent
-    self.__size_policy__ = sizePolicy
-
-  @overload(QWidget, SizeRule)
-  def __init__(self, parent: QWidget, sizePolicy: SizeRule) -> None:
-    """Overloaded constructor"""
-    self.__parent_widget__ = parent
-    self.__size_policy__ = sizePolicy
-
-  @overload(QWidget)
-  def __init__(self, parent: QWidget) -> None:
-    """Overloaded constructor"""
-    self.__parent_widget__ = parent
-
-  @overload()
-  def __init__(self) -> None:
-    """Overloaded constructor"""
-    pass
-
-
 class BoxWidget(QWidget):
   """BoxWidget provides a base class for other widgets that need to paint on
   a background that supports the box model."""
 
-  margins = MarginsBox(1)
-  paddings = MarginsBox(1)
-  borders = MarginsBox(1)
+  __suppress_notifiers__ = None
+
+  margins = MarginsBox(0)
+  paddings = MarginsBox(0)
+  borders = MarginsBox(0)
   sizeRule = AttriBox[SizeRule](SizeRule.PREFER)
   borderColor = ColorBox(QColor(0, 0, 0, 255))
-  borderBrush = Field()
   backgroundColor = ColorBox(QColor(255, 255, 255, 255))
+  borderBrush = Field()
   backgroundBrush = Field()
   aspectRatio = AttriBox[float](-1)  # -1 means ignore
 
@@ -96,15 +52,19 @@ class BoxWidget(QWidget):
     """Paints the widget."""
     painter = QPainter()
     painter.begin(self)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     viewRect = painter.viewport()
-    borderRect = QRectF.marginsRemoved(viewRect.toRectF(), self.borders)
+    center = viewRect.center()
+    marginRect = QRectF.marginsRemoved(viewRect.toRectF(), self.margins)
+    borderRect = QRectF.marginsRemoved(marginRect, self.borders)
     paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
+    marginRect.moveCenter(center)
+    borderRect.moveCenter(center)
+    paddedRect.moveCenter(center)
     painter.setPen(emptyPen())
     painter.setBrush(self.borderBrush)
-    painter.drawRect(borderRect)
+    painter.drawRect(marginRect)
     painter.setBrush(self.backgroundBrush)
-    painter.drawRect(paddedRect)
+    painter.drawRect(borderRect)
     painter.end()
 
   def resize(self, *args) -> None:
@@ -125,19 +85,50 @@ class BoxWidget(QWidget):
       newSize = QSize(width, width / self.aspectRatio)
     QWidget.resize(self, newSize)
 
+  @margins.ONSET
+  @borders.ONSET
+  @paddings.ONSET
+  def _updateBoxModel(self,
+                      oldVal: MarginsBox,
+                      newVal: MarginsBox) -> None:
+    """Setter-hook for changes to the box model."""
+    if oldVal != newVal:
+      self.adjustSize()
+      self.update()
+
   @sizeRule.ONSET
   def _updateSizeRule(self, oldRule: SizeRule, newRule: SizeRule) -> None:
     """Setter-hook for changes to the size rule. """
-    if oldRule == newRule:
-      return  # ignore
+    if oldRule != newRule:
+      QWidget.setSizePolicy(self, newRule.qt)
+      self.adjustSize()
+      self.update()
+
+  def requiredSize(self) -> QSizeF:
+    """Subclasses may implement this method to define minimum size
+    requirements. """
+    return QSizeF(0, 0)
+
+  def minimumSizeHint(self) -> QSize:
+    """This method returns the size hint of the widget."""
+    rect = QRectF(QPointF(0, 0), self.requiredSize())
+    rect += self.margins
+    rect += self.borders
+    rect += self.paddings
+    return QRectF.toRect(rect, ).size()
 
   def __init__(self, *args) -> None:
-    self.parsed = (*args,)
-    if not isinstance(self.parsed, _Parse):
-      e = typeMsg('parsed', self.parsed, _Parse)
-      raise TypeError(e)
-    QWidget.__init__(self, self.parsed.parent)
-    Field.silenceInstance(type(self).sizeRule, self)
-    self.sizeRule = self.parsed.sizeRule
-    QWidget.setSizePolicy(self, self.sizeRule.qt)
-    Field.unsilenceInstance(type(self).sizeRule, self)
+    for arg in args:
+      if isinstance(arg, QWidget):
+        QWidget.__init__(self, arg)
+        break
+    else:
+      QWidget.__init__(self)
+    sizeRule = None
+    for arg in args:
+      if isinstance(arg, SizeRule):
+        if sizeRule is None:
+          sizeRule = arg
+        else:
+          sizeRule += arg
+    self.sizeRule = maybe(sizeRule, SizeRule.PREFER)

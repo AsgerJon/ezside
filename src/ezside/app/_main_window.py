@@ -5,13 +5,14 @@ from __future__ import annotations
 
 import sys
 
-from PySide6.QtCore import QMargins
+from PySide6.QtCore import QMargins, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from icecream import ic
 from pyperclip import copy
 
 from ezside.app import LayoutWindow
+from ezside.tools import SizeRule, MarginsBox
 
 ic.configureOutput(includeContext=True)
 
@@ -85,19 +86,20 @@ class MainWindow(LayoutWindow):
     self.mainStatusBar.showMessage(str(sumOfMargins))
 
   def debug07(self) -> None:
-    """LMAO"""
-    popularFonts = [
-        "Helvetica", "Arial", "Times", "Courier", "DejaVu Sans",
-        "FreeMono", "FreeSans", "FreeSerif", "Inconsolata",
-        "Liberation Mono", "Liberation Sans", "Liberation Serif",
-        "Lucida", "Noto Sans", "Noto Serif", "Roboto", "Ubuntu",
-        "Ubuntu Condensed", "Ubuntu Light", "Ubuntu Mono"
-    ]
-    families = QFontDatabase().families()
-    out = []
-    for font in popularFonts:
-      if QFontDatabase().hasFamily(font):
-        key = font.upper().replace(' ', '_')
-        entry = """  %s = auto('%s')""" % (key, font)
-        out.append(entry)
-    copy('\n'.join(out))
+    """Testing SizeRule"""
+
+    class LMAO:
+      margins = MarginsBox(1)
+
+      def __str__(self) -> str:
+        left = self.margins.left()
+        top = self.margins.top()
+        right = self.margins.right()
+        bottom = self.margins.bottom()
+        out = """Left: %d, Top: %d, Right: %d, Bottom: %d"""
+        return out % (left, top, right, bottom)
+
+    rect = QRectF(QPointF(0, 0), QSizeF(100, 100))
+    print(rect.size())
+    rect += LMAO().margins
+    print(rect.size())
