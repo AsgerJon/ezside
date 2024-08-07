@@ -145,6 +145,12 @@ class AbstractLayout(BoxWidget):
 
   def __init__(self, *args) -> None:
     """This method initializes the layout. """
+    for arg in args:
+      if isinstance(arg, QWidget):
+        BoxWidget.__init__(self, arg)
+        break
+    else:
+      BoxWidget.__init__(self)
     self.margins = 2
     self.borders = 0
     self.paddings = 0
@@ -170,7 +176,10 @@ class AbstractLayout(BoxWidget):
         left = self.getRowLeft(args[0].row)
         top = self.getColTop(args[0].col)
         width, height = 0, 0
-
+        for i in range(args[0].rowSpan):
+          width += self.getRowWidth(args[0].row + i)
+        for i in range(args[0].colSpan):
+          height += self.getColHeight(args[0].col + i)
         size = QSizeF(width, height)
         topLeft = QPointF(left, top)
         return QRectF(topLeft, size)

@@ -8,6 +8,7 @@ from PySide6.QtGui import QColor, QFont, QPen, Qt, QPainter, QFontMetrics, \
 from icecream import ic
 from worktoy.desc import Field, AttriBox, DEFAULT
 from worktoy.meta import BaseObject
+from worktoy.parse import maybeType
 
 from ezside.tools import FontWeight, FontFamily, FontCap, Align, ColorBox
 
@@ -75,3 +76,15 @@ class Font(BaseObject):
   def _getMetrics(self) -> QFontMetricsF:
     """Getter-function for QFontMetrics"""
     return QFontMetricsF(self.asQFont)
+
+  def __init__(self, *args) -> None:
+    self.size = maybeType(int, *args, 12)
+    for arg in args:
+      if isinstance(arg, FontFamily):
+        self.family = arg
+      if isinstance(arg, FontWeight):
+        self.weight = arg
+      if isinstance(arg, FontCap):
+        self.cap = arg
+      if isinstance(arg, Align):
+        self.align = arg

@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QVBoxLayout, QLayout, QHBoxLayout
 from worktoy.desc import AttriBox, THIS
 
 from ezside.app import BaseWindow, StatusBar
+from ezside.layouts import VerticalLayout
 from ezside.tools import SizeRule
 from ezside.widgets import Label, BoxWidget, DigitalClock, PushButton, \
   ImgEdit
@@ -21,20 +22,7 @@ class LayoutWindow(BaseWindow):
   organizing the widget layout of the main window, leaving business logic
   for a further subclass."""
 
-  baseWidget = AttriBox[BoxWidget](THIS)
-  horizontalWidget = AttriBox[BoxWidget](THIS)
-  baseLayout = AttriBox[QVBoxLayout]()
-  horizontalLayout = AttriBox[QHBoxLayout]()
-  verticalWidget = AttriBox[BoxWidget](THIS)
-  verticalLayout = AttriBox[QVBoxLayout]()
-  updateImage = AttriBox[PushButton](THIS, 'Update Image')
-  updateTensor = AttriBox[PushButton](THIS, 'Update Tensor')
-  colorButton = AttriBox[PushButton](THIS, 'Color')
-  headerLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
-  leftLabel = AttriBox[Label](THIS, 'Left')
-  imgEdit = AttriBox[ImgEdit](THIS)
-  rightLabel = AttriBox[Label](THIS, 'Right')
-  footerLabel = AttriBox[Label](THIS, 'Footer')
+  baseWidget = AttriBox[VerticalLayout](THIS)
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the object"""
@@ -43,21 +31,3 @@ class LayoutWindow(BaseWindow):
 
   def initLayout(self) -> None:
     """This method is responsible for initializing the user interface."""
-    self.baseWidget.backgroundColor = QColor(144, 255, 0, 255)
-    self.horizontalWidget.backgroundColor = QColor(255, 144, 0, 255)
-    self.headerLabel.sizeRule = SizeRule.PREFER + SizeRule.CONTRACT
-    self.footerLabel.sizeRule = SizeRule.PREFER + SizeRule.CONTRACT
-    self.baseLayout.addWidget(self.headerLabel)
-    self.horizontalLayout.addWidget(self.leftLabel)
-    self.horizontalLayout.addWidget(self.imgEdit)
-    self.verticalLayout.addWidget(self.updateImage)
-    self.verticalLayout.addWidget(self.updateTensor)
-    self.colorButton.backgroundColor = self.imgEdit.paintColor
-    self.verticalLayout.addWidget(self.colorButton)
-    self.verticalWidget.setLayout(self.verticalLayout)
-    self.horizontalLayout.addWidget(self.verticalWidget)
-    self.horizontalWidget.setLayout(self.horizontalLayout)
-    self.baseLayout.addWidget(self.horizontalWidget)
-    self.baseLayout.addWidget(self.footerLabel)
-    self.baseWidget.setLayout(self.baseLayout)
-    self.setCentralWidget(self.baseWidget)
