@@ -3,6 +3,9 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import Callable
+
+from PySide6.QtCore import QSizeF, QRectF
 from PySide6.QtGui import QColor, QFont, QPen, Qt, QPainter, QFontMetrics, \
   QFontMetricsF
 from icecream import ic
@@ -32,6 +35,28 @@ class Font(BaseObject):
   asQPen = Field()
   asQtAlign = Field()
   metrics = Field()
+  boundSize = Field()
+  boundRect = Field()
+
+  @boundSize.GET
+  def _getBoundSize(self) -> Callable:
+    """Getter-function for QFontMetrics"""
+
+    def callMeMaybe(text: str) -> QSizeF:
+      """Returns the bounding rectangle of the text"""
+      return self.metrics.boundingRect(text).size()
+
+    return callMeMaybe
+
+  @boundRect.GET
+  def _getBoundRect(self) -> Callable:
+    """Getter-function for bounding rect function"""
+
+    def callMeMaybe(text: str) -> QRectF:
+      """Returns the bounding rectangle of the text"""
+      return self.metrics.boundingRect(text)
+
+    return callMeMaybe
 
   @asQFont.GET
   def _getQFont(self) -> QFont:

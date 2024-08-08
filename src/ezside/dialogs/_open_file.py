@@ -17,7 +17,6 @@ class OpenFileDialog(QFileDialog):
 
   def __init__(self, parent=None) -> None:
     QFileDialog.__init__(self, parent)
-    ic('LMAO')
     self.setMouseTracking(True)
     state = QSettings().value('OpenFileDialog/saveState', None)
     if isinstance(state, QByteArray):

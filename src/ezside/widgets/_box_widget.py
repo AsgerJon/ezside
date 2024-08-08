@@ -6,9 +6,10 @@ from __future__ import annotations
 
 from typing import TypeAlias, Union, Optional
 
-from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QPointF, Qt
+from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QPointF, Qt, \
+  QMarginsF
 from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush
-from PySide6.QtWidgets import QWidget, QLayout
+from PySide6.QtWidgets import QWidget, QLayout, QMainWindow
 from icecream import ic
 from worktoy.desc import AttriBox, Field
 from worktoy.meta import BaseObject, overload
@@ -27,16 +28,52 @@ class BoxWidget(QWidget):
   a background that supports the box model."""
 
   __suppress_notifiers__ = None
+  __parent_widget__ = None
+  __main_window__ = None
 
   margins = MarginsBox(0)
   paddings = MarginsBox(0)
   borders = MarginsBox(0)
+  allMargins = Field()
   sizeRule = AttriBox[SizeRule](SizeRule.PREFER)
+  aspectRatio = AttriBox[float](-1)  # -1 means ignore
   borderColor = ColorBox(QColor(0, 0, 0, 255))
   backgroundColor = ColorBox(QColor(255, 255, 255, 255))
   borderBrush = Field()
   backgroundBrush = Field()
-  aspectRatio = AttriBox[float](-1)  # -1 means ignore
+  parentWidget = Field()
+  mainWindow = Field()
+
+  @allMargins.GET
+  def _getAllMargins(self) -> QMarginsF:
+    """Getter-function for the allMargins."""
+    return self.margins + self.paddings + self.borders
+
+  @parentWidget.GET
+  def _getParentWidget(self) -> Optional[QWidget]:
+    """Getter-function for the parentWidget."""
+    return self.__parent_widget__
+
+  @parentWidget.SET
+  def _setParentWidget(self, parentWidget: QWidget) -> None:
+    """Setter-function for the parentWidget."""
+    if not isinstance(parentWidget, QWidget):
+      e = typeMsg('parentWidget', parentWidget, QWidget)
+      raise TypeError(e)
+    self.__parent_widget__ = parentWidget
+
+  @mainWindow.GET
+  def _getMainWindow(self) -> Optional[QWidget]:
+    """Getter-function for the mainWindow."""
+    return self.__main_window__
+
+  @mainWindow.SET
+  def _setMainWindow(self, mainWindow: QMainWindow) -> None:
+    """Setter-function for the mainWindow."""
+    if not isinstance(mainWindow, QMainWindow):
+      e = typeMsg('mainWindow', mainWindow, QMainWindow)
+      raise TypeError(e)
+    self.__main_window__ = mainWindow
 
   @borderBrush.GET
   def _getBorderBrush(self) -> QBrush:
@@ -47,25 +84,6 @@ class BoxWidget(QWidget):
   def _getBackgroundBrush(self) -> QBrush:
     """Getter-function for the backgroundBrush."""
     return fillBrush(self.backgroundColor, )
-
-  def paintEvent(self, event: QPaintEvent) -> None:
-    """Paints the widget."""
-    painter = QPainter()
-    painter.begin(self)
-    viewRect = painter.viewport()
-    center = viewRect.center()
-    marginRect = QRectF.marginsRemoved(viewRect.toRectF(), self.margins)
-    borderRect = QRectF.marginsRemoved(marginRect, self.borders)
-    paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
-    marginRect.moveCenter(center)
-    borderRect.moveCenter(center)
-    paddedRect.moveCenter(center)
-    painter.setPen(emptyPen())
-    painter.setBrush(self.borderBrush)
-    painter.drawRect(marginRect)
-    painter.setBrush(self.backgroundBrush)
-    painter.drawRect(borderRect)
-    painter.end()
 
   def resize(self, *args) -> None:
     """Reimplementation enforcing aspect ratio. """
@@ -107,35 +125,20 @@ class BoxWidget(QWidget):
   def requiredSize(self) -> QSizeF:
     """Subclasses may implement this method to define minimum size
     requirements. """
-    layout = self.layout()
-    n = QLayout.count(layout)
     return QSizeF(0, 0)
+
+  def requiredRect(self) -> QRectF:
+    """This method returns the required rectangle to bound the current
+    widget."""
+    size = self.requiredSize()
+    return QRectF(QPointF(0, 0), size)
 
   def minimumSizeHint(self) -> QSize:
     """This method returns the size hint of the widget."""
-    rect = QRectF(QPointF(0, 0), self.requiredSize())
-    rect += self.margins
-    rect += self.borders
-    rect += self.paddings
+    rect = QRectF(QPointF(0, 0), self.requiredSize()) + self.allMargins
     return QRectF.toRect(rect, ).size()
 
-  def __init__(self, *args) -> None:
-    for arg in args:
-      if isinstance(arg, QWidget):
-        QWidget.__init__(self, arg)
-        break
-    else:
-      QWidget.__init__(self)
-    sizeRule = None
-    for arg in args:
-      if isinstance(arg, SizeRule):
-        if sizeRule is None:
-          sizeRule = arg
-        else:
-          sizeRule += arg
-    self.sizeRule = maybe(sizeRule, SizeRule.PREFER)
-
-  def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
+  def paintMeLike(self, rect: Rect, painter: QPainter) -> None:
     """Subclasses should implement this method to specify how to paint
     them. When used in a layout from 'ezside.layouts', only this method
     can specify painting, as QWidget.paintEvent will not be called.
@@ -144,3 +147,24 @@ class BoxWidget(QWidget):
     are expected to draw only inside the given rect. The layout ensures
     that this rect is at least the exact size specified by the
     'requiredSize' method on this widget. """
+    viewRect = rect if isinstance(rect, QRectF) else QRect.toRectF(rect)
+    center = viewRect.center()
+    marginRect = QRectF.marginsRemoved(viewRect, self.margins)
+    borderRect = QRectF.marginsRemoved(marginRect, self.borders)
+    paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
+    marginRect.moveCenter(center)
+    borderRect.moveCenter(center)
+    paddedRect.moveCenter(center)
+    painter.setPen(emptyPen())
+    painter.setBrush(self.borderBrush)
+    painter.drawRect(marginRect)
+    painter.setBrush(self.backgroundBrush)
+    painter.drawRect(borderRect)
+
+  def __init__(self, *args) -> None:
+    for arg in args:
+      if isinstance(arg, QMainWindow):
+        self.mainWindow = arg
+      elif isinstance(arg, QWidget):
+        self.parentWidget = arg
+    QWidget.__init__(self)

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QSizeF, QSize
+from PySide6.QtGui import QEnterEvent
 from worktoy.desc import AttriBox, Field, NODEF
 from worktoy.meta import BaseObject, overload
 from worktoy.text import typeMsg
@@ -18,12 +19,25 @@ class LayoutItem(BaseObject):
   index: LayoutIndex
 
   __widget_item__ = None
+  __under_mouse__ = False
 
   index = AttriBox[LayoutIndex](NODEF)
   widgetItem = Field()
   height = Field()  # Reflects the 'requiredSize' method on the widget
   width = Field()
   size = Field()
+  underMouse = Field()
+
+  @underMouse.GET
+  def _getUnderMouse(self) -> bool:
+    """Getter-function for the underMouse"""
+    return True if self.__under_mouse__ else False
+
+  @underMouse.SET
+  def _setUnderMouse(self, underFlag: bool) -> None:
+    """Setter-function for the underMouse"""
+    if self.__under_mouse__ ^ underFlag:
+      self.__under_mouse__ = underFlag
 
   @size.GET
   def _getSizeF(self) -> QSizeF:
@@ -118,3 +132,8 @@ class LayoutItem(BaseObject):
     """Constructor for the LayoutItem class."""
     self.index = LayoutIndex(index)
     self.widgetItem = widgetItem
+
+  def __str__(self) -> str:
+    """String representation"""
+    clsName = self.widgetItem.__class__.__name__
+    return """%s at: %s""" % (clsName, self.index)

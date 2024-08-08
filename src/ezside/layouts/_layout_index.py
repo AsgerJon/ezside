@@ -20,10 +20,10 @@ class LayoutIndex(BaseObject):
   rowSpan: int
   colSpan: int
 
-  row = AttriBox[int](NODEF)
-  col = AttriBox[int](NODEF)
-  rowSpan = AttriBox[int](DEFAULT(1))
-  colSpan = AttriBox[int](DEFAULT(1))
+  row = AttriBox[int]()
+  col = AttriBox[int]()
+  rowSpan = AttriBox[int](1)
+  colSpan = AttriBox[int](1)
 
   @overload(int, int)
   def __init__(self, row: int, col: int) -> None:
@@ -84,3 +84,7 @@ class LayoutIndex(BaseObject):
       return self == LayoutIndex(other)
     except TypeError:
       return NotImplemented
+
+  def __str__(self) -> str:
+    """String representation"""
+    return """(%d, %d)""" % (self.row, self.col)

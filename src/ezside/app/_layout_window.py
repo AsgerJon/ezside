@@ -5,16 +5,14 @@ for a further subclass."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QVBoxLayout, QLayout, QHBoxLayout
-from worktoy.desc import AttriBox, THIS
+from icecream import ic
+from worktoy.desc import AttriBox
 
-from ezside.app import BaseWindow, StatusBar
+from ezside.app import BaseWindow
 from ezside.layouts import VerticalLayout
-from ezside.tools import SizeRule
-from ezside.widgets import Label, BoxWidget, DigitalClock, PushButton, \
-  ImgEdit
+from ezside.widgets import Label, PushButton
+
+ic.configureOutput(includeContext=True)
 
 
 class LayoutWindow(BaseWindow):
@@ -22,7 +20,12 @@ class LayoutWindow(BaseWindow):
   organizing the widget layout of the main window, leaving business logic
   for a further subclass."""
 
-  baseWidget = AttriBox[VerticalLayout](THIS)
+  baseWidget = AttriBox[VerticalLayout]()
+  headerLabel = AttriBox[Label]('LOL')
+  welcomeLabel = AttriBox[Label]('Welcome to EZSide')
+  infoLabel = AttriBox[Label]('New Layout System!!')
+  clickMe = AttriBox[PushButton]('CLICK ME!')
+  footerLabel = AttriBox[Label]('Footer')
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the object"""
@@ -31,3 +34,15 @@ class LayoutWindow(BaseWindow):
 
   def initLayout(self) -> None:
     """This method is responsible for initializing the user interface."""
+    self.baseWidget.addWidget(self.headerLabel, 0, 0)
+    self.baseWidget.addWidget(self.welcomeLabel, 1, 0)
+    self.baseWidget.addWidget(self.infoLabel, 2, 0)
+    self.baseWidget.addWidget(self.clickMe, 3, 0)
+    self.baseWidget.addWidget(self.footerLabel, 4, 0)
+    self.setCentralWidget(self.baseWidget)
+
+  def show(self) -> None:
+    """Show the window"""
+    self.initLayout()
+    self.initSignalSlot()
+    BaseWindow.show(self)

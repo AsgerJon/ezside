@@ -25,7 +25,6 @@ class BaseWindow(QMainWindow):
   application. It implements menus, menubar and statusbar. It is intended to
   be further subclassed to implement widget layout and business logic. """
 
-  newDialog = AttriBox[NewDialog](THIS)
   colorWheel = AttriBox[QColorDialog](THIS)
   fontOptions = AttriBox[QFontDialog](THIS)
   openFile = AttriBox[OpenFileDialog](THIS)
@@ -80,17 +79,10 @@ class BaseWindow(QMainWindow):
   @Slot()
   def requestNewFile(self) -> None:
     """Triggering this method starts the 'new' wizard"""
-    self.newDialog.show()
-
-  @Slot()
-  def _relayNewImage(self) -> None:
-    """Relays the completed wizard to the main window."""
-    self.newImage.emit(self.newDialog)
 
   def initSignalSlot(self, ) -> None:
     """Initializes the signal slot connections for the object."""
     #  Connecting 'accept' signals from dialogs to relevant slots
-    self.newDialog.accepted.connect(self._relayNewImage)
     self.colorWheel.colorSelected.connect(self.colorSelected)
     self.fontOptions.fontSelected.connect(self.fontSelected)
     self.selDir.fileSelected.connect(self.directorySelected)

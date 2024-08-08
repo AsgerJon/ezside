@@ -4,16 +4,19 @@ subclasses of QLayout are too difficult to manage. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from abc import abstractmethod
-
-from PySide6.QtCore import QRectF, QSizeF, QPointF
-from PySide6.QtGui import QColor, QPaintEvent, QPainter
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import (QRectF, QSizeF, QPointF, QSize, QMarginsF,
+                            QPoint, \
+                            QRect, QEvent)
+from PySide6.QtGui import QColor, QPaintEvent, QPainter, QMouseEvent, \
+  QEnterEvent
+from icecream import ic
 from worktoy.desc import AttriBox, Field
-from worktoy.text import monoSpace
+from worktoy.text import typeMsg
 
-from ezside.layouts import LayoutItem, LayoutIndex
+from ezside.layouts import LayoutItem
 from ezside.widgets import BoxWidget
+
+ic.configureOutput(includeContext=True)
 
 
 class AbstractLayout(BoxWidget):
@@ -21,177 +24,207 @@ class AbstractLayout(BoxWidget):
   QLayout and assigns it to itself. This allows it to properly implement
   the 'requiredSize' methods. """
 
+  paddings: QMarginsF
+  borders: QMarginsF
+  margins: QMarginsF
+  allMargins: QMarginsF
+
+  __cursor_position__ = None
+  __mouse_region__ = None
+  __layout_items__ = None
   __iter_contents__ = None
 
   spacing = AttriBox[int](0)
 
+  cursorPosition = Field()
+  mouseRegion = Field()
   rowCount = Field()
   colCount = Field()
 
-  def getRowLeft(self, row: int) -> float:
-    """Getter-function for the left side of the given row. """
-    if row:
-      return self.getRowLeft(row - 1) + self.getRowWidth(row - 1)
-    return 0
+  @cursorPosition.GET
+  def _getCursorPosition(self) -> QPointF:
+    """Getter-function for the cursor position"""
+    if self.__cursor_position__ is None:
+      return QPointF(-1, -1)
+    if isinstance(self.__cursor_position__, QPoint):
+      return QPoint.toPointF(self.__cursor_position__)
+    if isinstance(self.__cursor_position__, QPointF):
+      return self.__cursor_position__
+    e = typeMsg('cursorPosition', self.__cursor_position__, QPointF)
+    raise TypeError(e)
 
-  def getRowRight(self, row: int) -> float:
-    """Getter-function for the right side of the given row"""
-    return self.getRowLeft(row) + self.getRowWidth(row)
+  @mouseRegion.GET
+  def _getMouseRegion(self) -> QRectF:
+    """Getter-function for the mouse region"""
+    if self.__mouse_region__ is None:
+      return QRectF()
+    if isinstance(self.__mouse_region__, QRect):
+      return QRect.toRectF(self.__mouse_region__)
+    if isinstance(self.__mouse_region__, QRectF):
+      return self.__mouse_region__
+    e = typeMsg('mouseRegion', self.__mouse_region__, QRectF)
+    raise TypeError(e)
 
-  def getColTop(self, col: int) -> float:
-    """Getter-function for the top side of the given column"""
+  def getColRight(self, col: int) -> float:
+    """Return the right of the given column."""
+    return self.getColLeft(col) + self.getColWidth(col)
+
+  def getColLeft(self, col: int) -> float:
+    """Return the left of the given column."""
     if col:
-      return self.getColTop(col - 1) + self.getColHeight(col - 1)
-    return 0
+      return self.getColLeft(col - 1) + self.getColWidth(col - 1)
+    return self.allMargins.left()
 
-  def getColBottom(self, col: int) -> float:
-    """Getter-function for the bottom side of the given column"""
-    return self.getColTop(col) + self.getColHeight(col)
+  def getColWidth(self, col: int) -> float:
+    """Return the width of the given column."""
+    return max([item.width for item in self.getItemsInCol(col)] or [-1, ])
 
-  def getRowWidth(self, row: int) -> float:
-    """Getter-function for the width of the given row. It is maximum width
-    of the required sizes of the widgets. """
-    out = 0
-    oneSpan = False
-    if row >= self.rowCount:
-      e = """The row index: '%s' is out of bounds!""" % row
-      raise IndexError(monoSpace(e))
-    if row < 0:
-      return self.getRowWidth(row + self.rowCount)
-    for item in self:
-      if item.index.row == row and item.index.rowSpan == 1:
-        out = max(out, item.width)
-        oneSpan = True
-    if not oneSpan:
-      for item in self:
-        if item.index.row == row:
-          item.index.rowSpan -= 1
-      return self.getRowWidth(row)
-    return out
+  def getRowBottom(self, row: int) -> float:
+    """Return the bottom of the given row."""
+    return self.getRowTop(row) + self.getRowHeight(row)
 
-  def getColHeight(self, col: int) -> float:
-    """Getter-function for the height of the given column. It is maximum
-    height of the required sizes of the widgets. """
-    out = 0
-    oneSpan = False
-    if col >= self.colCount:
-      e = """The column index: '%s' is out of bounds!""" % col
-      raise IndexError(monoSpace(e))
-    if col < 0:
-      return self.getColHeight(col + self.colCount)
-    for item in self:
-      if item.index.col == col and item.index.colSpan == 1:
-        out = max(out, item.height)
-        oneSpan = True
-    if not oneSpan:
-      for item in self:
-        if item.index.col == col:
-          item.index.colSpan -= 1
-      return self.getColHeight(col)
-    return out
+  def getRowTop(self, row: int) -> float:
+    """Return the top of the given row."""
+    if row:
+      return self.getRowTop(row - 1) + self.getRowHeight(row - 1)
+    return self.allMargins.top()
+
+  def getRowHeight(self, row: int) -> float:
+    """Return the width of the given row."""
+    return max([item.height for item in self.getItemsInRow(row)] or [-1, ])
+
+  def getItemsInRow(self, row: int) -> list[LayoutItem]:
+    """Return the items in the given row."""
+    return [item for item in self.getItems() if item.index.row == row]
+
+  def getItemsInCol(self, col: int) -> list[LayoutItem]:
+    """Return the items in the given column."""
+    return [item for item in self.getItems() if item.index.col == col]
 
   @rowCount.GET
   def _getRowCount(self) -> int:
     """Getter-function for the row count attribute"""
-    out = -1
-    maxSpan = 1
-    for item in self:
-      if item.index.row > out:
-        maxSpan = item.index.rowSpan
-        out = item.index.row
-    return out + maxSpan
+    rows = [item.index.row for item in self.getItems()] or []
+    return len(list(set(rows)))
 
   @colCount.GET
   def _getColCount(self) -> int:
     """Getter-function for the column count attribute"""
-    out = -1
-    maxSpan = 1
-    for item in self:
-      if item.index.col > out:
-        maxSpan = item.index.colSpan
-        out = item.index.col
-    return out + maxSpan
+    cols = [item.index.col for item in self.getItems()] or []
+    return len(list(set(cols)))
 
-  def __getitem__(self, *args) -> LayoutItem:
-    """This method allows the user to access the layout items using
-    square brackets. """
-    for item in self:
-      if item == args:
-        return item
-    e = """Unable to resolve the index: '%s' in the layout!""" % args
-    raise IndexError(monoSpace(e))
+  def getItems(self) -> list[LayoutItem]:
+    """Getter-function for the items"""
+    return self.__layout_items__ or []
 
-  def __iter__(self) -> AbstractLayout:
-    """This method implements the iteration protocol. """
-    self.__iter_contents__ = [*self.getWidgets(), ]
-    return self
-
-  def __next__(self, ) -> LayoutItem:
-    """This method implements the iteration protocol. """
-    if self.__iter_contents__:
-      return self.__iter_contents__.pop(0)
-    raise StopIteration
-
-  @abstractmethod
-  def addWidget(self, *args) -> BoxWidget:
+  def addWidget(self, widget: BoxWidget, row: int, col: int) -> None:
     """Subclasses are required to implement this method. After adding the
     widget, the widget should be returned. """
-
-  @abstractmethod
-  def getWidgets(self, ) -> list[LayoutItem]:
-    """Subclasses are required to implement this method, to return the
-    layoutItem representations of the widgets managed by the layout. This
-    method is used by the iteration protocol implementation."""
+    layoutItem = LayoutItem(widget, row, col)
+    existing = self.__layout_items__ or []
+    self.__layout_items__ = [*existing, layoutItem]
 
   def __init__(self, *args) -> None:
     """This method initializes the layout. """
-    for arg in args:
-      if isinstance(arg, QWidget):
-        BoxWidget.__init__(self, arg)
-        break
-    else:
-      BoxWidget.__init__(self)
+    BoxWidget.__init__(self, *args)
     self.margins = 2
-    self.borders = 0
-    self.paddings = 0
+    self.borders = 1
+    self.paddings = 2
     self.borderColor = QColor(0, 0, 0, 255)
-    self.backgroundColor = QColor(191, 191, 191, 255)
+    self.backgroundColor = QColor(255, 255, 0, 255)
+    self.setMouseTracking(True)
 
-  def getSize(self, *args) -> QSizeF:
+  def getSize(self, item: LayoutItem) -> QSizeF:
     """Getter-function for the size at given grid"""
-    if len(args) == 1:
-      if isinstance(args[0], LayoutItem):
-        return self.getSize(args[0].index)
-      if isinstance(args[0], LayoutIndex):
-        return QSizeF(self.getRowWidth(args[0].row),
-                      self.getColHeight(args[0].col))
-    return self.getSize(LayoutIndex(*args))
+    col = item.index.col
+    row = item.index.row
+    width = self.getColWidth(col)
+    height = self.getRowHeight(row)
+    return QSizeF(width, height)
 
-  def getRect(self, *args) -> QRectF:  # this name lol
+  def getRect(self, item: LayoutItem) -> QRectF:  # this name lol
     """Getter-function for the layout rectangle. """
-    if len(args) == 1:
-      if isinstance(args[0], LayoutItem):
-        return self.getRect(args[0].index)
-      if isinstance(args[0], LayoutIndex):
-        left = self.getRowLeft(args[0].row)
-        top = self.getColTop(args[0].col)
-        width, height = 0, 0
-        for i in range(args[0].rowSpan):
-          width += self.getRowWidth(args[0].row + i)
-        for i in range(args[0].colSpan):
-          height += self.getColHeight(args[0].col + i)
-        size = QSizeF(width, height)
-        topLeft = QPointF(left, top)
-        return QRectF(topLeft, size)
-    return self.getRect(LayoutIndex(*args))
+    col = item.index.col
+    row = item.index.row
+    left = self.getColLeft(col)
+    top = self.getRowTop(row)
+    size = self.getSize(item)
+    return QRectF(QPointF(left, top), size)
 
   def paintEvent(self, event: QPaintEvent) -> None:
     """Reimplementation first painting self using parent method,
     then painting each widget. """
-    BoxWidget.paintEvent(self, event)
     painter = QPainter()
     painter.begin(self)
-    for item in self:
-      rect = self.getRect(item.index)
+    viewRect = painter.viewport()
+    reqRect = self.requiredRect()
+    BoxWidget.paintMeLike(self, reqRect, painter)
+    for item in self.getItems():
+      rect = self.getRect(item)
       item.widgetItem.paintMeLike(rect, painter)
     painter.end()
+
+  def requiredSize(self) -> QSizeF:
+    """Return the required size. """
+    return self.requiredRect().size()
+
+  def requiredRect(self) -> QRectF:
+    """Return the required rectangle. """
+    out = QRectF()
+    for item in self.getItems():
+      out = out.united(self.getRect(item))
+    return out + self.allMargins
+
+  def minimumSizeHint(self) -> QSize:
+    """Return the minimum size hint. """
+    return QSizeF.toSize(self.requiredRect().size())
+
+  def leaveEvent(self, event: QEvent) -> None:
+    """This method handles the leave event."""
+    self.__cursor_position__ = QPointF(-1, -1)
+    self.update()
+
+  def enterEvent(self, event: QEnterEvent) -> None:
+    """This method handles the enter event."""
+    self.__cursor_position__ = event.localPos()
+    self.update()
+
+  def mouseMoveEvent(self, event: QMouseEvent) -> None:
+    """This method handles the mouse move event."""
+    self.__cursor_position__ = event.localPos()
+    for item in self.getItems():
+      rect = self.getRect(item)
+      if rect.contains(self.cursorPosition):
+        if not item.widgetItem.underMouse:
+          enterObject = QEnterEvent(self.cursorPosition,
+                                    self.cursorPosition,
+                                    self.cursorPosition, )
+          item.widgetItem.enterEvent(enterObject)
+        item.widgetItem.mouseMoveEvent(event)
+      else:
+        if item.widgetItem.underMouse:
+          leaveObject = QEvent(QEvent.Type.Leave)
+          item.widgetItem.leaveEvent(leaveObject)
+    self.update()
+
+  def mousePressEvent(self, event: QMouseEvent) -> None:
+    """This method handles the mouse press event."""
+    for item in self.getItems():
+      rect = self.getRect(item)
+      if rect.contains(self.cursorPosition):
+        item.widgetItem.mousePressEvent(event)
+        break
+    else:
+      BoxWidget.mousePressEvent(self, event)
+    self.update()
+
+  def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+    """This method handles the mouse release event."""
+    for item in self.getItems():
+      rect = self.getRect(item)
+      if rect.contains(self.cursorPosition):
+        item.widgetItem.mouseReleaseEvent(event)
+        break
+    else:
+      BoxWidget.mouseReleaseEvent(self, event)
+    self.update()

@@ -6,14 +6,16 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF, QRect
-from PySide6.QtGui import QColor, QBrush, QPainter, QShowEvent
-from PySide6.QtWidgets import QSizePolicy
+from PySide6.QtCore import Qt, QMargins, QSize, QRect, QPoint, QSizeF, \
+  QRectF, QMarginsF, QPointF
+from PySide6.QtGui import QColor, QBrush, QPaintEvent, QPainter, \
+  QResizeEvent, QShowEvent
+from PySide6.QtWidgets import QHBoxLayout, QSizePolicy, QLayout
 from icecream import ic
-from worktoy.desc import AttriBox, Field
+from worktoy.desc import AttriBox, Field, THIS
 
 from ezside.layouts import AbstractLayout
-from ezside.tools import emptyPen
+from ezside.tools import emptyPen, Align
 from ezside.widgets import BoxWidget, SevenSeg
 
 ic.configureOutput(includeContext=True)
@@ -38,6 +40,10 @@ class Colon(BoxWidget):
 
   brush = Field()
 
+  def minimumSizeHint(self) -> QSize:
+    """This method returns the size hint of the widget."""
+    return QSize(12, 24)
+
   @brush.GET
   def _getBrush(self) -> QBrush:
     """Getter-function for the brush"""
@@ -45,14 +51,6 @@ class Colon(BoxWidget):
     brush.setStyle(Qt.BrushStyle.SolidPattern)
     brush.setColor(self.color)
     return brush
-
-  def requiredSize(self) -> QSizeF:
-    """This method returns the required size of the widget."""
-    return self.requiredRect().size()
-
-  def requiredRect(self) -> QRectF:
-    """This method returns the required rectangle of the widget."""
-    return QRectF(QPointF(0, 0), QSizeF(16, 32))
 
   def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
     """Paints the colon with the current color."""
@@ -64,26 +62,29 @@ class Colon(BoxWidget):
     marginRect.moveCenter(center)
     borderRect.moveCenter(center)
     paddedRect.moveCenter(center)
-    brush = QBrush()
-    brush.setStyle(Qt.BrushStyle.SolidPattern)
-    brush.setColor(QColor(255, 0, 0, 255))
-    painter.setBrush(brush)
-    viewRect = QRect.toRectF(painter.viewport())
-    h = viewRect.height()
-    d = h / 4
-    y1 = d * 1.25
-    y2 = h - d * 1.25
-    x = rect.center().x()
-    topCenter = QPointF(x, y1)
-    bottomCenter = QPointF(x, y2)
-    r = d / 4
-    painter.drawEllipse(topCenter, r, r)
-    painter.drawEllipse(bottomCenter, r, r)
+    painter.setBrush(self.brush)
+    painter.setPen(emptyPen())
+    d = borderRect.height() / 5
+    x = painter.viewport().width() / 2 - d / 2
+    y1 = 1 * d + borderRect.top()
+    y2 = 3 * d + borderRect.top()
+    painter.drawEllipse(int(x), int(y1), int(d), int(d))
+    painter.drawEllipse(int(x), int(y2), int(d), int(d))
 
 
 class DigitalClock(AbstractLayout):
   """DigitalClock provides a widget displaying the current time using seven
   segment displays."""
+
+  oneSec = AttriBox[SevenSeg](THIS)
+  tenSec = AttriBox[SevenSeg](THIS)
+  colon1 = AttriBox[Colon](THIS)
+  oneMin = AttriBox[SevenSeg](THIS)
+  tenMin = AttriBox[SevenSeg](THIS)
+  colon2 = AttriBox[Colon](THIS)
+  oneHour = AttriBox[SevenSeg](THIS)
+  tenHour = AttriBox[SevenSeg](THIS)
+  # spacer = AttriBox[Spacer](THIS)
 
   hour = Field()
   minute = Field()
@@ -104,27 +105,43 @@ class DigitalClock(AbstractLayout):
     """This method returns the current second."""
     return datetime.now().second
 
-  def __init__(self, *args) -> None:
+  def __init__(self, parent=None, *args) -> None:
     """The constructor method for the DigitalClock widget."""
-    AbstractLayout.__init__(self, *args)
+    BoxWidget.__init__(self, parent)
     self.backgroundColor = QColor(0, 0, 0, 255)
-    self.tenHour = SevenSeg()
-    self.oneHour = SevenSeg()
-    self.colon1 = Colon()
-    self.tenMin = SevenSeg()
-    self.oneMin = SevenSeg()
-    self.colon2 = Colon()
-    self.tenSec = SevenSeg()
-    self.oneSec = SevenSeg()
-    self.addWidget(self.tenHour, 0, 0)
-    self.addWidget(self.oneHour, 0, 1)
-    self.addWidget(self.colon1, 0, 2)
-    self.addWidget(self.tenMin, 0, 3)
-    self.addWidget(self.oneMin, 0, 4)
-    self.addWidget(self.colon2, 0, 5)
-    self.addWidget(self.tenSec, 0, 6)
-    self.addWidget(self.oneSec, 0, 7)
+    self.borderColor = QColor(255, 0, 169, 255)
+    self.marginColor = QColor(31, 0, 0, 255)
+    self.margins = 1
+    self.paddings = 2
+    QHBoxLayout.setContentsMargins(self.layout, allMargins.toMargins())
+    QHBoxLayout.setSpacing(self.layout, 0)
+    self.setMinimumSize(self.minimumSizeHint())
+    ratio = 0
+    for widget in self._getWidgets():
+      if type(widget) is SevenSeg:
+        setattr(widget, 'aspectRatio', 0.5)
+        ratio += 0.5
+      elif type(widget) is Colon:
+        setattr(widget, 'aspectRatio', 0.5)
+        ratio += 0.5
+      # setattr(widget, 'paddings', QMarginsF(1, 1, 1, 1, ))
+      setattr(widget, 'lowColor', QColor(95, 0, 0, 255))
+      setattr(widget, 'highColor', QColor(255, 0, 0, 255))
+      setattr(widget, 'backgroundColor', QColor(0, 0, 0, 255))
+      self.layout.addWidget(widget)
+    self.aspectRatio = ratio
+    self.adjustSize()
+    self.update()
+    self.setLayout(self.layout)
     self.refreshTime()
+
+  def requiredSize(self) -> QSizeF:
+    """This method returns the size hint of the widget."""
+    h = self.oneSec.requiredSize().height()
+    w = self.oneSec.requiredSize().width() * 6
+    w += self.colon1.requiredSize().width() * 2
+    rect = QRectF(QPointF(0, 0), QSizeF(w, h))
+    return rect.size()
 
   def _getWidgets(self) -> list[BoxWidget]:
     """This method returns the widgets in the layout."""

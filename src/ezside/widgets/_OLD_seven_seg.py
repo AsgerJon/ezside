@@ -80,8 +80,8 @@ class SevenSeg(BoxWidget):
   __fallback_digit__ = 0
   __current_digit__ = None
 
-  scale = AttriBox[float](0.12)
-  segmentMargins = AttriBox[QMarginsF](QMarginsF(0, 0, 0, 0))
+  scale = AttriBox[float](0.15)
+  segmentMargins = AttriBox[QMarginsF](QMarginsF(0.15, 0.15, 0.15, 0.15))
   highColor = AttriBox[QColor](QColor(255, 0, 0, 255))
   lowColor = AttriBox[QColor](QColor(127, 0, 0, 255))
 
@@ -93,11 +93,18 @@ class SevenSeg(BoxWidget):
 
   def requiredSize(self) -> QSizeF:
     """This method returns the required size of the widget."""
-    return self.requiredRect().size()
+    return QSizeF(16, 24)
 
-  def requiredRect(self) -> QRectF:
-    """This method returns the required rectangle of the widget."""
-    return QRectF(QPointF(0, 0), QSizeF(24, 32))
+  @aspectRect.GET
+  def _getAspectRect(self) -> QRect:
+    """This method returns the aspect ratio of the widget."""
+    width, height = self.contentRect.width(), self.contentRect.height()
+    if height > width * self.aspectRatio:
+      height = width * self.aspectRatio
+    if width > height / self.aspectRatio:
+      width = height / self.aspectRatio
+    rect = QRectF(QPointF(0, 0), QSizeF(width, height))
+    return QRectF.toRect(rect)
 
   @digit.GET
   def _getDigit(self) -> int:
