@@ -1,22 +1,23 @@
-"""BoxWidget provides a base class for other widgets that need to paint on
+"""BoxWidget provides a base class for other basewidgets that need to
+paint on
 a background that supports the box model."""
 #  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TypeAlias, Union, Optional
+from typing import TypeAlias, Union, Optional, TYPE_CHECKING
 
-from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QPointF, Qt, \
-  QMarginsF
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush
-from PySide6.QtWidgets import QWidget, QLayout, QMainWindow
+from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QPointF, QMarginsF
+from PySide6.QtGui import QPainter, QColor, QBrush
+from PySide6.QtWidgets import QWidget, QMainWindow
 from icecream import ic
 from worktoy.desc import AttriBox, Field
-from worktoy.meta import BaseObject, overload
-from worktoy.parse import maybe
 from worktoy.text import monoSpace, typeMsg
 
 from ezside.tools import fillBrush, emptyPen, SizeRule, MarginsBox, ColorBox
+
+if TYPE_CHECKING:
+  from ezside.layouts import AbstractLayout, LayoutItem
 
 Rect: TypeAlias = Union[QRect, QRectF]
 
@@ -24,11 +25,14 @@ ic.configureOutput(includeContext=True)
 
 
 class BoxWidget(QWidget):
-  """BoxWidget provides a base class for other widgets that need to paint on
+  """BoxWidget provides a base class for other basewidgets that need to
+  paint on
   a background that supports the box model."""
 
   __suppress_notifiers__ = None
   __parent_widget__ = None
+  __parent_layout__ = None
+  __parent_layout_item__ = None
   __main_window__ = None
 
   margins = MarginsBox(0)
@@ -42,7 +46,34 @@ class BoxWidget(QWidget):
   borderBrush = Field()
   backgroundBrush = Field()
   parentWidget = Field()
+  parentLayout = Field()
+  parentLayoutItem = Field()
   mainWindow = Field()
+
+  @parentLayoutItem.GET
+  def _getParentLayoutItem(self) -> LayoutItem:
+    """Getter-function for the layout item on the parent layout that
+    contains this widget."""
+    return self.__parent_layout_item__
+
+  @parentLayoutItem.SET
+  def _setParentLayoutItem(self, item: LayoutItem) -> None:
+    """Setter-function for the layout item on the parent layout that
+    contains this widget."""
+    self.__parent_layout_item__ = item
+
+  @parentLayout.GET
+  def _getParentLayout(self) -> Optional[AbstractLayout]:
+    """Getter-function for the parentLayout."""
+    return self.__parent_layout__
+
+  @parentLayout.SET
+  def _setParentLayout(self, parentLayout: AbstractLayout) -> None:
+    """Setter-function for the parentLayout."""
+    if not isinstance(parentLayout, QWidget):
+      e = typeMsg('parentLayout', parentLayout, QWidget)
+      raise TypeError(e)
+    self.__parent_layout__ = parentLayout
 
   @allMargins.GET
   def _getAllMargins(self) -> QMarginsF:
@@ -143,7 +174,8 @@ class BoxWidget(QWidget):
     them. When used in a layout from 'ezside.layouts', only this method
     can specify painting, as QWidget.paintEvent will not be called.
 
-    The painter and rectangle passed are managed by the layout and widgets
+    The painter and rectangle passed are managed by the layout and
+    basewidgets
     are expected to draw only inside the given rect. The layout ensures
     that this rect is at least the exact size specified by the
     'requiredSize' method on this widget. """
@@ -166,5 +198,9 @@ class BoxWidget(QWidget):
       if isinstance(arg, QMainWindow):
         self.mainWindow = arg
       elif isinstance(arg, QWidget):
-        self.parentWidget = arg
+        if type(arg).__name__ == 'AbstractLayout':
+          self.parentLayout = arg
+        else:
+          self.parentWidget = arg
+
     QWidget.__init__(self)

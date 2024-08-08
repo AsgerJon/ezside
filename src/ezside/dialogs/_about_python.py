@@ -15,7 +15,7 @@ from worktoy.desc import AttriBox
 from worktoy.text import monoSpace
 
 from ezside.tools import Align
-from ezside.widgets import Label, Label
+from ezside.basewidgets import Label, Label
 from moreworktoy import mambaVersion
 
 

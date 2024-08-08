@@ -9,7 +9,7 @@ from icecream import ic
 from worktoy.desc import AttriBox
 
 from ezside.tools import Font, FontFamily, FontCap, emptyPen
-from ezside.widgets import BoxWidget
+from ezside.basewidgets import BoxWidget
 
 ic.configureOutput(includeContext=True)
 

@@ -14,7 +14,7 @@ from worktoy.keenum import KeeNum, auto
 from worktoy.parse import maybe
 
 from ezside.tools import emptyBrush, parsePen, fillBrush
-from ezside.widgets import BoxWidget
+from ezside.basewidgets import BoxWidget
 
 Size: TypeAlias = Union[QSize, QSizeF]
 Point: TypeAlias = Union[QPoint, QPointF]

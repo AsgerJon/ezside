@@ -4,27 +4,26 @@
 from __future__ import annotations
 
 import os
+from typing import TypeAlias, Union
 
 import numpy as np
 import torch
 from PIL import Image
-from PIL.ImageQt import QImage as QImagePIL
-from PySide6.QtCore import QSizeF, QSize, QRectF, QPointF, Slot, QRect, \
-  QEvent, Qt, Signal
-from PySide6.QtGui import QPaintEvent, QPainter, QPixmap, QImage, \
-  QMouseEvent, QEnterEvent, QColor
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import (QSizeF, QSize, QRectF, QPointF, Slot, QEvent,
+                            Qt, Signal, QRect)
+from PySide6.QtGui import QPainter, QPixmap, QImage, \
+  QMouseEvent, QEnterEvent, QColor, QContextMenuEvent
+from PySide6.QtWidgets import QMenu
 from icecream import ic
 from torchvision.transforms import ToTensor, ToPILImage
-
-from worktoy.desc import Field
+from worktoy.desc import Field, AttriBox, THIS
 from worktoy.parse import maybe
-from worktoy.text import monoSpace
 
 from ezside.dialogs import NewDialog
-from ezside.tools import SizeRule
-from ezside.widgets import BoxWidget
+from ezside.basewidgets import BoxWidget
+from ezside.widgets import ImgContextMenu
 
+Rect: TypeAlias = Union[QRect, QRectF]
 ic.configureOutput(includeContext=True)
 
 
@@ -37,18 +36,34 @@ class ImgEdit(BoxWidget):
   __left_mouse_pressed__ = None
   __under_mouse__ = None
   __paint_color__ = None
+  __mouse_region__ = None
+  __brush_radius__ = None
 
+  contextMenu = AttriBox[ImgContextMenu](THIS)
+
+  brushRadius = Field()
   pix = Field()
   fid = Field()
   data = Field()
   paintColor = Field()
   leftMouse = Field()
+  mouseRegion = Field()
 
   requestColor = Signal()
   requestFid = Signal()
   newFid = Signal(str)
   openFid = Signal(str)
   saveFid = Signal(str)
+
+  @brushRadius.GET
+  def _getBrushRadius(self) -> int:
+    """Getter-function for brush radius"""
+    return self.__brush_radius__
+
+  @brushRadius.SET
+  def _setBrushRadius(self, brushRadius: int) -> None:
+    """Setter-function for brush radius"""
+    self.__brush_radius__ = brushRadius
 
   @fid.ONSET
   def _onFidSet(self, oldVal: str, newVal: str) -> None:
@@ -75,9 +90,14 @@ class ImgEdit(BoxWidget):
     """Slot opens the given image. """
     self.fid = fid
     image = Image.open(fid).convert("RGB")
-    image = image.resize((256, 256), )
+    aspectRatio = image.size[0] / image.size[1]
+    if aspectRatio < 1:
+      image = image.resize((256, int(256 / aspectRatio)), )
+    else:
+      image = image.resize((int(256 * aspectRatio), 256), )
     transform = ToTensor()
     self.__data_tensor__ = transform(image)
+    ic(self.__data_tensor__.shape)
     self.updateImage()
     self.openFid.emit(self.fid)
 
@@ -86,8 +106,19 @@ class ImgEdit(BoxWidget):
     """Getter-function for pixmap"""
     return self.__pix_map__ or QPixmap()
 
+  @mouseRegion.GET
+  def _getMouseRegion(self) -> QRectF:
+    """Getter-function for mouse region"""
+    return maybe(self.__mouse_region__, QRectF())
+
+  @mouseRegion.SET
+  def _setMouseRegion(self, mouseRegion: QRectF) -> None:
+    """Setter-function for mouse region"""
+    self.__mouse_region__ = mouseRegion
+
   def updateImage(self) -> None:
     """Updates the view"""
+    oldSize = self.parentLayout.requiredSize()
     if self.__data_tensor__ is None:
       return
     pilImage = ToPILImage()(self.__data_tensor__)
@@ -101,23 +132,19 @@ class ImgEdit(BoxWidget):
     h, w, _ = imageArray.shape
     qImage = QImage(imageArray.data, w, h, imageArray.strides[0], fmt)
     self.__pix_map__ = QPixmap.fromImage(qImage)
-    self.update()
-    self.adjustSize()
-    self.update()
-    self.setMinimumSize(self.pix.size())
-    self.parent().adjustSize()
-    self.parent().update()
-    self.parent().parent().adjustSize()
-    self.parent().parent().update()
-    self.parent().parent().parent().adjustSize()
-    self.parent().parent().parent().update()
-    parentSize = self.parent().parent().parent().size()
-    self.parent().parent().parent().setMinimumSize(parentSize)
+    rect = QRectF(QPointF(0, 0), QSizeF(w, h))
+    self.mouseRegion = rect - self.allMargins
+    newSize = self.parentLayout.requiredSize()
+    sizeIncrease = QSizeF.toSize(newSize - oldSize)
+    self.parentLayout.resize(QSizeF.toSize(newSize))
+    newWindowSize = self.mainWindow.size() + sizeIncrease
+    self.mainWindow.resize(newWindowSize)
+    self.parentLayout.adjustSize()
 
-  @Slot()
-  def saveImage(self, ) -> None:
+  @Slot(str)
+  def saveImage(self, fid: str) -> None:
     """Slot saves the image to the file. """
-    ic(os.path.basename(self.fid))
+    self.fid = fid
     if self.fid is None or os.path.basename(self.fid) == "unnamed.png":
       return self.requestFid.emit()
     self.pix.save(self.fid)
@@ -145,46 +172,44 @@ class ImgEdit(BoxWidget):
 
   def requiredSize(self) -> QSizeF:
     """Return the required size. """
+    if not self.pix:
+      return QSizeF(256, 256)
     return self.pix.size()
 
-  def contentRect(self) -> QSizeF:
-    """Return the content rectangle. """
-    return self.requiredSize() + self.paddings
-
-  def minimumSizeHint(self) -> QSize:
-    """Return the minimum size hint. """
-    return QPixmap.size(self.pix)
-
-  def paintEvent(self, event: QPaintEvent) -> None:
+  def paintMeLike(self, rect: Rect, painter: QPainter) -> None:
     """Paint the image. """
-    BoxWidget.paintEvent(self, event)
+    BoxWidget.paintMeLike(self, rect, painter)
     if not self.pix:
       return
-    painter = QPainter()
-    painter.begin(self)
-    viewRect = painter.viewport()
+    viewRect = rect
     center = viewRect.center()
     pixSize = QPixmap.size(self.pix)
     pixRect = QRectF(QPointF(0, 0), QSize.toSizeF(pixSize))
     pixRect.moveCenter(center)
-    innerRect = QRect.toRectF(viewRect) - self.margins
+    innerRect = viewRect - self.margins
     innerRect -= self.borders
     innerRect -= self.paddings
     innerRect.moveCenter(center)
-    painter.drawPixmap(QPointF(0, 0, ), self.pix)
-    painter.end()
+    self.mouseRegion = innerRect
+    painter.drawPixmap(innerRect.topLeft(), self.pix)
 
-  def __init__(self, parent: QWidget = None) -> None:
-    BoxWidget.__init__(self, parent)
-    self.sizeRule = SizeRule.EXPAND
+  def __init__(self, *args) -> None:
+    BoxWidget.__init__(self, *args)
     self.setMouseTracking(True)
+    self.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
+
+  def contextMenuEvent(self, event: QContextMenuEvent) -> None:
+    """Right-click should open tool options"""
+    self.contextMenu.popup(event.globalPos(), )
 
   def mousePressEvent(self, event: QMouseEvent) -> None:
     """Sets the mouse down flag"""
     if event.buttons() == Qt.MouseButton.LeftButton:
-      ic('left mouse!')
       self.__left_mouse_pressed__ = True
-    ic(self.__data_tensor__.shape)
+    if event.buttons() == Qt.MouseButton.RightButton:
+      contextEvent = QContextMenuEvent(QContextMenuEvent.Reason.Mouse,
+                                       event.pos())
+      self.contextMenuEvent(contextEvent)
 
   def mouseReleaseEvent(self, event: QMouseEvent) -> None:
     """Sets the mouse down flag"""
@@ -201,20 +226,32 @@ class ImgEdit(BoxWidget):
 
   def mouseMoveEvent(self, event: QMouseEvent) -> None:
     """Applies paint when mouse button held"""
-    x, y = int(event.localPos().x()), int(event.localPos().y())
-    i = int(y / self.width() * self.__data_tensor__.shape[2])
-    j = int(x / self.height() * self.__data_tensor__.shape[1])
-
-    i = min(max(0, i), self.__data_tensor__.shape[2] - 1)
-    j = min(max(0, j), self.__data_tensor__.shape[1] - 1)
+    if self.__data_tensor__ is None:
+      return
+    p = event.pos()
+    x, y = p.x(), p.y()
+    width, height = self.pix.size().width(), self.pix.size().height()
+    j0 = int(x / width * self.__data_tensor__.shape[2])
+    i0 = int(y / height * self.__data_tensor__.shape[1])
 
     rgb = self.paintColor
+    if rgb is None:
+      self.contextMenu.popup(event.globalPos(), )
+      return
     r, g, b = float(rgb.red()), float(rgb.green()), float(rgb.blue())
     r, g, b = r / 255, g / 255, b / 255
     if self.leftMouse:
-      self.__data_tensor__[0, i - 2:i + 2, j - 2:j + 2] = r
-      self.__data_tensor__[1, i - 2:i + 2, j - 2:j + 2] = g
-      self.__data_tensor__[2, i - 2:i + 2, j - 2:j + 2] = b
+      for ii in range(-5, 5):
+        for jj in range(-5, 5):
+          if i0 + ii < 0 or i0 + ii >= self.__data_tensor__.shape[1]:
+            continue
+          if ii * ii + jj * jj < 25:
+            r0 = self.__data_tensor__[0, i0 + ii, j0 + jj]
+            g0 = self.__data_tensor__[1, i0 + ii, j0 + jj]
+            b0 = self.__data_tensor__[2, i0 + ii, j0 + jj]
+            self.__data_tensor__[0, i0 + ii, j0 + jj] = 0.75 * r0 + 0.25 * r
+            self.__data_tensor__[1, i0 + ii, j0 + jj] = 0.75 * g0 + 0.25 * g
+            self.__data_tensor__[2, i0 + ii, j0 + jj] = 0.75 * b0 + 0.25 * b
       self.updateImage()
 
   def newImage(self, size: QSize, fid: str = None) -> None:

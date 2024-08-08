@@ -25,6 +25,14 @@ class LayoutIndex(BaseObject):
   rowSpan = AttriBox[int](1)
   colSpan = AttriBox[int](1)
 
+  @overload(int, int, int, int)
+  def __init__(self, row: int, col: int, rowSpan: int, colSpan: int) -> None:
+    """Constructor for the LayoutIndex class."""
+    self.row = row
+    self.col = col
+    self.rowSpan = rowSpan
+    self.colSpan = colSpan
+
   @overload(int, int)
   def __init__(self, row: int, col: int) -> None:
     """Constructor for the LayoutIndex class."""

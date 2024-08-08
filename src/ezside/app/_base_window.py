@@ -79,6 +79,7 @@ class BaseWindow(QMainWindow):
   @Slot()
   def requestNewFile(self) -> None:
     """Triggering this method starts the 'new' wizard"""
+    raise NotImplementedError
 
   def initSignalSlot(self, ) -> None:
     """Initializes the signal slot connections for the object."""
@@ -95,6 +96,13 @@ class BaseWindow(QMainWindow):
     #  Implementing 'about' actions to relevant information dialogs
     self.mainMenuBar.helpMenu.aboutQtAction.triggered.connect(
         QApplication.aboutQt)
+    # -
     self.mainMenuBar.helpMenu.aboutPythonAction.triggered.connect(
         self.aboutPython.show)
     self.mainMenuBar.fileMenu.exitAction.triggered.connect(self.close)
+    self.mainMenuBar.fileMenu.newAction.triggered.connect(
+        self.requestNewFile)
+    self.mainMenuBar.fileMenu.openAction.triggered.connect(
+        self.requestOpenFile)
+    self.mainMenuBar.fileMenu.saveAsAction.triggered.connect(
+        self.requestSaveFile)

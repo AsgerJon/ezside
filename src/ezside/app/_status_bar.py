@@ -6,9 +6,9 @@ from __future__ import annotations
 
 from typing import Callable
 
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Slot
 from PySide6.QtGui import QShowEvent
-from PySide6.QtWidgets import QStatusBar, QMainWindow, QHBoxLayout, QLabel
+from PySide6.QtWidgets import QStatusBar, QMainWindow
 from icecream import ic
 from worktoy.desc import AttriBox, THIS
 

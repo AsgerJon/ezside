@@ -10,7 +10,7 @@ from worktoy.desc import Field
 from worktoy.text import typeMsg
 
 from ezside.tools import emptyPen
-from ezside.widgets import Label, ButtonStyle, ButtonState
+from ezside.basewidgets import Label, ButtonStyle, ButtonState
 
 ic.configureOutput(includeContext=True)
 

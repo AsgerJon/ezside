@@ -6,11 +6,12 @@ for a further subclass."""
 from __future__ import annotations
 
 from icecream import ic
-from worktoy.desc import AttriBox
+from worktoy.desc import AttriBox, THIS
 
 from ezside.app import BaseWindow
-from ezside.layouts import VerticalLayout
-from ezside.widgets import Label, PushButton
+from ezside.layouts import VerticalLayout, AbstractLayout
+from ezside.basewidgets import Label, PushButton
+from ezside.widgets import ImgEdit
 
 ic.configureOutput(includeContext=True)
 
@@ -20,12 +21,13 @@ class LayoutWindow(BaseWindow):
   organizing the widget layout of the main window, leaving business logic
   for a further subclass."""
 
-  baseWidget = AttriBox[VerticalLayout]()
-  headerLabel = AttriBox[Label]('LOL')
-  welcomeLabel = AttriBox[Label]('Welcome to EZSide')
-  infoLabel = AttriBox[Label]('New Layout System!!')
-  clickMe = AttriBox[PushButton]('CLICK ME!')
-  footerLabel = AttriBox[Label]('Footer')
+  baseWidget = AttriBox[AbstractLayout]()
+  headerLabel = AttriBox[Label](THIS, 'LOL')
+  welcomeLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
+  infoLabel = AttriBox[Label](THIS, 'New Layout System!!')
+  clickMe = AttriBox[PushButton](THIS, 'CLICK ME!')
+  footerLabel = AttriBox[Label](THIS, 'Footer')
+  imgEdit = AttriBox[ImgEdit](THIS)
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the object"""
@@ -39,6 +41,7 @@ class LayoutWindow(BaseWindow):
     self.baseWidget.addWidget(self.infoLabel, 2, 0)
     self.baseWidget.addWidget(self.clickMe, 3, 0)
     self.baseWidget.addWidget(self.footerLabel, 4, 0)
+    self.baseWidget.addWidget(self.imgEdit, 0, 1, 5, 1)
     self.setCentralWidget(self.baseWidget)
 
   def show(self) -> None:

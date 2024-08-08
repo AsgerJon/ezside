@@ -8,15 +8,21 @@ from PySide6.QtCore import (QRectF, QSizeF, QPointF, QSize, QMarginsF,
                             QPoint, \
                             QRect, QEvent)
 from PySide6.QtGui import QColor, QPaintEvent, QPainter, QMouseEvent, \
-  QEnterEvent
+  QEnterEvent, QEventPoint
 from icecream import ic
 from worktoy.desc import AttriBox, Field
 from worktoy.text import typeMsg
 
-from ezside.layouts import LayoutItem
-from ezside.widgets import BoxWidget
+from ezside.layouts import LayoutItem, LayoutIndex
+from ezside.basewidgets import BoxWidget
 
 ic.configureOutput(includeContext=True)
+
+TypePress = QEvent.Type.MouseButtonPress
+TypeRelease = QEvent.Type.MouseButtonRelease
+TypeMouseMove = QEvent.Type.MouseMove
+TypeEnter = QEvent.Type.Enter
+TypeLeave = QEvent.Type.Leave
 
 
 class AbstractLayout(BoxWidget):
@@ -30,6 +36,7 @@ class AbstractLayout(BoxWidget):
   allMargins: QMarginsF
 
   __cursor_position__ = None
+  __press_position__ = None
   __mouse_region__ = None
   __layout_items__ = None
   __iter_contents__ = None
@@ -37,9 +44,30 @@ class AbstractLayout(BoxWidget):
   spacing = AttriBox[int](0)
 
   cursorPosition = Field()
+  pressPosition = Field()
   mouseRegion = Field()
   rowCount = Field()
   colCount = Field()
+
+  @pressPosition.GET
+  def _getPressPosition(self) -> QPointF:
+    """Getter-function for press position"""
+    if self.__press_position__ is None:
+      return QPointF(-1, -1)
+    if isinstance(self.__press_position__, QPoint):
+      return QPoint.toPointF(self.__press_position__)
+    if isinstance(self.__press_position__, QPointF):
+      return self.__press_position__
+    e = typeMsg('pressPosition', self.__press_position__, QPointF)
+    raise TypeError(e)
+
+  @pressPosition.SET
+  def _setPressPosition(self, pressPosition: QPointF) -> None:
+    """Setter-function for press position"""
+    if not isinstance(pressPosition, QPointF):
+      e = typeMsg('pressPosition', pressPosition, QPointF)
+      raise TypeError(e)
+    self.__press_position__ = pressPosition
 
   @cursorPosition.GET
   def _getCursorPosition(self) -> QPointF:
@@ -52,6 +80,14 @@ class AbstractLayout(BoxWidget):
       return self.__cursor_position__
     e = typeMsg('cursorPosition', self.__cursor_position__, QPointF)
     raise TypeError(e)
+
+  @cursorPosition.SET
+  def _setCursorPosition(self, cursorPosition: QPointF) -> None:
+    """Setter-function for the cursor position"""
+    if not isinstance(cursorPosition, QPointF):
+      e = typeMsg('cursorPosition', cursorPosition, QPointF)
+      raise TypeError(e)
+    self.__cursor_position__ = cursorPosition
 
   @mouseRegion.GET
   def _getMouseRegion(self) -> QRectF:
@@ -77,7 +113,12 @@ class AbstractLayout(BoxWidget):
 
   def getColWidth(self, col: int) -> float:
     """Return the width of the given column."""
-    return max([item.width for item in self.getItemsInCol(col)] or [-1, ])
+    out = 0
+    for item in self.getItems():
+      if item.index.col == col:
+        if item.index.colSpan == 1:
+          out = max(out, item.width)
+    return out
 
   def getRowBottom(self, row: int) -> float:
     """Return the bottom of the given row."""
@@ -91,7 +132,12 @@ class AbstractLayout(BoxWidget):
 
   def getRowHeight(self, row: int) -> float:
     """Return the width of the given row."""
-    return max([item.height for item in self.getItemsInRow(row)] or [-1, ])
+    out = 0
+    for item in self.getItems():
+      if item.index.row == row:
+        if item.index.rowSpan == 1:
+          out = max(out, item.height)
+    return out
 
   def getItemsInRow(self, row: int) -> list[LayoutItem]:
     """Return the items in the given row."""
@@ -117,10 +163,14 @@ class AbstractLayout(BoxWidget):
     """Getter-function for the items"""
     return self.__layout_items__ or []
 
-  def addWidget(self, widget: BoxWidget, row: int, col: int) -> None:
+  def addWidget(self, widget: BoxWidget, row: int, col: int, *args) -> None:
     """Subclasses are required to implement this method. After adding the
     widget, the widget should be returned. """
-    layoutItem = LayoutItem(widget, row, col)
+    widget.parentLayout = self
+    rowSpan, colSpan = [*args, 1, 1, ][:2]
+    layoutIndex = LayoutIndex(row, col, rowSpan, colSpan)
+    layoutItem = LayoutItem(widget, layoutIndex)
+    widget.parentLayoutItem = layoutItem
     existing = self.__layout_items__ or []
     self.__layout_items__ = [*existing, layoutItem]
 
@@ -134,12 +184,24 @@ class AbstractLayout(BoxWidget):
     self.backgroundColor = QColor(255, 255, 0, 255)
     self.setMouseTracking(True)
 
+  def getHeight(self, item: LayoutItem) -> float:
+    """Getter-function for the height at given grid"""
+    height = 0
+    for row in range(item.index.row, item.index.row + item.index.rowSpan):
+      height += self.getRowHeight(row)
+    return height
+
+  def getWidth(self, item: LayoutItem) -> float:
+    """Getter-function for the width at given grid"""
+    width = 0
+    for col in range(item.index.col, item.index.col + item.index.colSpan):
+      width += self.getColWidth(col)
+    return width
+
   def getSize(self, item: LayoutItem) -> QSizeF:
     """Getter-function for the size at given grid"""
-    col = item.index.col
-    row = item.index.row
-    width = self.getColWidth(col)
-    height = self.getRowHeight(row)
+    width = self.getWidth(item)
+    height = self.getHeight(item)
     return QSizeF(width, height)
 
   def getRect(self, item: LayoutItem) -> QRectF:  # this name lol
@@ -149,6 +211,10 @@ class AbstractLayout(BoxWidget):
     left = self.getColLeft(col)
     top = self.getRowTop(row)
     size = self.getSize(item)
+    reqSize = item.widgetItem.requiredSize()
+    width = max(size.width(), reqSize.width())
+    height = max(size.height(), reqSize.height())
+    size = QSizeF(width, height)
     return QRectF(QPointF(left, top), size)
 
   def paintEvent(self, event: QPaintEvent) -> None:
@@ -172,7 +238,9 @@ class AbstractLayout(BoxWidget):
     """Return the required rectangle. """
     out = QRectF()
     for item in self.getItems():
-      out = out.united(self.getRect(item))
+      size = item.widgetItem.requiredSize()
+      topLeft = self.getRect(item).topLeft()
+      out = out.united(QRectF(topLeft, size))
     return out + self.allMargins
 
   def minimumSizeHint(self) -> QSize:
@@ -191,28 +259,43 @@ class AbstractLayout(BoxWidget):
 
   def mouseMoveEvent(self, event: QMouseEvent) -> None:
     """This method handles the mouse move event."""
-    self.__cursor_position__ = event.localPos()
+    point = (event.points() or [None, ]).pop()
+    if isinstance(point, QEventPoint):
+      self.cursorPosition = QEventPoint.lastPosition(point)
+    else:
+      self.cursorPosition = QPointF(-1, -1)
     for item in self.getItems():
       rect = self.getRect(item)
+      relPos = QPointF(self.cursorPosition - rect.topLeft()).toPoint()
       if rect.contains(self.cursorPosition):
+        newEnter = QEnterEvent(relPos, relPos, relPos)
+        btn = event.buttons()
+        mdf = event.modifiers()
+        newMove = QMouseEvent(TypeMouseMove, relPos, btn, btn, mdf)
         if not item.widgetItem.underMouse:
-          enterObject = QEnterEvent(self.cursorPosition,
-                                    self.cursorPosition,
-                                    self.cursorPosition, )
-          item.widgetItem.enterEvent(enterObject)
-        item.widgetItem.mouseMoveEvent(event)
+          item.widgetItem.enterEvent(newEnter)
+        item.widgetItem.mouseMoveEvent(newMove)
       else:
         if item.widgetItem.underMouse:
-          leaveObject = QEvent(QEvent.Type.Leave)
-          item.widgetItem.leaveEvent(leaveObject)
+          newLeave = QEvent(TypeLeave)
+          item.widgetItem.leaveEvent(newLeave)
     self.update()
 
   def mousePressEvent(self, event: QMouseEvent) -> None:
     """This method handles the mouse press event."""
+    point = (event.points() or [None, ]).pop()
+    if isinstance(point, QEventPoint):
+      self.pressPosition = QEventPoint.lastPosition(point)
+    else:
+      self.pressPosition = QPointF(-1, -1)
     for item in self.getItems():
       rect = self.getRect(item)
-      if rect.contains(self.cursorPosition):
-        item.widgetItem.mousePressEvent(event)
+      if rect.contains(self.pressPosition):
+        relPos = QPointF(self.pressPosition - rect.topLeft())
+        btn = event.buttons()
+        mdf = event.modifiers()
+        newPress = QMouseEvent(TypePress, relPos, btn, btn, mdf)
+        item.widgetItem.mousePressEvent(newPress)
         break
     else:
       BoxWidget.mousePressEvent(self, event)
@@ -220,10 +303,18 @@ class AbstractLayout(BoxWidget):
 
   def mouseReleaseEvent(self, event: QMouseEvent) -> None:
     """This method handles the mouse release event."""
+    point = (event.points() or [None, ]).pop()
+    if isinstance(point, QEventPoint):
+      p = QEventPoint.lastPosition(point)
+    else:
+      p = QPointF(-1, -1)
     for item in self.getItems():
       rect = self.getRect(item)
-      if rect.contains(self.cursorPosition):
-        item.widgetItem.mouseReleaseEvent(event)
+      if rect.contains(p):
+        relPos = QPointF(p - rect.topLeft())
+        newRelease = QMouseEvent(TypeRelease, relPos, event.buttons(),
+                                 event.button(), event.modifiers())
+        item.widgetItem.mouseReleaseEvent(newRelease)
         break
     else:
       BoxWidget.mouseReleaseEvent(self, event)

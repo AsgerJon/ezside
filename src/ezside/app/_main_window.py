@@ -20,3 +20,12 @@ ic.configureOutput(includeContext=True)
 
 class MainWindow(LayoutWindow):
   """This subclass should implement business logic."""
+
+  def initSignalSlot(self, ) -> None:
+    """Initializes the signal-slot connections"""
+    LayoutWindow.initSignalSlot(self)
+    self.openFileSelected.connect(self.imgEdit.openImage)
+    self.saveFileSelected.connect(self.imgEdit.saveImage)
+    self.imgEdit.contextMenu.selectColor.triggered.connect(
+        self.requestColor)
+    self.colorSelected.connect(self.imgEdit.setPaintColor)

@@ -7,7 +7,7 @@ from __future__ import annotations
 from worktoy.parse import maybe
 
 from ezside.layouts import AbstractLayout, LayoutItem
-from ezside.widgets import BoxWidget
+from ezside.basewidgets import BoxWidget
 
 
 class HorizontalLayout(AbstractLayout):
@@ -17,19 +17,19 @@ class HorizontalLayout(AbstractLayout):
   __layout_items__ = None
 
   def __len__(self, ) -> int:
-    """Return the number of widgets in the layout."""
+    """Return the number of basewidgets in the layout."""
     return len(self.getWidgets())
 
   def __bool__(self) -> bool:
-    """Return True if the layout has widgets."""
+    """Return True if the layout has basewidgets."""
     return True if self.__layout_items__ else False
 
   def getWidgets(self, ) -> list[LayoutItem]:
-    """Getter-function for the widgets"""
+    """Getter-function for the basewidgets"""
     return maybe(self.__layout_items__, [])
 
   def addWidget(self, widget: BoxWidget) -> BoxWidget:
-    """Adds all widgets to the same row. """
+    """Adds all basewidgets to the same row. """
     existing = self.getWidgets()
     widgetItem = LayoutItem(widget, 0, len(self))
     self.__layout_items__ = [*existing, widgetItem]

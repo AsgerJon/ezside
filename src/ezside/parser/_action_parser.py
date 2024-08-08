@@ -108,3 +108,9 @@ class ActionParser(AbstractParser):
     self.title = actionTitle
     self.icon = iconFile
     self.shortCut = shortCut
+
+  @overload(QObject, str)
+  def __init__(self, parentWidget: QObject, actionTitle: str) -> None:
+    """Constructor for the ActionParse class."""
+    self.title = actionTitle
+    self.__init__(parentWidget)

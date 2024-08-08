@@ -1,4 +1,5 @@
-"""VerticalLayout provides a layout, which explicitly exposes its widgets.
+"""VerticalLayout provides a layout, which explicitly exposes its
+basewidgets.
 """
 #  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
@@ -8,7 +9,7 @@ from icecream import ic
 from worktoy.parse import maybe
 
 from ezside.layouts import AbstractLayout, LayoutItem
-from ezside.widgets import BoxWidget
+from ezside.basewidgets import BoxWidget
 
 
 class VerticalLayout(AbstractLayout):

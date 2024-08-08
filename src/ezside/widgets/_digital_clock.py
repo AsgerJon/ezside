@@ -13,15 +13,14 @@ from icecream import ic
 from worktoy.desc import AttriBox, Field
 
 from ezside.layouts import AbstractLayout
-from ezside.tools import emptyPen
-from ezside.widgets import BoxWidget, SevenSeg
+from ezside.basewidgets import BoxWidget, SevenSeg
 
 ic.configureOutput(includeContext=True)
 
 
 class Spacer(BoxWidget):
   """Spacer provides a widget that can be used to add space between
-  widgets."""
+  basewidgets."""
 
   def __init__(self, parent=None) -> None:
     """The constructor method for the Spacer widget."""
@@ -127,7 +126,7 @@ class DigitalClock(AbstractLayout):
     self.refreshTime()
 
   def _getWidgets(self) -> list[BoxWidget]:
-    """This method returns the widgets in the layout."""
+    """This method returns the basewidgets in the layout."""
     return [
         self.tenHour,
         self.oneHour,

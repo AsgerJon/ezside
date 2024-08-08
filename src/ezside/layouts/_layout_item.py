@@ -4,13 +4,13 @@
 from __future__ import annotations
 
 from PySide6.QtCore import QSizeF, QSize
-from PySide6.QtGui import QEnterEvent
+from icecream import ic
 from worktoy.desc import AttriBox, Field, NODEF
 from worktoy.meta import BaseObject, overload
 from worktoy.text import typeMsg
 
 from ezside.layouts import LayoutIndex
-from ezside.widgets import BoxWidget
+from ezside.basewidgets import BoxWidget
 
 
 class LayoutItem(BaseObject):

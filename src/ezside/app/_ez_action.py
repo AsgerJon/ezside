@@ -20,11 +20,7 @@ class EZAction(QAction):
   objects."""
 
   def __init__(self, *args) -> None:
-    try:
-      parsed = ActionParser(*args)
-    except ValueError as valueError:
-      ic(valueError)
-      ic(args)
+    parsed = ActionParser(*args)
     if parsed.parent:
       QAction.__init__(self, parsed.parent)
     else:
