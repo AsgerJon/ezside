@@ -108,6 +108,7 @@ class AbstractLayout(BoxWidget):
 
   def getItemCount(self) -> int:
     """Getter-function for number of items"""
+    return len(self.getItems())
 
   def addWidget(self, widget: BoxWidget, *args) -> LayoutItem:
     """Subclasses are required to implement this method. Upon receiving a

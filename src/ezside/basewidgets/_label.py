@@ -3,8 +3,10 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QSize, QRectF, QSizeF, QPointF, QMarginsF
-from PySide6.QtGui import QPainter
+from typing import TypeAlias, Union, Any
+
+from PySide6.QtCore import QSize, QRectF, QSizeF, QPointF, QMarginsF, QRect
+from PySide6.QtGui import QPainter, QPaintEvent
 from icecream import ic
 from worktoy.desc import AttriBox
 
@@ -13,13 +15,11 @@ from ezside.basewidgets import BoxWidget
 
 ic.configureOutput(includeContext=True)
 
+Rect: TypeAlias = Union[QRect, QRectF]
+
 
 class Label(BoxWidget):
   """Label provides a property driven alternative to QLabel. """
-
-  margins: QMarginsF
-  borders: QMarginsF
-  paddings: QMarginsF
 
   __fallback_text__ = 'LABEL'
   __parsed_object__ = None
@@ -28,48 +28,37 @@ class Label(BoxWidget):
   text = AttriBox[str]()
 
   def requiredSize(self) -> QSizeF:
-    """The required size to show the current text with the current font."""
-    return self.requiredRect().size()
+    """Returns the size required to display the current text with the
+    current font."""
+    rect = self.textFont.boundRect(self.text)
+    return (rect + self.allMargins).size()
 
-  def requiredRect(self) -> QRectF:
-    """The required rectangle to bound the current text."""
-    rect = self.textFont.boundRect(self.text) + self.allMargins
-    size = rect.size()
-    return QRectF(QPointF(0, 0), size)
-
-  def minimumSizeHint(self) -> QSize:
-    """The minimum size hint to show the current text with the current
-    font."""
-    return QSize(0, 0)
-
-  def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
+  def paintMeLike(self,
+                  rect: Rect,
+                  painter: QPainter,
+                  event: QPaintEvent) -> Any:
     """Paints the label with the current text and font."""
-    viewRect = rect
-    center = viewRect.center()
-    marginRect = QRectF.marginsRemoved(viewRect, self.margins)
-    borderRect = QRectF.marginsRemoved(marginRect, self.borders)
-    paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
-    marginRect.moveCenter(center)
-    borderRect.moveCenter(center)
-    paddedRect.moveCenter(center)
-    painter.setPen(emptyPen())
-    painter.setBrush(self.borderBrush)
-    painter.drawRect(marginRect)
-    painter.setBrush(self.backgroundBrush)
-    painter.drawRect(borderRect)
-    painter.setPen(self.textFont.asQPen)
-    painter.setFont(self.textFont.asQFont)
-    textRect = self.textFont.align.fitRectF(self.requiredRect(), paddedRect)
-    painter.drawText(textRect, self.textFont.align.qt, self.text)
+    rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
+    textRect = self.textFont.boundRect(self.text)
+    targetRect = rect - self.allMargins
+    alignRect = self.textFont.align.fitRectF(textRect, targetRect)
+    self.textFont @= painter
+    ic(self.textFont)
+    painter.drawText(alignRect, self.text)
+    return alignRect, painter, event
 
   def __init__(self, *args) -> None:
-    BoxWidget.__init__(self)
-    for arg in args:
+    unusedArgs = []
+    tempArgs = [*args, ]
+    while tempArgs:
+      arg = tempArgs.pop(0)
       if isinstance(arg, str):
         self.text = arg
+        unusedArgs.extend(tempArgs)
         break
     else:
       self.text = self.__fallback_text__
-    self.paddings = QMarginsF(8, 1, 8, 1)
+    BoxWidget.__init__(self, *unusedArgs)
+    self.paddings = QMarginsF(1, 1, 1, 1, )
     self.borders = QMarginsF(2, 2, 2, 2, )
     self.margins = QMarginsF(2, 2, 2, 2, )

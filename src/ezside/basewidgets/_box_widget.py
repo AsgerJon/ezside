@@ -94,4 +94,4 @@ class BoxWidget(LayoutWidget):
     painter.drawRect(marginRect)
     painter.setBrush(self.backgroundBrush)
     painter.drawRect(borderRect)
-    return paddedRect, painter
+    return paddedRect, painter, event

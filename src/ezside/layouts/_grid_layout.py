@@ -21,7 +21,6 @@ class GridLayout(AbstractLayout):
   def addWidget(self, widget: LayoutWidget, *args) -> LayoutItem:
     """Add a widget to the layout."""
     index = LayoutIndex(*args)
-
-    item = self.createItem(widget, row, col, rowSpan, colSpan)
-    self.addItem(item)
-    return item
+    layoutItem = LayoutItem(widget, index)
+    self.addWidgetItem(layoutItem)
+    return layoutItem
