@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from PIL import Image
 from PySide6.QtCore import (QSizeF, QSize, QRectF, QPointF, Slot, QEvent,
-                            Qt, Signal, QRect)
+                            Qt, Signal, QRect, QTimer)
 from PySide6.QtGui import QPainter, QPixmap, QImage, \
   QMouseEvent, QEnterEvent, QColor, QContextMenuEvent
 from PySide6.QtWidgets import QMenu
@@ -18,6 +18,7 @@ from icecream import ic
 from torchvision.transforms import ToTensor, ToPILImage
 from worktoy.desc import Field, AttriBox, THIS
 from worktoy.parse import maybe
+from worktoy.text import typeMsg
 
 from ezside.dialogs import NewDialog
 from ezside.basewidgets import BoxWidget
@@ -38,6 +39,7 @@ class ImgEdit(BoxWidget):
   __paint_color__ = None
   __mouse_region__ = None
   __brush_radius__ = None
+  __image_timer__ = None
 
   contextMenu = AttriBox[ImgContextMenu](THIS)
 
@@ -48,12 +50,30 @@ class ImgEdit(BoxWidget):
   paintColor = Field()
   leftMouse = Field()
   mouseRegion = Field()
+  imageTimer = Field()
 
   requestColor = Signal()
   requestFid = Signal()
   newFid = Signal(str)
   openFid = Signal(str)
   saveFid = Signal(str)
+
+  @imageTimer.GET
+  def _getImageTimer(self, **kwargs) -> QTimer:
+    """Getter-function for the image timer"""
+    if self.__image_timer__ is None:
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      self.__image_timer__ = QTimer()
+      self.__image_timer__.setInterval(10)
+      self.__image_timer__.setSingleShot(True)
+      self.__image_timer__.setTimerType(Qt.TimerType.PreciseTimer)
+      self.__image_timer__.timeout.connect(self.updateImage)
+      return self._getImageTimer(_recursion=True)
+    if isinstance(self.__image_timer__, QTimer):
+      return self.__image_timer__
+    e = typeMsg('imageTimer', self.__image_timer__, QTimer)
+    raise TypeError(e)
 
   @brushRadius.GET
   def _getBrushRadius(self) -> int:
@@ -206,6 +226,8 @@ class ImgEdit(BoxWidget):
     """Sets the mouse down flag"""
     if event.buttons() == Qt.MouseButton.LeftButton:
       self.__left_mouse_pressed__ = True
+      if not self.imageTimer.isActive():
+        self.imageTimer.start()
     if event.buttons() == Qt.MouseButton.RightButton:
       contextEvent = QContextMenuEvent(QContextMenuEvent.Reason.Mouse,
                                        event.pos())
@@ -214,6 +236,8 @@ class ImgEdit(BoxWidget):
   def mouseReleaseEvent(self, event: QMouseEvent) -> None:
     """Sets the mouse down flag"""
     self.__left_mouse_pressed__ = False
+    if self.imageTimer.isActive():
+      self.imageTimer.stop()
 
   def enterEvent(self, event: QEnterEvent) -> None:
     """Sets the under mouse flag"""
@@ -252,7 +276,8 @@ class ImgEdit(BoxWidget):
             self.__data_tensor__[0, i0 + ii, j0 + jj] = 0.75 * r0 + 0.25 * r
             self.__data_tensor__[1, i0 + ii, j0 + jj] = 0.75 * g0 + 0.25 * g
             self.__data_tensor__[2, i0 + ii, j0 + jj] = 0.75 * b0 + 0.25 * b
-      self.updateImage()
+    if not self.imageTimer.isActive():
+      self.imageTimer.start()
 
   def newImage(self, size: QSize, fid: str = None) -> None:
     """Slot creates a new image. """

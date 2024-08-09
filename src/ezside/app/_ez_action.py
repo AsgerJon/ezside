@@ -6,11 +6,13 @@ from __future__ import annotations
 
 import os.path
 
-from PySide6.QtGui import QAction, QPixmap, QKeySequence
+from PySide6.QtCore import QObject
+from PySide6.QtGui import QAction, QPixmap, QKeySequence, QIcon
 from PySide6.QtWidgets import QMenu, QMainWindow
 from icecream import ic
+from worktoy.text import typeMsg
 
-from ezside.parser import ActionParser
+from ezside.parser import ActionParser, IconParser
 
 ic.configureOutput(includeContext=True)
 
@@ -20,7 +22,16 @@ class EZAction(QAction):
   objects."""
 
   def __init__(self, *args) -> None:
-    parsed = ActionParser(*args)
+    parseArgs = []
+    for arg in args:
+      if isinstance(arg, QObject):
+        if any([isinstance(i, QObject) for i in parseArgs]):
+          continue
+        parseArgs.append(arg)
+      elif isinstance(arg, str):
+        if len([i for i in parseArgs if isinstance(i, str)]) < 2:
+          parseArgs.append(arg)
+    parsed = ActionParser(*parseArgs)
     if parsed.parent:
       QAction.__init__(self, parsed.parent)
     else:
@@ -32,18 +43,14 @@ class EZAction(QAction):
     if parsed.shortCut:
       self.setShortcut(parsed.shortCut)
 
-  def setIcon(self, *args) -> None:
+  def setIcon(self, iconParser: IconParser = None) -> None:
     """Reimplementation supporting receiving a file name"""
-    for arg in args:
-      if isinstance(arg, str):
-        if '.png' in arg:
-          here = os.path.dirname(os.path.abspath(__file__))
-          iconFile = os.path.join(here, 'icons', arg)
-          if os.path.isfile(iconFile):
-            pix = QPixmap(iconFile)
-            return QAction.setIcon(self, pix)
-    else:
-      return QAction.setIcon(self, *args)
+    if isinstance(iconParser, IconParser):
+      return QAction.setIcon(self, iconParser.icon)
+    if isinstance(iconParser, (QPixmap, QIcon)):
+      return QAction.setIcon(self, iconParser)
+    e = typeMsg('iconParser', iconParser, IconParser)
+    raise TypeError(e)
 
   def setShortcut(self, *args) -> None:
     """Reimplementation supporting receiving a string"""

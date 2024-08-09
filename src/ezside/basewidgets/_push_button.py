@@ -47,6 +47,11 @@ class PushButton(Label):
   mouseRelease = Signal()
   leftClick = Signal()
   rightClick = Signal()
+  singleClick = Signal(Qt.MouseButton)
+  doubleClick = Signal(Qt.MouseButton)
+  tripleClick = Signal(Qt.MouseButton)
+  pressHold = Signal(Qt.MouseButton)
+  speedClick = Signal(QPointF)
 
   def _createStyleData(self) -> None:
     """Creates the style data for the push button."""

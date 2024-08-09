@@ -10,7 +10,7 @@ from worktoy.meta import BaseObject, overload
 from worktoy.text import typeMsg
 
 from ezside.layouts import LayoutIndex
-from ezside.basewidgets import BoxWidget
+from ezside.basewidgets import BoxWidget, LayoutWidget
 
 
 class LayoutItem(BaseObject):
@@ -79,11 +79,63 @@ class LayoutItem(BaseObject):
       raise TypeError(e)
     return self.__widget_item__
 
-  @overload(LayoutIndex, BoxWidget)
-  def __init__(self, index: LayoutIndex, widgetItem: BoxWidget) -> None:
+  @overload()
+  def __init__(self) -> None:
     """Constructor for the LayoutItem class."""
-    self.index = index
+    pass
+
+  @overload(LayoutIndex)
+  def __init__(self, layoutIndex: LayoutIndex) -> None:
+    """Constructor for the LayoutItem class."""
+    self.index = layoutIndex
+
+  @overload(tuple)
+  def __init__(self, index: tuple) -> None:
+    """Constructor for the LayoutItem class."""
+    intArgs = [i for i in index if isinstance(i, int)]
+    self.__init__(LayoutIndex(*intArgs))
+
+  @overload(list)
+  def __init__(self, index: list) -> None:
+    """Constructor for the LayoutItem class."""
+    self.__init__(tuple(index))
+
+  @overload(int, int)
+  def __init__(self, row: int, col: int) -> None:
+    """Constructor for the LayoutItem class."""
+    self.__init__(LayoutIndex(row, col))
+
+  @overload(int, int, int, int)
+  def __init__(self, *args) -> None:
+    """Constructor for the LayoutItem class."""
+    self.__init__(LayoutIndex(*args))
+
+  @overload(LayoutWidget)
+  def __init__(self, widgetItem: LayoutWidget) -> None:
+    """Constructor for the LayoutItem class."""
     self.widgetItem = widgetItem
+
+  @overload(LayoutWidget, LayoutIndex)
+  def __init__(self, *args) -> None:
+    """Constructor for the LayoutItem class."""
+    widgetItem, layoutIndex = args
+    self.index = layoutIndex
+    self.widgetItem = widgetItem
+
+  @overload(LayoutIndex, LayoutWidget)
+  def __init__(self, *args) -> None:
+    """Constructor for the LayoutItem class."""
+    layoutIndex, widgetItem = args
+    self.__init__(widgetItem, layoutIndex)
+
+  @overload(LayoutWidget, int, int)
+  def __init__(self, *args) -> None:
+    """Constructor for the LayoutItem class."""
+    widgetArg = [arg for arg in args if isinstance(arg, LayoutWidget)]
+    intArgs = [arg for arg in args if isinstance(arg, int)]
+    layoutIndex = LayoutIndex(*intArgs)
+    layoutWidget = widgetArg[0]
+    self.__init__(layoutWidget, layoutIndex)
 
   @overload(BoxWidget, LayoutIndex)
   def __init__(self, widgetItem: BoxWidget, index: LayoutIndex) -> None:

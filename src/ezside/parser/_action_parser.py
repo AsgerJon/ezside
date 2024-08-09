@@ -4,15 +4,17 @@
 from __future__ import annotations
 
 import os
+from typing import Any
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, QSize
 from PySide6.QtWidgets import QWidget
 from worktoy.desc import Field
-from PySide6.QtGui import QIcon, QPixmap, QKeySequence
+from PySide6.QtGui import QIcon, QPixmap, QKeySequence, QImage
 
 from worktoy.meta import BaseObject, overload
+from worktoy.text import typeMsg
 
-from ezside.parser import AbstractParser
+from ezside.parser import AbstractParser, IconParser
 
 
 class ActionParser(AbstractParser):
@@ -23,6 +25,7 @@ class ActionParser(AbstractParser):
   __action_title__ = None
   __action_icon__ = None
   __action_shortcut__ = None
+  __icon_parser__ = None
 
   title = Field()
   icon = Field()
@@ -33,36 +36,14 @@ class ActionParser(AbstractParser):
     """Setter-function for the title."""
     self.__action_title__ = actionTitle
 
-  @icon.SET
-  @overload(str)
-  def _setIcon(self, iconFile: str, **kwargs) -> None:
-    """Setter-function for the icon file."""
-    if not os.path.isabs(iconFile):
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      here = os.path.dirname(os.path.abspath(__file__))
-      iconFile = os.path.join(here, '..', 'app', 'icons', iconFile)
-      iconFile = os.path.normpath(iconFile)
-    if not os.path.exists(iconFile):
-      e = """Unable to find icon file at: '%s'!""" % iconFile
-      raise FileNotFoundError(e)
-    if os.path.isdir(iconFile):
-      e = """The icon file at: '%s' is a directory!""" % iconFile
-      raise IsADirectoryError(e)
-    pix = QPixmap(iconFile)
-    self.icon = QIcon(pix)
-
-  @icon.SET
-  @overload(QIcon)
-  def _setIcon(self, icon: QIcon) -> None:
-    """Setter-function for the icon."""
-    self.__action_icon__ = icon
-
   @shortCut.SET
   @overload(str)
   def _setShortCut(self, shortCut: str) -> None:
     """Setter-function for the shortcut."""
-    self.shortCut = QKeySequence.fromString(shortCut)
+    keySequence = QKeySequence.fromString(shortCut)
+    if keySequence.isEmpty():
+      return
+    self.__action_shortcut__ = keySequence
 
   @shortCut.SET
   @overload(QKeySequence)
@@ -75,42 +56,80 @@ class ActionParser(AbstractParser):
     """Getter-function for the title."""
     return self.__action_title__
 
-  @icon.GET
-  def _getIcon(self) -> QIcon:
-    """Getter-function for the icon."""
-    return self.__action_icon__
-
   @shortCut.GET
   def _getShortCut(self) -> QKeySequence:
     """Getter-function for the shortcut."""
     return self.__action_shortcut__
+
+  #  Icon retrieval
+  @icon.GET
+  def _getIcon(self, **kwargs) -> QIcon:
+    """Getter-function for the icon."""
+    if self.__icon_parser__ is None:
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      self.__icon_parser__ = IconParser(self.title.lower())
+      return self._getIcon(_recursion=True)
+    if isinstance(self.__icon_parser__, IconParser):
+      return self.__icon_parser__.icon
+    e = typeMsg('iconParser', self.__icon_parser__, IconParser)
+    raise TypeError(e)
+
+  @icon.SET
+  def _setIcon(self, newIcon: Any) -> None:
+    """Setter-function for the icon."""
+    if isinstance(newIcon, str):
+      self.__icon_parser__ = IconParser(newIcon.lower())
+    elif isinstance(newIcon, QPixmap):
+      iconPath = IconParser.getIconPath()
+      iconFileName = '%s.png' % self.title.lower()
+      for item in os.listdir(iconPath):
+        if self.title.lower() in item:
+          digNum = 1
+          while iconFileName[-digNum].isnumeric():
+            if int(iconFileName[-digNum]):
+              digNum += 1
+              continue
+            break
+          num = int(iconFileName[-digNum:]) + 1
+          iconFileName = '%s%s.png' % (self.title.lower(), num)
+          break
+      else:
+        iconFileName = '%s00.png' % self.title.lower()
+      newIcon.save(os.path.join(iconPath, iconFileName))
+      self.__icon_parser__ = IconParser(iconFileName.replace('.png', ''))
+      return
+    if isinstance(newIcon, QIcon):
+      return self._setIcon(newIcon.pixmap(QSize(128, 128)))
+    if isinstance(newIcon, QImage):
+      return self._setIcon(QPixmap.fromImage(newIcon))
+
+  #  __init__ overloads
 
   @overload(QObject)
   def __init__(self, parentWidget: QObject) -> None:
     """Constructor for the ActionParse class."""
     self.parent = parentWidget
 
-  @overload(QObject, str, str, str)
-  def __init__(self,
-               parentWidget: QWidget,
-               actionTitle: str,
-               shortCut: str,
-               iconFile: str, ) -> None:
-    """Constructor for the ActionParse class."""
-    self.title = actionTitle
-    self.icon = iconFile
-    self.shortCut = shortCut
-    self.__init__(parentWidget)
-
-  @overload(str, str, str)
-  def __init__(self, actionTitle: str, shortCut: str, iconFile: str) -> None:
-    """Constructor for the ActionParse class."""
-    self.title = actionTitle
-    self.icon = iconFile
-    self.shortCut = shortCut
-
   @overload(QObject, str)
-  def __init__(self, parentWidget: QObject, actionTitle: str) -> None:
+  def __init__(self, parentWidget: QObject, *args) -> None:
+    """Constructor for the ActionParse class."""
+    self.__init__(parentWidget)
+    self.__init__(*args)
+
+  @overload(QObject, str, str)
+  def __init__(self, parentWidget: QWidget, *args) -> None:
+    """Constructor for the ActionParse class."""
+    self.parent = parentWidget
+    self.__init__(*args)
+
+  @overload(str)
+  def __init__(self, actionTitle: str, ) -> None:
     """Constructor for the ActionParse class."""
     self.title = actionTitle
-    self.__init__(parentWidget)
+
+  @overload(str, str)
+  def __init__(self, actionTitle: str, shortCut: str, ) -> None:
+    """Constructor for the ActionParse class."""
+    self.title = actionTitle
+    self.shortCut = shortCut

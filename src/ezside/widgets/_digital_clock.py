@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF, QRect
+from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF, QRect, QMarginsF
 from PySide6.QtGui import QColor, QBrush, QPainter, QShowEvent
 from PySide6.QtWidgets import QSizePolicy
 from icecream import ic
@@ -20,7 +20,7 @@ ic.configureOutput(includeContext=True)
 
 class Spacer(BoxWidget):
   """Spacer provides a widget that can be used to add space between
-  basewidgets."""
+  base widgets."""
 
   def __init__(self, parent=None) -> None:
     """The constructor method for the Spacer widget."""
@@ -106,7 +106,7 @@ class DigitalClock(AbstractLayout):
   def __init__(self, *args) -> None:
     """The constructor method for the DigitalClock widget."""
     AbstractLayout.__init__(self, *args)
-    self.backgroundColor = QColor(0, 0, 0, 255)
+    self.backgroundColor = QColor(63, 0, 0, 255)
     self.tenHour = SevenSeg()
     self.oneHour = SevenSeg()
     self.colon1 = Colon()
@@ -115,18 +115,18 @@ class DigitalClock(AbstractLayout):
     self.colon2 = Colon()
     self.tenSec = SevenSeg()
     self.oneSec = SevenSeg()
-    self.addWidget(self.tenHour, 0, 0)
-    self.addWidget(self.oneHour, 0, 1)
-    self.addWidget(self.colon1, 0, 2)
-    self.addWidget(self.tenMin, 0, 3)
-    self.addWidget(self.oneMin, 0, 4)
-    self.addWidget(self.colon2, 0, 5)
-    self.addWidget(self.tenSec, 0, 6)
-    self.addWidget(self.oneSec, 0, 7)
+    for (i, widget) in enumerate(self._getWidgets()):
+      widget.backgroundColor = self.backgroundColor
+      if isinstance(widget, SevenSeg):
+        widget.highMargins = QMarginsF(1, 1, 1, 1) * 0.05
+        widget.lowMargins = -QMarginsF(1, 1, 1, 1) * 0.05
+        widget.scale = 0.1
+        widget.margins = QMarginsF(1, 1, 1, 1)
+      self.addWidget(widget, 0, i)
     self.refreshTime()
 
   def _getWidgets(self) -> list[BoxWidget]:
-    """This method returns the basewidgets in the layout."""
+    """This method returns the base widgets in the layout."""
     return [
         self.tenHour,
         self.oneHour,

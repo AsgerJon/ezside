@@ -41,7 +41,6 @@ class LayoutWindow(BaseWindow):
     self.baseWidget.addWidget(self.infoLabel, 2, 0)
     self.baseWidget.addWidget(self.clickMe, 3, 0)
     self.baseWidget.addWidget(self.footerLabel, 4, 0)
-    self.baseWidget.addWidget(self.imgEdit, 0, 1, 5, 1)
     self.setCentralWidget(self.baseWidget)
 
   def show(self) -> None:

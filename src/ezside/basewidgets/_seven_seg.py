@@ -13,7 +13,7 @@ from worktoy.desc import AttriBox, Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.parse import maybe
 
-from ezside.tools import emptyBrush, parsePen, fillBrush
+from ezside.tools import emptyBrush, parsePen, fillBrush, emptyPen
 from ezside.basewidgets import BoxWidget
 
 Size: TypeAlias = Union[QSize, QSizeF]
@@ -82,14 +82,20 @@ class SevenSeg(BoxWidget):
 
   scale = AttriBox[float](0.12)
   segmentMargins = AttriBox[QMarginsF](QMarginsF(0, 0, 0, 0))
+  highMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.2)
+  lowMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.2)
   highColor = AttriBox[QColor](QColor(255, 0, 0, 255))
-  lowColor = AttriBox[QColor](QColor(127, 0, 0, 255))
+  lowColor = AttriBox[QColor](QColor(0, 0, 0, 255))
 
   aspectRect = Field()
   digit = Field()
   segmentPen = Field()
   highBrush = Field()
   lowBrush = Field()
+
+  def __init__(self, *args) -> None:
+    BoxWidget.__init__(self, *args)
+    self.backgroundColor = QColor(63, 0, 0, 255)
 
   def requiredSize(self) -> QSizeF:
     """This method returns the required size of the widget."""
@@ -212,6 +218,7 @@ class SevenSeg(BoxWidget):
 
   def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
     """This method allows the layout to paint this widget. """
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     viewRect = rect
     center = viewRect.center()
     marginRect = QRectF.marginsRemoved(viewRect, self.margins)
@@ -221,12 +228,15 @@ class SevenSeg(BoxWidget):
     borderRect.moveCenter(center)
     paddedRect.moveCenter(center)
     #  Draw padded area
-    painter.setBrush(emptyBrush())
-    painter.setPen(self.segmentPen)
+    painter.setBrush(self.backgroundBrush)
+    painter.setPen(emptyPen())
+    painter.drawRect(paddedRect)
     rects = self.getRects(paddedRect)
     for segment, rect in rects.items():
       if segment.state(self.digit):
         painter.setBrush(self.highBrush)
+        rect = QRect.toRectF(rect) + self.highMargins
       else:
         painter.setBrush(self.lowBrush)
+        rect = QRect.toRectF(rect)
       painter.drawRect(rect)

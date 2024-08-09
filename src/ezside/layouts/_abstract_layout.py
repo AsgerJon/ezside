@@ -4,19 +4,20 @@ subclasses of QLayout are too difficult to manage. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import (QRectF, QSizeF, QPointF, QSize, QMarginsF,
-                            QPoint, \
-                            QRect, QEvent)
-from PySide6.QtGui import QColor, QPaintEvent, QPainter, QMouseEvent, \
-  QEnterEvent, QEventPoint
-from icecream import ic
+from PySide6.QtCore import QRectF, QSizeF, QPointF, QSize, QMarginsF, QEvent
+from PySide6.QtGui import QColor, QPaintEvent, QPainter, QPointerEvent
 from worktoy.desc import AttriBox, Field
 from worktoy.text import typeMsg
 
 from ezside.layouts import LayoutItem, LayoutIndex
-from ezside.basewidgets import BoxWidget
+from ezside.basewidgets import BoxWidget, LayoutWidget
 
-ic.configureOutput(includeContext=True)
+try:
+  from icecream import ic
+
+  ic.configureOutput(includeContext=True)
+except ImportError:
+  ic = lambda *__, **_: None
 
 TypePress = QEvent.Type.MouseButtonPress
 TypeRelease = QEvent.Type.MouseButtonRelease
@@ -35,71 +36,13 @@ class AbstractLayout(BoxWidget):
   margins: QMarginsF
   allMargins: QMarginsF
 
-  __cursor_position__ = None
-  __press_position__ = None
-  __mouse_region__ = None
   __layout_items__ = None
   __iter_contents__ = None
 
   spacing = AttriBox[int](0)
 
-  cursorPosition = Field()
-  pressPosition = Field()
-  mouseRegion = Field()
   rowCount = Field()
   colCount = Field()
-
-  @pressPosition.GET
-  def _getPressPosition(self) -> QPointF:
-    """Getter-function for press position"""
-    if self.__press_position__ is None:
-      return QPointF(-1, -1)
-    if isinstance(self.__press_position__, QPoint):
-      return QPoint.toPointF(self.__press_position__)
-    if isinstance(self.__press_position__, QPointF):
-      return self.__press_position__
-    e = typeMsg('pressPosition', self.__press_position__, QPointF)
-    raise TypeError(e)
-
-  @pressPosition.SET
-  def _setPressPosition(self, pressPosition: QPointF) -> None:
-    """Setter-function for press position"""
-    if not isinstance(pressPosition, QPointF):
-      e = typeMsg('pressPosition', pressPosition, QPointF)
-      raise TypeError(e)
-    self.__press_position__ = pressPosition
-
-  @cursorPosition.GET
-  def _getCursorPosition(self) -> QPointF:
-    """Getter-function for the cursor position"""
-    if self.__cursor_position__ is None:
-      return QPointF(-1, -1)
-    if isinstance(self.__cursor_position__, QPoint):
-      return QPoint.toPointF(self.__cursor_position__)
-    if isinstance(self.__cursor_position__, QPointF):
-      return self.__cursor_position__
-    e = typeMsg('cursorPosition', self.__cursor_position__, QPointF)
-    raise TypeError(e)
-
-  @cursorPosition.SET
-  def _setCursorPosition(self, cursorPosition: QPointF) -> None:
-    """Setter-function for the cursor position"""
-    if not isinstance(cursorPosition, QPointF):
-      e = typeMsg('cursorPosition', cursorPosition, QPointF)
-      raise TypeError(e)
-    self.__cursor_position__ = cursorPosition
-
-  @mouseRegion.GET
-  def _getMouseRegion(self) -> QRectF:
-    """Getter-function for the mouse region"""
-    if self.__mouse_region__ is None:
-      return QRectF()
-    if isinstance(self.__mouse_region__, QRect):
-      return QRect.toRectF(self.__mouse_region__)
-    if isinstance(self.__mouse_region__, QRectF):
-      return self.__mouse_region__
-    e = typeMsg('mouseRegion', self.__mouse_region__, QRectF)
-    raise TypeError(e)
 
   def getColRight(self, col: int) -> float:
     """Return the right of the given column."""
@@ -163,16 +106,35 @@ class AbstractLayout(BoxWidget):
     """Getter-function for the items"""
     return self.__layout_items__ or []
 
-  def addWidget(self, widget: BoxWidget, row: int, col: int, *args) -> None:
-    """Subclasses are required to implement this method. After adding the
-    widget, the widget should be returned. """
-    widget.parentLayout = self
-    rowSpan, colSpan = [*args, 1, 1, ][:2]
-    layoutIndex = LayoutIndex(row, col, rowSpan, colSpan)
-    layoutItem = LayoutItem(widget, layoutIndex)
-    widget.parentLayoutItem = layoutItem
-    existing = self.__layout_items__ or []
-    self.__layout_items__ = [*existing, layoutItem]
+  def getItemCount(self) -> int:
+    """Getter-function for number of items"""
+
+  def addWidget(self, widget: BoxWidget, *args) -> LayoutItem:
+    """Subclasses are required to implement this method. Upon receiving a
+    widget, this method is responsible for added the given widget.
+    Subclasses are entirely free to implement this functionality. The
+    'AbstractLayout' class does provide 'addWidgetItem' that adds an
+    instance of 'LayoutItem' to the list of inner items. This class
+    requires an instance of 'LayoutIndex' instance that specifies the
+    index and spans of the widget. """
+
+  def addWidgetItem(self, layoutItem: LayoutItem) -> LayoutItem:
+    """This method adds the given 'LayoutItem' to the list of inner
+    items. """
+    if not isinstance(layoutItem, LayoutItem):
+      e = typeMsg('layoutItem', layoutItem, LayoutItem)
+      raise TypeError(e)
+    itemWidget = layoutItem.widgetItem
+    if not isinstance(itemWidget, LayoutWidget):
+      e = typeMsg('itemWidget', itemWidget, LayoutWidget)
+      raise TypeError(e)
+    if itemWidget.parentLayout is not self:
+      itemWidget.parentLayout = self
+    if itemWidget.parentLayoutItem is not layoutItem:
+      itemWidget.parentLayoutItem = layoutItem
+    existingItems = self.getItems()
+    self.__layout_items__ = [*existingItems, layoutItem]
+    return layoutItem
 
   def __init__(self, *args) -> None:
     """This method initializes the layout. """
@@ -228,6 +190,7 @@ class AbstractLayout(BoxWidget):
     for item in self.getItems():
       rect = self.getRect(item)
       item.widgetItem.paintMeLike(rect, painter)
+      item.widgetItem.parentRect = rect
     painter.end()
 
   def requiredSize(self) -> QSizeF:
@@ -245,77 +208,31 @@ class AbstractLayout(BoxWidget):
 
   def minimumSizeHint(self) -> QSize:
     """Return the minimum size hint. """
-    return QSizeF.toSize(self.requiredRect().size())
+    if self.parentLayout is None:
+      return QSizeF.toSize(self.requiredRect().size())
 
-  def leaveEvent(self, event: QEvent) -> None:
-    """This method handles the leave event."""
-    self.__cursor_position__ = QPointF(-1, -1)
-    self.update()
+  def event(self, widgetEvent: QEvent) -> bool:
+    """Event handler for the layout. It passes pointer events on to the
+    widget whose assigned rectangle bounds the position of the event. """
+    if isinstance(widgetEvent, QPointerEvent):
+      if self.handleEvent(widgetEvent):
+        return True
+    return BoxWidget.event(self, widgetEvent)
 
-  def enterEvent(self, event: QEnterEvent) -> None:
-    """This method handles the enter event."""
-    self.__cursor_position__ = event.localPos()
-    self.update()
+  def handleEvent(self, widgetEvent: QPointerEvent) -> bool:
+    """Handle the event. """
+    if QPointerEvent.pointCount(widgetEvent) - 1:
+      return False
+    return self.handlePoint(widgetEvent)
 
-  def mouseMoveEvent(self, event: QMouseEvent) -> None:
-    """This method handles the mouse move event."""
-    point = (event.points() or [None, ]).pop()
-    if isinstance(point, QEventPoint):
-      self.cursorPosition = QEventPoint.lastPosition(point)
-    else:
-      self.cursorPosition = QPointF(-1, -1)
+  def handlePoint(self, pointerEvent: QPointerEvent) -> bool:
+    """Handles the point received. """
+    eventPoint = pointerEvent.point(0)
     for item in self.getItems():
+      widget = item.widgetItem
+      widget.update()
       rect = self.getRect(item)
-      relPos = QPointF(self.cursorPosition - rect.topLeft()).toPoint()
-      if rect.contains(self.cursorPosition):
-        newEnter = QEnterEvent(relPos, relPos, relPos)
-        btn = event.buttons()
-        mdf = event.modifiers()
-        newMove = QMouseEvent(TypeMouseMove, relPos, btn, btn, mdf)
-        if not item.widgetItem.underMouse:
-          item.widgetItem.enterEvent(newEnter)
-        item.widgetItem.mouseMoveEvent(newMove)
-      else:
-        if item.widgetItem.underMouse:
-          newLeave = QEvent(TypeLeave)
-          item.widgetItem.leaveEvent(newLeave)
-    self.update()
-
-  def mousePressEvent(self, event: QMouseEvent) -> None:
-    """This method handles the mouse press event."""
-    point = (event.points() or [None, ]).pop()
-    if isinstance(point, QEventPoint):
-      self.pressPosition = QEventPoint.lastPosition(point)
-    else:
-      self.pressPosition = QPointF(-1, -1)
-    for item in self.getItems():
-      rect = self.getRect(item)
-      if rect.contains(self.pressPosition):
-        relPos = QPointF(self.pressPosition - rect.topLeft())
-        btn = event.buttons()
-        mdf = event.modifiers()
-        newPress = QMouseEvent(TypePress, relPos, btn, btn, mdf)
-        item.widgetItem.mousePressEvent(newPress)
-        break
-    else:
-      BoxWidget.mousePressEvent(self, event)
-    self.update()
-
-  def mouseReleaseEvent(self, event: QMouseEvent) -> None:
-    """This method handles the mouse release event."""
-    point = (event.points() or [None, ]).pop()
-    if isinstance(point, QEventPoint):
-      p = QEventPoint.lastPosition(point)
-    else:
-      p = QPointF(-1, -1)
-    for item in self.getItems():
-      rect = self.getRect(item)
-      if rect.contains(p):
-        relPos = QPointF(p - rect.topLeft())
-        newRelease = QMouseEvent(TypeRelease, relPos, event.buttons(),
-                                 event.button(), event.modifiers())
-        item.widgetItem.mouseReleaseEvent(newRelease)
-        break
-    else:
-      BoxWidget.mouseReleaseEvent(self, event)
-    self.update()
+      if rect.contains(eventPoint.pos()):
+        returnVal = widget.handlePointerEvent(pointerEvent)
+        return True if returnVal else False
+    return False
