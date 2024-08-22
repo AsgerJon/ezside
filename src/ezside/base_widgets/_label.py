@@ -54,6 +54,7 @@ class Label(BoxWidget):
     textRect = self.fontStyle.boundRect(self.text)
     alignedRect = self.align.fitRect(textRect, rect)
     painter = self.fontStyle @ painter
+    
     painter.drawText(alignedRect, self.align.qt, self.text)
     return alignedRect, painter, event
 
