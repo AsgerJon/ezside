@@ -13,7 +13,8 @@ from PySide6.QtCore import QMarginsF, QPointF, Qt
 from PySide6.QtGui import QColor, QBrush, QPen, QFont
 from worktoy.meta import BaseObject
 
-from ezside.tools import FontFamily, FontWeight, Align, FontCap
+from ezside.style import Align
+from ezside.style.font_enums import FontFamily, FontWeight, FontCap
 
 
 class AbstractBoxStyle(BaseObject):

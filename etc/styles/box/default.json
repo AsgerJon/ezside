@@ -34,5 +34,6 @@
     "green": 255,
     "blue": 255,
     "alpha": 255
-  }
+  },
+  "align": "center"
 }

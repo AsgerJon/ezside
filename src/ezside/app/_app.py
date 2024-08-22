@@ -5,15 +5,15 @@ provides only functionality relating to managing threads. """
 from __future__ import annotations
 
 import os
-from json import loads
+from json import loads, JSONDecodeError
 from typing import Any
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMainWindow
 from worktoy.desc import Field
-from worktoy.text import typeMsg
+from worktoy.text import typeMsg, monoSpace
 
-from ezside.tools import BoxStyle, FontStyle
+from ezside.style import ControlStyle, BoxStyle, FontStyle
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
 
@@ -22,8 +22,42 @@ class App(QApplication):
   """App provides a subclass of QApplication. Please note that this subclass
   provides only functionality relating to managing threads. """
 
+  __ezside_app__ = True
+
   __main_window_class__ = None
   __main_window_instance__ = None
+  __style_classes__ = dict(font=FontStyle,
+                           box=BoxStyle,
+                           control=ControlStyle)
+  __named_icons__ = dict(aboutConda='about_conda.png',
+                         aboutPySide6='about_pyside6.png',
+                         aboutPython='about_python.png',
+                         aboutQt='about_qt.png',
+                         add='add.png',
+                         copy='copy.png',
+                         cut='cut.png',
+                         debug='debug.png',
+                         documentation='documentation.png',
+                         editMenu='edit_menu.png',
+                         exit='exit.png',
+                         exitImg='exit_img.png',
+                         files='files.png',
+                         filesMenu='files_menu.png',
+                         help='help.png',
+                         helpMenu='help_menu.png',
+                         locked='locked.png',
+                         microphone='microphone.png',
+                         new='new.png',
+                         open='open.png',
+                         paste='paste.png',
+                         preferences='preferences.png',
+                         redo='redo.png',
+                         save='save.png',
+                         saveAs='save_as.png',
+                         screenShot='screen_shot.png',
+                         selectAll='select_all.png',
+                         undo='undo.png',
+                         unlocked='unlocked.png')
 
   root = Field()
   pythonPath = Field()
@@ -32,6 +66,22 @@ class App(QApplication):
   styles = Field()
   fonts = Field()
   boxes = Field()
+
+  def getIconFile(self, iconName: str, **kwargs) -> str:
+    """Getter-function for the path to the named icon. """
+    if iconName not in self.__named_icons__:
+      if kwargs.get('strict', False):
+        e = """The icon name is not in the named icons!"""
+        raise ValueError(e)
+      return os.path.join(self.icons, 'risitas.png')
+    iconFid = os.path.join(self.icons, self.__named_icons__[iconName])
+    if not os.path.exists(iconFid):
+      e = """The icon file is missing: %s"""
+      raise FileNotFoundError(e % iconFid)
+    if not os.path.isfile(iconFid):
+      e = """The icon file is not a file: %s"""
+      raise IsADirectoryError(e % iconFid)
+    return str(iconFid)
 
   @classmethod
   def _loadFile(cls, filePath: str) -> Any:
@@ -47,47 +97,51 @@ class App(QApplication):
       data = file.read()
     return data
 
-  def defaultFont(self, ) -> dict:
-    """Returns the default font."""
-    fid = os.path.join(self.fonts, 'default.json')
-    data = self._loadFile(fid)
-    return loads(data)
-
-  def loadFont(self, styleId: str) -> FontStyle:
-    """Loads the font at the given style id."""
+  def _loadStyle(self,
+                 type_: str,
+                 styleId: str,
+                 stateId: str = None) -> Any:
+    """Loads the style type at the given style id."""
+    fid = os.path.join(self.styles, type_, f'{styleId}.json')
+    defaultFid = os.path.join(self.styles, type_, 'default.json')
+    rawData = self._loadFile(fid)
+    try:
+      data = loads(rawData)
+    except JSONDecodeError as jsonDecodeError:
+      e = """The style file: '%s' could not be decoded: %s"""
+      raise KeyError(e % (fid, str(rawData))) from jsonDecodeError
+    defaultData = loads(self._loadFile(defaultFid))
+    if stateId is not None:
+      if stateId not in data:
+        e = """The state id is not in the font data!"""
+        raise ValueError(e)
+      data = data[stateId]
     out = {}
-    fid = os.path.join(self.fonts, f'{styleId}.json')
-    data = loads(self._loadFile(fid))
-    defaultData = self.defaultFont()
     for key, value in defaultData.items():
       out[key] = data.get(key, value)
-    return FontStyle.load(out)
+    return self.__style_classes__[type_].load(out)
 
-  def defaultBox(self, ) -> dict:
-    """Returns the default box."""
-    fid = os.path.join(self.boxes, 'default.json')
-    data = self._loadFile(fid)
-    return loads(data)
+  def loadBox(self, styleId: str, stateId: str = None) -> BoxStyle:
+    """Loads the box style at the given style id."""
+    return self._loadStyle('box', styleId, stateId)
 
-  def loadBox(self, styleId: str) -> BoxStyle:
-    """Loads the box at the given style id."""
-    out = {}
-    fid = os.path.join(self.boxes, f'{styleId}.json')
-    data = loads(self._loadFile(fid))
-    defaultData = self.defaultBox()
-    for key, value in defaultData.items():
-      out[key] = data.get(key, value)
-    return BoxStyle.load(out)
+  def loadFont(self, styleId: str, stateId: str = None) -> FontStyle:
+    """Loads the font style at the given style id."""
+    return self._loadStyle('font', styleId, stateId)
+
+  def loadControl(self, styleId: str, stateId: str = None) -> ControlStyle:
+    """Loads the control style at the given style id."""
+    return self._loadStyle('control', styleId, stateId)
 
   @boxes.GET
   def _getBoxes(self) -> str:
-    """Getter-function for the 'boxes' folder. """
-    return os.path.join(self.styles, 'boxes')
+    """Getter-function for the 'box' folder. """
+    return os.path.join(self.styles, 'box')
 
   @fonts.GET
   def _getFonts(self) -> str:
-    """Getter-function for the 'fonts' folder. """
-    return os.path.join(self.styles, 'fonts')
+    """Getter-function for the 'font' folder. """
+    return os.path.join(self.styles, 'font')
 
   @styles.GET
   def _getStyles(self) -> str:

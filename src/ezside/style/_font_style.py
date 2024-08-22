@@ -12,8 +12,8 @@ from PySide6.QtGui import QColor, QPen
 from worktoy.desc import Field, AttriBox, DEFAULT
 from worktoy.text import typeMsg
 
-from ezside.tools import AbstractStyle
-from ezside.tools import FontWeight, FontFamily, FontCap, Align
+from ezside.style import Align, AbstractStyle
+from ezside.style.font_enums import FontFamily, FontWeight, FontCap
 
 ic.configureOutput(includeContext=True)
 

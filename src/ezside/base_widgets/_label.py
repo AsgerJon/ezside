@@ -5,14 +5,14 @@ from __future__ import annotations
 
 from typing import TypeAlias, Union, Any
 
-from PySide6.QtCore import QRectF, QSizeF, QRect
+from PySide6.QtCore import QRectF, QSizeF, QRect, QSize
 from PySide6.QtGui import QPainter, QPaintEvent
 from icecream import ic
 from worktoy.desc import Field, AttriBox
 from worktoy.text import typeMsg
 
 from ezside.base_widgets import BoxWidget
-from ezside.tools import FontStyle
+from ezside.style import FontStyle
 
 ic.configureOutput(includeContext=True)
 
@@ -43,7 +43,15 @@ class Label(BoxWidget):
   def requiredSize(self) -> QSizeF:
     """Returns the size required to display the current text with the
     current font."""
-    return self.fontStyle.boundSize(self.text)
+    textRect = self.fontStyle.boundRect(self.text)
+    fullRect = textRect.marginsAdded(self.allMargins)
+    size = fullRect.size()
+    if isinstance(size, QSizeF):
+      return size
+    if isinstance(size, QSize):
+      return QSize.toSizeF(size)
+    e = typeMsg('size', size, QSizeF)
+    raise TypeError(e)
 
   def paintMeLike(self,
                   rect: Rect,
@@ -53,8 +61,8 @@ class Label(BoxWidget):
     rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
     textRect = self.fontStyle.boundRect(self.text)
     alignedRect = self.align.fitRect(textRect, rect)
-    painter = self.fontStyle @ painter
-    
+    painter.setFont(self.fontStyle.asQFont)
+    painter.setPen(self.fontStyle.asQPen)
     painter.drawText(alignedRect, self.align.qt, self.text)
     return alignedRect, painter, event
 

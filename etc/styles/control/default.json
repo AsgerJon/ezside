@@ -1,0 +1,16 @@
+{
+  "singleClick": 300,
+  "doubleClick": 300,
+  "tripleClick": 300,
+  "clickDrift": 5,
+  "singleDelay": 150,
+  "doubleDelay": 150,
+  "tripleDelay": 150,
+  "multiClickDrift": 5,
+  "singleHold": 600,
+  "doubleHold": 600,
+  "tripleHold": 600,
+  "restSpeed": 100,
+  "restRadius": 5,
+  "restDelay": 150
+}

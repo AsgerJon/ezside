@@ -5,8 +5,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QSettings, QByteArray
 from PySide6.QtGui import QCloseEvent, QMouseEvent
-from PySide6.QtWidgets import QFileDialog, QAbstractItemView, QTreeView, \
-  QListView
+from PySide6.QtWidgets import QFileDialog
 from icecream import ic
 
 ic.configureOutput(includeContext=True)

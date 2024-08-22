@@ -1,4 +1,4 @@
-"""Font encapsulates settings for fonts and text rendering."""
+"""Font encapsulates settings for font and text rendering."""
 #  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
@@ -18,7 +18,7 @@ ic.configureOutput(includeContext=True)
 
 
 class Font(BaseObject):
-  """Font encapsulates settings for fonts and text rendering."""
+  """Font encapsulates settings for font and text rendering."""
 
   weight = AttriBox[FontWeight](FontWeight.NORMAL)
   size = AttriBox[int](12)

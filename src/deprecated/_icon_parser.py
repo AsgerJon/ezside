@@ -17,7 +17,6 @@ from worktoy.desc import Field
 from worktoy.text import stringList
 
 from ezside.parser import AbstractParser
-from ezside.tools import LoadResource
 
 ic.configureOutput(includeContext=True)
 

@@ -15,7 +15,7 @@ from worktoy.desc import Field
 from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
-from ezside.tools import Align
+from ezside.style import Align
 
 if TYPE_CHECKING:
   from ezside.layouts import AbstractLayout, LayoutItem, LayoutIndex
@@ -211,6 +211,7 @@ class LayoutWidget(QWidget):
         break
     else:
       QWidget.__init__(self, )
+    self.setMouseTracking(True)
     for arg in args:
       if getattr(arg, '__abstract_layout__', None) is not None:
         self.parentLayout = arg

@@ -3,17 +3,11 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-import os
-import sys
-
-from PySide6.QtCore import QMargins, QRectF, QPointF, QSizeF, QSize, Slot, Qt
-from PySide6.QtGui import QColor, QFont, QFontDatabase, QResizeEvent
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtCore import QSize, QEvent
+from PySide6.QtGui import QPointerEvent, QMouseEvent
 from icecream import ic
-from pyperclip import copy
 
 from ezside.app import LayoutWindow
-from ezside.tools import SizeRule, MarginsBox, FontWeight
 
 ic.configureOutput(includeContext=True)
 
@@ -37,6 +31,60 @@ class MainWindow(LayoutWindow):
     self.mainMenuBar.debugMenu.debugAction06.triggered.connect(self.debug06)
     self.mainMenuBar.debugMenu.debugAction07.triggered.connect(self.debug07)
     self.mainMenuBar.debugMenu.debugAction08.triggered.connect(self.debug08)
+    self.clickMe.singleClick.connect(self.singleClick)
+    self.clickMe.doubleClick.connect(self.doubleClick)
+    self.clickMe.tripleClick.connect(self.tripleClick)
+    self.clickMe.singleHold.connect(self.singleHold)
+    self.clickMe.doubleHold.connect(self.doubleHold)
+    self.clickMe.tripleHold.connect(self.tripleHold)
+
+  def singleClick(self, pointerEvent: QPointerEvent) -> None:
+    """Single click event"""
+    if isinstance(pointerEvent, QMouseEvent):
+      button = pointerEvent.buttons()
+      return self.statusBar().showMessage('Single click: %s' % str(button))
+    e = 'The pointerEvent is not a QMouseEvent: %s!'
+    raise TypeError(e % str(QEvent.type(pointerEvent)))
+
+  def doubleClick(self, pointerEvent: QPointerEvent) -> None:
+    """Double click event"""
+    if isinstance(pointerEvent, QMouseEvent):
+      button = pointerEvent.buttons()
+      return self.statusBar().showMessage('Double click: %s' % str(button))
+    e = 'The pointerEvent is not a QMouseEvent: %s!'
+    raise TypeError(e % str(QEvent.type(pointerEvent)))
+
+  def tripleClick(self, pointerEvent: QPointerEvent) -> None:
+    """Triple click event"""
+    if isinstance(pointerEvent, QMouseEvent):
+      button = pointerEvent.buttons()
+      return self.statusBar().showMessage('Triple click: %s' % str(button))
+    e = 'The pointerEvent is not a QMouseEvent: %s!'
+    raise TypeError(e % str(QEvent.type(pointerEvent)))
+
+  def singleHold(self, pointerEvent: QPointerEvent) -> None:
+    """Single hold event"""
+    if isinstance(pointerEvent, QMouseEvent):
+      button = pointerEvent.buttons()
+      return self.statusBar().showMessage('Single hold: %s' % str(button))
+    e = 'The pointerEvent is not a QMouseEvent: %s!'
+    raise TypeError(e % str(QEvent.type(pointerEvent)))
+
+  def doubleHold(self, pointerEvent: QPointerEvent) -> None:
+    """Double hold event"""
+    if isinstance(pointerEvent, QMouseEvent):
+      button = pointerEvent.buttons()
+      return self.statusBar().showMessage('Double hold: %s' % str(button))
+    e = 'The pointerEvent is not a QMouseEvent: %s!'
+    raise TypeError(e % str(QEvent.type(pointerEvent)))
+
+  def tripleHold(self, pointerEvent: QPointerEvent) -> None:
+    """Triple hold event"""
+    if isinstance(pointerEvent, QMouseEvent):
+      button = pointerEvent.buttons()
+      return self.statusBar().showMessage('Triple hold: %s' % str(button))
+    e = 'The pointerEvent is not a QMouseEvent: %s!'
+    raise TypeError(e % str(QEvent.type(pointerEvent)))
 
   def debug02(self) -> None:
     """Debug action 02"""

@@ -7,13 +7,11 @@ from __future__ import annotations
 
 import sys
 
-from PySide6.QtGui import QPaintEvent
-from PySide6.QtWidgets import QVBoxLayout, QDialog, QHBoxLayout, QWidget
+from PySide6.QtWidgets import QDialog, QWidget
 from worktoy.desc import AttriBox, THIS
 from worktoy.text import monoSpace
 
 from ezside.layouts import VerticalLayout
-from ezside.tools import Align
 from ezside.base_widgets import Label
 from moreworktoy import mambaVersion
 

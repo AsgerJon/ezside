@@ -1,0 +1,230 @@
+{
+  "disabled_hover": {
+    "margins": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "borders": {
+      "left": 2,
+      "top": 2,
+      "right": 2,
+      "bottom": 2
+    },
+    "paddings": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "marginsColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 0
+    },
+    "bordersColor": {
+      "red": 127,
+      "green": 127,
+      "blue": 127,
+      "alpha": 255
+    },
+    "paddingsColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255,
+      "alpha": 255
+    }
+  },
+  "disabled_released": {
+    "margins": {
+      "left": 5,
+      "top": 5,
+      "right": 5,
+      "bottom": 5
+    },
+    "borders": {
+      "left": 1,
+      "top": 1,
+      "right": 1,
+      "bottom": 1
+    },
+    "paddings": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "marginsColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 0
+    },
+    "bordersColor": {
+      "red": 127,
+      "green": 127,
+      "blue": 127,
+      "alpha": 255
+    },
+    "paddingsColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255,
+      "alpha": 255
+    }
+  },
+  "disabled_pressed": {
+    "margins": {
+      "left": 2,
+      "top": 2,
+      "right": 2,
+      "bottom": 2
+    },
+    "borders": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "paddings": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "marginsColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 0
+    },
+    "bordersColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 255
+    },
+    "paddingsColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255,
+      "alpha": 255
+    }
+  },
+  "enabled_hover": {
+    "margins": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "borders": {
+      "left": 2,
+      "top": 2,
+      "right": 2,
+      "bottom": 2
+    },
+    "paddings": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "marginsColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 0
+    },
+    "bordersColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 255
+    },
+    "paddingsColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255,
+      "alpha": 255
+    }
+  },
+  "enabled_released": {
+    "margins": {
+      "left": 5,
+      "top": 5,
+      "right": 5,
+      "bottom": 5
+    },
+    "borders": {
+      "left": 1,
+      "top": 1,
+      "right": 1,
+      "bottom": 1
+    },
+    "paddings": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "marginsColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 0
+    },
+    "bordersColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 255
+    },
+    "paddingsColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255,
+      "alpha": 255
+    }
+  },
+  "enabled_pressed": {
+    "margins": {
+      "left": 2,
+      "top": 2,
+      "right": 2,
+      "bottom": 2
+    },
+    "borders": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "paddings": {
+      "left": 4,
+      "top": 4,
+      "right": 4,
+      "bottom": 4
+    },
+    "marginsColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 0
+    },
+    "bordersColor": {
+      "red": 0,
+      "green": 0,
+      "blue": 0,
+      "alpha": 255
+    },
+    "paddingsColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255,
+      "alpha": 255
+    }
+  }
+}

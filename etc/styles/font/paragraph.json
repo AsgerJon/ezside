@@ -1,13 +1,12 @@
 {
-  "weight": "normal",
-  "size": 16,
+  "size": 12,
   "family": "Montserrat",
+  "weight": "normal",
   "italic": false,
   "underline": false,
   "strike": false,
-  "align": "center",
-  "cap": "CAP",
-  "color": {
+  "cap": "MIX",
+  "textColor": {
     "red": 0,
     "green": 0,
     "blue": 0,

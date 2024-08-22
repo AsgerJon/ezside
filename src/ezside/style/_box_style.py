@@ -7,9 +7,12 @@ from typing import Any, TypeAlias, Union
 
 from PySide6.QtCore import QMarginsF, Qt
 from PySide6.QtGui import QColor, QBrush
+from icecream import ic
 
 from worktoy.desc import Field, AttriBox, DEFAULT
-from ezside.tools import Align, AbstractStyle
+from ezside.style import Align, AbstractStyle
+
+ic.configureOutput(includeContext=True)
 
 Margins: TypeAlias = tuple[float, float, float, float]
 Color: TypeAlias = tuple[int, int, int, int]
@@ -68,6 +71,7 @@ class BoxStyle(AbstractStyle):
     newBox.marginsColor = data.get('marginsColor', {})
     newBox.bordersColor = data.get('bordersColor', {})
     newBox.paddingsColor = data.get('paddingsColor', {})
+    newBox.align = data.get('align', Align.CENTER)
     return newBox
 
   @margins.GET

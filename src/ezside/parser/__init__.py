@@ -5,6 +5,4 @@ powerful features like function overloading. """
 from __future__ import annotations
 
 from ._abstract_parser import AbstractParser
-from ._icon_parser import IconParser
 from ._menu_parser import MenuParser
-from ._action_parser import ActionParser

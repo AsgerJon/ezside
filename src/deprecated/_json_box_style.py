@@ -12,7 +12,8 @@ from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
 from ezside.base_widgets import AbstractBoxStyle
-from ezside.tools import FontFamily, LoadResource, FontWeight, FontCap
+from ezside.style import Align
+from ezside.style.font_enums import FontFamily, FontWeight, FontCap
 
 
 class JSONBoxStyle(AbstractBoxStyle):

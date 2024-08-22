@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import os
-from typing import TypeAlias, Union
+from typing import TypeAlias, Union, Any
 
 import numpy as np
 import torch
@@ -12,8 +12,7 @@ from PIL import Image
 from PySide6.QtCore import (QSizeF, QSize, QRectF, QPointF, Slot, QEvent,
                             Qt, Signal, QRect, QTimer)
 from PySide6.QtGui import QPainter, QPixmap, QImage, \
-  QMouseEvent, QEnterEvent, QColor, QContextMenuEvent
-from PySide6.QtWidgets import QMenu
+  QMouseEvent, QEnterEvent, QColor, QContextMenuEvent, QPaintEvent
 from icecream import ic
 from torchvision.transforms import ToTensor, ToPILImage
 from worktoy.desc import Field, AttriBox, THIS
