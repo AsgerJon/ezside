@@ -5,4 +5,4 @@ the pyside6 framework."""
 from __future__ import annotations
 
 import ezside.layouts
-import ezside.basewidgets
+import ezside.base_widgets

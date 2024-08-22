@@ -5,28 +5,25 @@ segment displays."""
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TypeAlias, Union, TYPE_CHECKING, Any
 
-from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF, QRect, QMarginsF
-from PySide6.QtGui import QColor, QBrush, QPainter, QShowEvent
-from PySide6.QtWidgets import QSizePolicy
+from PySide6.QtCore import Qt, QPointF, QSizeF
+from PySide6.QtGui import QColor, QBrush, QPointerEvent
 from icecream import ic
-from worktoy.desc import AttriBox, Field
+from worktoy.desc import AttriBox
+from PySide6.QtCore import QRect, QRectF
+from PySide6.QtGui import QPainter, QPaintEvent
+from worktoy.desc import Field
 
-from ezside.layouts import AbstractLayout
-from ezside.basewidgets import BoxWidget, SevenSeg
+from ezside.layouts import HorizontalLayout
+from ezside.base_widgets import BoxWidget, SevenSeg
+
+if TYPE_CHECKING:
+  pass
+
+Rect: TypeAlias = Union[QRect, QRectF]
 
 ic.configureOutput(includeContext=True)
-
-
-class Spacer(BoxWidget):
-  """Spacer provides a widget that can be used to add space between
-  base widgets."""
-
-  def __init__(self, parent=None) -> None:
-    """The constructor method for the Spacer widget."""
-    BoxWidget.__init__(self, parent)
-    self.setSizePolicy(QSizePolicy.Policy.Expanding,
-                       QSizePolicy.Policy.Expanding)
 
 
 class Colon(BoxWidget):
@@ -42,45 +39,43 @@ class Colon(BoxWidget):
     """Getter-function for the brush"""
     brush = QBrush()
     brush.setStyle(Qt.BrushStyle.SolidPattern)
-    brush.setColor(self.color)
+    brush.setColor(QColor(255, 0, 0, 255))
     return brush
+
+  def __init__(self, *args) -> None:
+    """The constructor method for the Colon widget."""
+    BoxWidget.__init__(self, *args)
+    self.paddingColor = QColor(63, 0, 0, 255)
 
   def requiredSize(self) -> QSizeF:
     """This method returns the required size of the widget."""
-    return self.requiredRect().size()
+    return QSizeF(18, 36)
 
-  def requiredRect(self) -> QRectF:
-    """This method returns the required rectangle of the widget."""
-    return QRectF(QPointF(0, 0), QSizeF(16, 32))
-
-  def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
+  def paintMeLike(self,
+                  rect: Rect,
+                  painter: QPainter,
+                  event: QPaintEvent) -> Any:
     """Paints the colon with the current color."""
-    viewRect = rect
-    center = viewRect.center()
-    marginRect = QRectF.marginsRemoved(viewRect, self.margins)
-    borderRect = QRectF.marginsRemoved(marginRect, self.borders)
-    paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
-    marginRect.moveCenter(center)
-    borderRect.moveCenter(center)
-    paddedRect.moveCenter(center)
-    brush = QBrush()
-    brush.setStyle(Qt.BrushStyle.SolidPattern)
-    brush.setColor(QColor(255, 0, 0, 255))
-    painter.setBrush(brush)
-    viewRect = QRect.toRectF(painter.viewport())
-    h = viewRect.height()
-    d = h / 4
-    y1 = d * 1.25
-    y2 = h - d * 1.25
+    rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
+    c = rect.center()
+    top = rect.top()
+    rect -= self.allMargins
+    rect.moveCenter(c)
     x = rect.center().x()
-    topCenter = QPointF(x, y1)
-    bottomCenter = QPointF(x, y2)
-    r = d / 4
-    painter.drawEllipse(topCenter, r, r)
-    painter.drawEllipse(bottomCenter, r, r)
+    y1 = rect.height() * 0.2 + top
+    y2 = y1 + rect.height() * 0.6
+    r = rect.height() * 0.1
+    painter.setBrush(self.brush)
+    painter.drawEllipse(QPointF(x, y1), r, r)
+    painter.drawEllipse(QPointF(x, y2), r, r)
+    return rect, painter, event
+
+  def handlePointerEvent(self, pointerEvent: QPointerEvent) -> bool:
+    """This method is responsible for handling pointer events."""
+    return False
 
 
-class DigitalClock(AbstractLayout):
+class DigitalClock(HorizontalLayout):
   """DigitalClock provides a widget displaying the current time using seven
   segment displays."""
 
@@ -105,8 +100,8 @@ class DigitalClock(AbstractLayout):
 
   def __init__(self, *args) -> None:
     """The constructor method for the DigitalClock widget."""
-    AbstractLayout.__init__(self, *args)
-    self.backgroundColor = QColor(63, 0, 0, 255)
+    HorizontalLayout.__init__(self, *args, styleId='digital_clock')
+    self.spacing = 5
     self.tenHour = SevenSeg()
     self.oneHour = SevenSeg()
     self.colon1 = Colon()
@@ -115,28 +110,15 @@ class DigitalClock(AbstractLayout):
     self.colon2 = Colon()
     self.tenSec = SevenSeg()
     self.oneSec = SevenSeg()
-    for (i, widget) in enumerate(self._getWidgets()):
-      widget.backgroundColor = self.backgroundColor
-      if isinstance(widget, SevenSeg):
-        widget.highMargins = QMarginsF(1, 1, 1, 1) * 0.05
-        widget.lowMargins = -QMarginsF(1, 1, 1, 1) * 0.05
-        widget.scale = 0.1
-        widget.margins = QMarginsF(1, 1, 1, 1)
-      self.addWidget(widget, 0, i)
+    self.addWidget(self.tenHour)
+    self.addWidget(self.oneHour)
+    self.addWidget(self.colon1)
+    self.addWidget(self.tenMin)
+    self.addWidget(self.oneMin)
+    self.addWidget(self.colon2)
+    self.addWidget(self.tenSec)
+    self.addWidget(self.oneSec)
     self.refreshTime()
-
-  def _getWidgets(self) -> list[BoxWidget]:
-    """This method returns the base widgets in the layout."""
-    return [
-        self.tenHour,
-        self.oneHour,
-        self.colon1,
-        self.tenMin,
-        self.oneMin,
-        self.colon2,
-        self.tenSec,
-        self.oneSec,
-    ]
 
   def refreshTime(self, **kwargs) -> None:
     """This method is responsible for refreshing the time."""
@@ -149,7 +131,6 @@ class DigitalClock(AbstractLayout):
     if not kwargs.get('_recursion', False):
       self.update()
 
-  def showEvent(self, event: QShowEvent) -> None:
-    """This method is responsible for showing the widget."""
-    self.refreshTime(_recursion=True)
-    BoxWidget.showEvent(self, event)
+  def handlePointerEvent(self, pointerEvent: QPointerEvent) -> None:
+    """This method is responsible for handling pointer events."""
+    pass

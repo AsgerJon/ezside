@@ -8,7 +8,7 @@ import os.path
 
 from worktoy.desc import Field
 from worktoy.meta import BaseObject
-from PySide6.QtCore import QMarginsF, Qt
+from PySide6.QtCore import QMarginsF, Qt, QPointF
 from PySide6.QtGui import QColor, QBrush
 from icecream import ic
 
@@ -29,6 +29,7 @@ class ButtonStyle(BaseObject):
   allMargins = Field()
   backgroundColor = Field()
   borderColor = Field()
+  cornerRadius = Field()
   backgroundBrush = Field()
   borderBrush = Field()
 
@@ -157,3 +158,10 @@ class ButtonStyle(BaseObject):
     brush.setStyle(Qt.BrushStyle.SolidPattern)
     brush.setColor(self.backgroundColor)
     return brush
+
+  @cornerRadius.GET
+  def _getCornerRadius(self) -> QPointF:
+    """Getter-function for corner radius."""
+    data = self.getStateStyle().get('radius', None)
+    x, y = data.get('x', ), data.get('y', )
+    return QPointF(float(x), float(y))

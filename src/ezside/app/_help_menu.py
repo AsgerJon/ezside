@@ -19,7 +19,10 @@ class HelpMenu(AbstractMenu):
       THIS, 'About Python', 'F11', 'about_python.png')
   aboutPySide6Action = AttriBox[EZAction](
       THIS, 'About PySide6', 'F10', 'about_pyside6.png')
-  docAction = AttriBox[EZAction](THIS, 'Documentation', 'F1', 'doc.png')
+  docAction = AttriBox[EZAction](THIS,
+                                 'Documentation',
+                                 'F1',
+                                 'documentation.png')
 
   def initUi(self) -> None:
     """Initializes the menu"""

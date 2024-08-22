@@ -3,6 +3,10 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from typing import TypeAlias, Union, Any
+
+from PySide6.QtCore import QRect
+from PySide6.QtGui import QPaintEvent
 from PySide6.QtCore import QRectF, QPoint, Qt, Signal, QPointF
 from PySide6.QtGui import QPainter, QEnterEvent, QMouseEvent
 from icecream import ic
@@ -10,9 +14,11 @@ from worktoy.desc import Field
 from worktoy.text import typeMsg
 
 from ezside.tools import emptyPen
-from ezside.basewidgets import Label, ButtonStyle, ButtonState
+from ezside.base_widgets import Label, ButtonStyle, ButtonState
 
 ic.configureOutput(includeContext=True)
+
+Rect: TypeAlias = Union[QRect, QRectF]
 
 
 class PushButton(Label):
@@ -139,7 +145,10 @@ class PushButton(Label):
     """Returns the style for the push button."""
     return self.styleData[self.state]
 
-  def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
+  def paintMeLike(self,
+                  rect: Rect,
+                  painter: QPainter,
+                  event: QPaintEvent) -> Any:
     """Paints the push button."""
     viewRect = rect
     center = viewRect.center()

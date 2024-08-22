@@ -11,7 +11,7 @@ from worktoy.desc import Field
 from worktoy.text import typeMsg
 
 from ezside.layouts import AbstractLayout
-from ezside.basewidgets import BoxWidget
+from ezside.base_widgets import BoxWidget
 
 ic.configureOutput(includeContext=True)
 

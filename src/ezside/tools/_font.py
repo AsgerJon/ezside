@@ -6,8 +6,7 @@ from __future__ import annotations
 from typing import Callable
 
 from PySide6.QtCore import QSizeF, QRectF
-from PySide6.QtGui import QColor, QFont, QPen, Qt, QPainter, QFontMetrics, \
-  QFontMetricsF
+from PySide6.QtGui import QColor, QFont, QPen, Qt, QPainter, QFontMetricsF
 from icecream import ic
 from worktoy.desc import Field, AttriBox, DEFAULT
 from worktoy.meta import BaseObject
@@ -101,6 +100,15 @@ class Font(BaseObject):
   def _getMetrics(self) -> QFontMetricsF:
     """Getter-function for QFontMetrics"""
     return QFontMetricsF(self.asQFont)
+
+  @classmethod
+  def fromJSON(cls, data: dict) -> Font:
+    """Creates a Font object from JSON data"""
+    newFont = cls()
+    for (key, value) in data.items():
+      if hasattr(newFont, key):
+        setattr(newFont, key, value)
+    return newFont
 
   def __init__(self, *args) -> None:
     self.size = maybeType(int, *args, 12)

@@ -4,19 +4,15 @@ layout."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from worktoy.parse import maybe
-
-from ezside.layouts import AbstractLayout, LayoutItem, LayoutIndex
-from ezside.basewidgets import BoxWidget
+from ezside.layouts import AbstractLayout
+from ezside.base_widgets import BoxWidget, LayoutWidget
 
 
 class HorizontalLayout(AbstractLayout):
   """HorizontalLayout subclasses AbstractLayout providing a single row
   layout."""
 
-  def addWidget(self, widget: BoxWidget, *args) -> LayoutItem:
+  def addWidget(self, widget: BoxWidget, *args) -> LayoutWidget:
     """Add a widget to the layout."""
-    index = LayoutIndex(0, self.getItemCount())
-    layoutItem = LayoutItem(widget, index)
-    self.addWidgetItem(layoutItem)
-    return layoutItem
+    row, col = 0, self.getItemCount()
+    return AbstractLayout.addWidget(self, widget, row, col)

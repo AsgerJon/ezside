@@ -1,24 +1,19 @@
 """VerticalLayout provides a layout, which explicitly exposes its
-basewidgets.
+base_widgets.
 """
 #  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from icecream import ic
-from worktoy.parse import maybe
-
-from ezside.layouts import AbstractLayout, LayoutItem, LayoutIndex
-from ezside.basewidgets import BoxWidget
+from ezside.layouts import AbstractLayout
+from ezside.base_widgets import BoxWidget, LayoutWidget
 
 
 class VerticalLayout(AbstractLayout):
   """VerticalLayout subclasses AbstractLayout providing a single column
   layout."""
 
-  def addWidget(self, widget: BoxWidget, *args) -> LayoutItem:
+  def addWidget(self, widget: BoxWidget, *args) -> LayoutWidget:
     """Add a widget to the layout."""
-    index = LayoutIndex(self.getItemCount(), 0)
-    layoutItem = LayoutItem(widget, index)
-    self.addWidgetItem(layoutItem)
-    return layoutItem
+    row, col = self.getItemCount(), 0
+    return AbstractLayout.addWidget(self, widget, row, col)

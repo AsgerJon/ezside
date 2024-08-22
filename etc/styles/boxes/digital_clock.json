@@ -1,0 +1,26 @@
+{
+  "paddingsColor": {
+    "red": 63,
+    "green": 0,
+    "blue": 0,
+    "alpha": 255
+  },
+  "margins": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+  },
+  "borders": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+  },
+  "paddings": {
+    "left": 4,
+    "top": 4,
+    "right": 4,
+    "bottom": 4
+  }
+}

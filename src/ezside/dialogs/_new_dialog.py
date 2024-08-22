@@ -12,7 +12,7 @@ from worktoy.desc import THIS, AttriBox, Field
 from ezside.dialogs import SaveFileDialog
 from ezside.layouts import AbstractLayout
 from ezside.tools import SizeRule
-from ezside.basewidgets import Label, BoxWidget, PushButton
+from ezside.base_widgets import Label, BoxWidget, PushButton
 
 
 class NewDialog(QDialog):

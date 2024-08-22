@@ -3,10 +3,10 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from icecream import ic
 from typing import TypeAlias, Union, Self
 
 from PySide6.QtCore import QRect, QRectF, QPointF, Qt
-from icecream import ic
 from worktoy.desc import Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.text import monoSpace, typeMsg

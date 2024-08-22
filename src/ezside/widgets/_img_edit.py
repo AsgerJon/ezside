@@ -21,7 +21,7 @@ from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
 from ezside.dialogs import NewDialog
-from ezside.basewidgets import BoxWidget
+from ezside.base_widgets import BoxWidget
 from ezside.widgets import ImgContextMenu
 
 Rect: TypeAlias = Union[QRect, QRectF]
@@ -196,22 +196,18 @@ class ImgEdit(BoxWidget):
       return QSizeF(256, 256)
     return self.pix.size()
 
-  def paintMeLike(self, rect: Rect, painter: QPainter) -> None:
+  def paintMeLike(self,
+                  rect: Rect,
+                  painter: QPainter,
+                  event: QPaintEvent) -> Any:
     """Paint the image. """
-    BoxWidget.paintMeLike(self, rect, painter)
-    if not self.pix:
-      return
-    viewRect = rect
-    center = viewRect.center()
-    pixSize = QPixmap.size(self.pix)
-    pixRect = QRectF(QPointF(0, 0), QSize.toSizeF(pixSize))
-    pixRect.moveCenter(center)
-    innerRect = viewRect - self.margins
-    innerRect -= self.borders
-    innerRect -= self.paddings
+    rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
+    center = rect.center()
+    innerRect = rect - self.allMargins
     innerRect.moveCenter(center)
     self.mouseRegion = innerRect
     painter.drawPixmap(innerRect.topLeft(), self.pix)
+    return innerRect, painter, event
 
   def __init__(self, *args) -> None:
     BoxWidget.__init__(self, *args)

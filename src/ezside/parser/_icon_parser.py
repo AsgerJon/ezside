@@ -9,12 +9,17 @@ import os
 import torch
 from PIL import Image
 from PySide6.QtGui import QIcon, QPixmap, QImage
+from PySide6.QtWidgets import QLabel
+from icecream import ic
 from torch import Tensor
 from torchvision.transforms.v2 import ToTensor
 from worktoy.desc import Field
 from worktoy.text import stringList
 
 from ezside.parser import AbstractParser
+from ezside.tools import LoadResource
+
+ic.configureOutput(includeContext=True)
 
 
 class IconParser(AbstractParser):
@@ -23,104 +28,43 @@ class IconParser(AbstractParser):
 
   __fallback_name__ = 'risitas'
   __icon_name__ = None
-  __data_tensor__ = None
+  __icon_path__ = None
+  __load_resource__ = None
 
-  @classmethod
-  def _getRoot(cls, here: str = None) -> str:
-    """Returns path to root directory"""
-    if here is None:
-      here = os.path.dirname(os.path.abspath(__file__))
-    items = os.listdir(here)
-    rootItems = stringList("""src, README.md ,LICENSE""")
-    for item in rootItems:
-      if item not in items:
-        parentDir = cls._getRoot(os.path.join(here, '..'))
-        return cls._getRoot(os.path.normpath(parentDir))
+  def __init__(self, *args) -> None:
+    for arg in args:
+      if isinstance(arg, str):
+        self.__icon_name__ = arg
+        break
     else:
-      return here
+      self.__icon_name__ = self.__fallback_name__
+    self.__load_resource__ = LoadResource('icons')
 
-  @classmethod
-  def getIconPath(cls, e: str = None) -> str:
-    """Returns the icon directory path"""
-    if e is not None:
-      if not os.path.isabs(e):
-        e = """Encountered bad path: '%s'!""" % e
-        raise ValueError(e)
-      if not os.path.exists(e):
-        e = """While searching for icon directory '%s' was reached, 
-        which does not exist!"""
-        raise FileNotFoundError(e)
-      if os.path.isfile(e):
-        e = """While searching for icon directory '%s' was reached, 
-        which is a file!"""
-        raise NotADirectoryError(e)
-      raise RecursionError
+  def getLoadResource(self) -> LoadResource:
+    """Returns the resource loader."""
+    return self.__load_resource__
 
-    iconPath = cls._getRoot()
-    for directory in stringList("""src, ezside, app, icons"""):
-      iconPath = os.path.join(iconPath, directory)
-      iconPath = os.path.normpath(iconPath)
-      if not os.path.exists(iconPath):
-        return cls.getIconPath(iconPath)
+  def getIconFile(self) -> str:
+    """Returns the icon file name."""
+    iconPath = self.getLoadResource().getFilePath(self.__icon_name__)
+    if iconPath is None:
+      iconPath = self.getLoadResource().getFilePath(self.__fallback_name__)
+    ic(iconPath)
     return iconPath
 
-  name = Field()
-  file = Field()
-  icon = Field()
-  pix = Field()
-  img = Field()
-  data = Field()
-  pil = Field()
+  def getIconPath(self, ) -> str:
+    """Returns the icon directory path."""
+    return self.__load_resource__.getContentPath()
 
-  def __init__(self, name: str) -> None:
-    """Initializes the parser on the name of the icon."""
-    AbstractParser.__init__(self)
-    self.__icon_name__ = name
+  def getQPixmap(self) -> QPixmap:
+    """Returns the icon as a QPixmap."""
+    iconFile = self.getIconFile()
+    pix = QPixmap()
+    QPixmap.load(pix, iconFile)
+    return pix
 
-  @name.GET
-  def _getIconName(self) -> str:
-    """Getter-function for the icon name."""
-    if self.__icon_name__ is None:
-      return self.__fallback_name__
-    return self.__icon_name__
-
-  @name.SET
-  def _setIconName(self, newName: str) -> None:
-    """Setter-function for the icon name."""
-    self.__icon_name__ = newName
-
-  @file.GET
-  def _getFile(self) -> str:
-    """Getter-function for the file."""
-    iconPath = self.getIconPath()
-    for item in os.listdir(iconPath):
-      if self.name in item:
-        iconFile = os.path.join(iconPath, item)
-        if os.path.isfile(iconFile):
-          return iconFile
-    return os.path.join(iconPath, '%s.png' % self.__fallback_name__)
-
-  @pix.GET
-  def _getPix(self) -> QPixmap:
-    """Getter-function for the pixmap."""
-    return QPixmap(self.file)
-
-  @icon.GET
-  def _getIcon(self) -> QIcon:
-    """Getter-function for the icon."""
-    return QIcon(self.pix)
-
-  @img.GET
-  def _getImg(self) -> QImage:
-    """Getter-function for the image."""
-    return QPixmap.toImage(self.pix)
-
-  @pil.GET
-  def _getPilImage(self) -> Image:
-    """Getter-function for the PIL image."""
-    return Image.fromqpixmap(self.pix)
-
-  @data.GET
-  def _getData(self, **kwargs) -> Tensor:
-    """Getter-function for the data."""
-    return ToTensor()(self.pil)
+  def getQIcon(self) -> QIcon:
+    """Getter-function for QIcon"""
+    pix = self.getQPixmap()
+    ic(pix.size())
+    return QIcon(pix)

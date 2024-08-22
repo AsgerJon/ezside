@@ -3,23 +3,26 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TypeAlias, Union, Self
+from typing import TypeAlias, Union, Self, Any
 
 from PySide6.QtCore import QSize, QSizeF, QPoint, QPointF, QRect, QRectF, \
   QMarginsF
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QPen, QBrush
+from PySide6.QtGui import QPaintEvent, QPainter, QColor, QPen, QBrush, \
+  QPointerEvent
 from icecream import ic
 from worktoy.desc import AttriBox, Field
 from worktoy.keenum import KeeNum, auto
 from worktoy.parse import maybe
 
 from ezside.tools import emptyBrush, parsePen, fillBrush, emptyPen
-from ezside.basewidgets import BoxWidget
+from ezside.base_widgets import BoxWidget
 
 Size: TypeAlias = Union[QSize, QSizeF]
 Point: TypeAlias = Union[QPoint, QPointF]
 
 ic.configureOutput(includeContext=True)
+
+Rect: TypeAlias = Union[QRect, QRectF]
 
 
 class Segment(KeeNum):
@@ -80,10 +83,10 @@ class SevenSeg(BoxWidget):
   __fallback_digit__ = 0
   __current_digit__ = None
 
-  scale = AttriBox[float](0.12)
-  segmentMargins = AttriBox[QMarginsF](QMarginsF(0, 0, 0, 0))
-  highMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.2)
-  lowMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.2)
+  scale = AttriBox[float](0.1)
+  segmentMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.002)
+  highMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.1)
+  lowMargins = AttriBox[QMarginsF](QMarginsF(1, 1, 1, 1, ) * 0.)
   highColor = AttriBox[QColor](QColor(255, 0, 0, 255))
   lowColor = AttriBox[QColor](QColor(0, 0, 0, 255))
 
@@ -95,15 +98,11 @@ class SevenSeg(BoxWidget):
 
   def __init__(self, *args) -> None:
     BoxWidget.__init__(self, *args)
-    self.backgroundColor = QColor(63, 0, 0, 255)
+    self.paddingColor = QColor(63, 0, 0, 255)
 
   def requiredSize(self) -> QSizeF:
     """This method returns the required size of the widget."""
-    return self.requiredRect().size()
-
-  def requiredRect(self) -> QRectF:
-    """This method returns the required rectangle of the widget."""
-    return QRectF(QPointF(0, 0), QSizeF(24, 32))
+    return QSizeF(24, 36)
 
   @digit.GET
   def _getDigit(self) -> int:
@@ -216,19 +215,21 @@ class SevenSeg(BoxWidget):
       rects[segment] = QRectF.toRect(rect)
     return rects
 
-  def paintMeLike(self, rect: QRectF, painter: QPainter) -> None:
+  def paintMeLike(self,
+                  rect: Rect,
+                  painter: QPainter,
+                  event: QPaintEvent) -> Any:
     """This method allows the layout to paint this widget. """
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    viewRect = rect
-    center = viewRect.center()
-    marginRect = QRectF.marginsRemoved(viewRect, self.margins)
+    rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
+    center = rect.center()
+    marginRect = QRectF.marginsRemoved(rect, self.margins)
     borderRect = QRectF.marginsRemoved(marginRect, self.borders)
     paddedRect = QRectF.marginsRemoved(borderRect, self.paddings)
     marginRect.moveCenter(center)
     borderRect.moveCenter(center)
     paddedRect.moveCenter(center)
     #  Draw padded area
-    painter.setBrush(self.backgroundBrush)
+    painter.setBrush(self.paddingBrush)
     painter.setPen(emptyPen())
     painter.drawRect(paddedRect)
     rects = self.getRects(paddedRect)
@@ -240,3 +241,12 @@ class SevenSeg(BoxWidget):
         painter.setBrush(self.lowBrush)
         rect = QRect.toRectF(rect)
       painter.drawRect(rect)
+    return paddedRect, painter, event
+
+  # def sizeHint(self) -> QSize:
+  #   """Returns the required size"""
+  #   return QSizeF.toSize(self.requiredSize())
+  #
+  # def minimumSizeHint(self) -> QSize:
+  #   """Returns the required size"""
+  #   return QSizeF.toSize(self.requiredSize())

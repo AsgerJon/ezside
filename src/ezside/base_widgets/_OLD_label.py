@@ -5,13 +5,13 @@ from __future__ import annotations
 
 from typing import TypeAlias, Union, Any
 
-from PySide6.QtCore import QSize, QRectF, QSizeF, QPointF, QMarginsF, QRect
-from PySide6.QtGui import QPainter, QPaintEvent
+from PySide6.QtCore import QRectF, QSizeF, QPointF, QMarginsF, QRect
+from PySide6.QtGui import QPainter, QPaintEvent, QColor
 from icecream import ic
 from worktoy.desc import AttriBox
 
-from ezside.tools import Font, FontFamily, FontCap, emptyPen
-from ezside.basewidgets import BoxWidget
+from ezside.tools import Font, FontFamily, FontCap, LoadResource
+from ezside.base_widgets import BoxWidget, AbstractBoxStyle
 
 ic.configureOutput(includeContext=True)
 
@@ -22,10 +22,15 @@ class Label(BoxWidget):
   """Label provides a property driven alternative to QLabel. """
 
   __fallback_text__ = 'LABEL'
-  __parsed_object__ = None
+  __resource_loader__ = None
+  __style_data__ = None
 
-  textFont = AttriBox[Font](16, FontFamily.MONTSERRAT, FontCap.MIX)
-  text = AttriBox[str]()
+  def getStyle(self, **kwargs) -> AbstractBoxStyle:
+    """Returns the style object for the widget."""
+    if self.__style_data__ is None:
+      if kwargs.get('_recursion', False):
+        raise RecursionError
+      labelStyle = self.__resource_loader__['label_style.json']
 
   def requiredSize(self) -> QSizeF:
     """Returns the size required to display the current text with the
@@ -38,14 +43,6 @@ class Label(BoxWidget):
                   painter: QPainter,
                   event: QPaintEvent) -> Any:
     """Paints the label with the current text and font."""
-    rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
-    textRect = self.textFont.boundRect(self.text)
-    targetRect = rect - self.allMargins
-    alignRect = self.textFont.align.fitRectF(textRect, targetRect)
-    self.textFont @= painter
-    ic(self.textFont)
-    painter.drawText(alignRect, self.text)
-    return alignRect, painter, event
 
   def __init__(self, *args) -> None:
     unusedArgs = []
@@ -59,6 +56,4 @@ class Label(BoxWidget):
     else:
       self.text = self.__fallback_text__
     BoxWidget.__init__(self, *unusedArgs)
-    self.paddings = QMarginsF(1, 1, 1, 1, )
-    self.borders = QMarginsF(2, 2, 2, 2, )
-    self.margins = QMarginsF(2, 2, 2, 2, )
+    self.__resource_loader__ = LoadResource('styles')

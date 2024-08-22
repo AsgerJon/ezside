@@ -4,13 +4,12 @@ subclasses of QLayout are too difficult to manage. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from PySide6.QtCore import QRectF, QSizeF, QPointF, QSize, QMarginsF, QEvent
-from PySide6.QtGui import QColor, QPaintEvent, QPainter, QPointerEvent
+from PySide6.QtCore import QRectF, QSizeF, QPointF, QEvent
+from PySide6.QtGui import QPaintEvent, QPainter, QPointerEvent
 from worktoy.desc import AttriBox, Field
-from worktoy.text import typeMsg
 
 from ezside.layouts import LayoutItem, LayoutIndex
-from ezside.basewidgets import BoxWidget, LayoutWidget
+from ezside.base_widgets import BoxWidget, LayoutWidget
 
 try:
   from icecream import ic
@@ -31,13 +30,9 @@ class AbstractLayout(BoxWidget):
   QLayout and assigns it to itself. This allows it to properly implement
   the 'requiredSize' methods. """
 
-  paddings: QMarginsF
-  borders: QMarginsF
-  margins: QMarginsF
-  allMargins: QMarginsF
+  __abstract_layout__ = True  # Allows deferred instance check.
 
   __layout_items__ = None
-  __iter_contents__ = None
 
   spacing = AttriBox[int](0)
 
@@ -49,9 +44,13 @@ class AbstractLayout(BoxWidget):
     return self.getColLeft(col) + self.getColWidth(col)
 
   def getColLeft(self, col: int) -> float:
+    """Wrapper adding spacing to the result from the recursive version."""
+    return col * self.spacing + self._getColLeft(col)
+
+  def _getColLeft(self, col: int) -> float:
     """Return the left of the given column."""
     if col:
-      return self.getColLeft(col - 1) + self.getColWidth(col - 1)
+      return self._getColLeft(col - 1) + self.getColWidth(col - 1)
     return self.allMargins.left()
 
   def getColWidth(self, col: int) -> float:
@@ -68,9 +67,13 @@ class AbstractLayout(BoxWidget):
     return self.getRowTop(row) + self.getRowHeight(row)
 
   def getRowTop(self, row: int) -> float:
+    """Wrapper adding spacing to the result from the recursive version."""
+    return row * self.spacing + self._getRowTop(row)
+
+  def _getRowTop(self, row: int) -> float:
     """Return the top of the given row."""
     if row:
-      return self.getRowTop(row - 1) + self.getRowHeight(row - 1)
+      return self._getRowTop(row - 1) + self.getRowHeight(row - 1)
     return self.allMargins.top()
 
   def getRowHeight(self, row: int) -> float:
@@ -110,7 +113,7 @@ class AbstractLayout(BoxWidget):
     """Getter-function for number of items"""
     return len(self.getItems())
 
-  def addWidget(self, widget: BoxWidget, *args) -> LayoutItem:
+  def addWidget(self, widget: BoxWidget, *args) -> LayoutWidget:
     """Subclasses are required to implement this method. Upon receiving a
     widget, this method is responsible for added the given widget.
     Subclasses are entirely free to implement this functionality. The
@@ -118,34 +121,17 @@ class AbstractLayout(BoxWidget):
     instance of 'LayoutItem' to the list of inner items. This class
     requires an instance of 'LayoutIndex' instance that specifies the
     index and spans of the widget. """
-
-  def addWidgetItem(self, layoutItem: LayoutItem) -> LayoutItem:
-    """This method adds the given 'LayoutItem' to the list of inner
-    items. """
-    if not isinstance(layoutItem, LayoutItem):
-      e = typeMsg('layoutItem', layoutItem, LayoutItem)
-      raise TypeError(e)
-    itemWidget = layoutItem.widgetItem
-    if not isinstance(itemWidget, LayoutWidget):
-      e = typeMsg('itemWidget', itemWidget, LayoutWidget)
-      raise TypeError(e)
-    if itemWidget.parentLayout is not self:
-      itemWidget.parentLayout = self
-    if itemWidget.parentLayoutItem is not layoutItem:
-      itemWidget.parentLayoutItem = layoutItem
-    existingItems = self.getItems()
-    self.__layout_items__ = [*existingItems, layoutItem]
-    return layoutItem
-
-  def __init__(self, *args) -> None:
-    """This method initializes the layout. """
-    BoxWidget.__init__(self, *args)
-    self.margins = 2
-    self.borders = 1
-    self.paddings = 2
-    self.borderColor = QColor(0, 0, 0, 255)
-    self.backgroundColor = QColor(255, 255, 0, 255)
-    self.setMouseTracking(True)
+    widget.parentLayout = self
+    if len(args) not in [2, 4]:
+      e = """Expected 2 or 4 positional arguments, but received: '%s'"""
+      raise ValueError(e % str(args))
+    index = LayoutIndex(*args)
+    item = LayoutItem(widget, index)
+    widget.parentLayoutItem = item
+    widget.parentIndex = index
+    existing = self.getItems()
+    self.__layout_items__ = [*existing, item]
+    return widget
 
   def getHeight(self, item: LayoutItem) -> float:
     """Getter-function for the height at given grid"""
@@ -185,12 +171,13 @@ class AbstractLayout(BoxWidget):
     then painting each widget. """
     painter = QPainter()
     painter.begin(self)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     viewRect = painter.viewport()
     reqRect = self.requiredRect()
-    BoxWidget.paintMeLike(self, reqRect, painter)
+    BoxWidget.paintMeLike(self, reqRect, painter, event)
     for item in self.getItems():
       rect = self.getRect(item)
-      item.widgetItem.paintMeLike(rect, painter)
+      item.widgetItem.paintMeLike(rect, painter, event)
       item.widgetItem.parentRect = rect
     painter.end()
 
@@ -206,11 +193,6 @@ class AbstractLayout(BoxWidget):
       topLeft = self.getRect(item).topLeft()
       out = out.united(QRectF(topLeft, size))
     return out + self.allMargins
-
-  def minimumSizeHint(self) -> QSize:
-    """Return the minimum size hint. """
-    if self.parentLayout is None:
-      return QSizeF.toSize(self.requiredRect().size())
 
   def event(self, widgetEvent: QEvent) -> bool:
     """Event handler for the layout. It passes pointer events on to the
@@ -229,11 +211,18 @@ class AbstractLayout(BoxWidget):
   def handlePoint(self, pointerEvent: QPointerEvent) -> bool:
     """Handles the point received. """
     eventPoint = pointerEvent.point(0)
+    returnVal = None
     for item in self.getItems():
       widget = item.widgetItem
       widget.update()
       rect = self.getRect(item)
       if rect.contains(eventPoint.pos()):
-        returnVal = widget.handlePointerEvent(pointerEvent)
-        return True if returnVal else False
+        if not widget.underMouse:
+          widget.underMouse = True
+          returnVal = widget.handleEnterEvent(pointerEvent)
+        else:
+          returnVal = widget.handlePointerEvent(pointerEvent)
+      elif widget.underMouse:
+        widget.underMouse = False
+        widget.handleLeaveEvent(pointerEvent)
     return False

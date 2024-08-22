@@ -1,19 +1,20 @@
-"""BoxWidget provides a base class for other basewidgets that need to
-paint on
-a background that supports the box model."""
+"""BoxWidget provides a base class for other base widgets that need to
+paint on a background that supports the box model."""
 #  AGPL-3.0 license
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import TypeAlias, Union, TYPE_CHECKING, Any
 
-from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QMarginsF
-from PySide6.QtGui import QPainter, QColor, QBrush, QPaintEvent
+from PySide6.QtCore import QRect, QRectF, QSizeF, QSize, QMarginsF, QPointF
+from PySide6.QtGui import QPainter, QColor, QBrush, QPaintEvent, \
+  QPointerEvent
 from PySide6.QtWidgets import QWidget
 from icecream import ic
 from worktoy.desc import AttriBox, Field
+from worktoy.parse import maybe
 
-from ezside.basewidgets import LayoutWidget
+from ezside.base_widgets import LayoutWidget
 from ezside.tools import fillBrush, emptyPen, MarginsBox, ColorBox
 
 if TYPE_CHECKING:
@@ -28,14 +29,18 @@ class BoxWidget(LayoutWidget):
   """BoxWidget provides a base class for other base widgets that need to
   paint on a background that supports the box model."""
 
-  __suppress_notifiers__ = None
+  def handlePointerEvent(self, pointerEvent: QPointerEvent) -> None:
+    """Reimplementation to handle pointer events. """
+
+  __fallback_radius__ = QPointF(0, 0, )
+  __corner_radius__ = None
 
   aspectRatio = AttriBox[float](-1)  # -1 means ignore
   margins = MarginsBox(0)
   paddings = MarginsBox(0)
   borders = MarginsBox(0)
   allMargins = Field()
-
+  cornerRadius = Field()
   borderColor = ColorBox(QColor(0, 0, 0, 0))
   backgroundColor = ColorBox(QColor(0, 0, 0, 0))
 
@@ -46,6 +51,16 @@ class BoxWidget(LayoutWidget):
   def _getAllMargins(self) -> QMarginsF:
     """Getter-function for the allMargins."""
     return self.margins + self.paddings + self.borders
+
+  @cornerRadius.GET
+  def _getCornerRadius(self) -> QPointF:
+    """Getter-function for the corner radius of the widget."""
+    return maybe(self.__corner_radius__, self.__fallback_radius__)
+
+  @cornerRadius.SET
+  def _setCornerRadius(self, radius: QPointF) -> None:
+    """Setter-function for the corner radius of the widget."""
+    self.__corner_radius__ = radius
 
   @borderBrush.GET
   def _getBorderBrush(self) -> QBrush:
@@ -89,9 +104,10 @@ class BoxWidget(LayoutWidget):
     marginRect.moveCenter(center)
     borderRect.moveCenter(center)
     paddedRect.moveCenter(center)
+    rx, ry = self.cornerRadius.x(), self.cornerRadius.y()
     painter.setPen(emptyPen())
     painter.setBrush(self.borderBrush)
-    painter.drawRect(marginRect)
+    painter.drawRoundedRect(borderRect, rx, ry)
     painter.setBrush(self.backgroundBrush)
-    painter.drawRect(borderRect)
+    painter.drawRoundedRect(marginRect, rx, ry)
     return paddedRect, painter, event

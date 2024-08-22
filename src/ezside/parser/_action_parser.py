@@ -31,12 +31,16 @@ class ActionParser(AbstractParser):
   icon = Field()
   shortCut = Field()
 
+  @shortCut.SET
+  def _wrapSetShortCut(self, *args) -> None:
+    """Wrapper for the setShortcut method."""
+    self._setShortCut(*args)
+
   @title.SET
   def _setTitle(self, actionTitle: str) -> None:
     """Setter-function for the title."""
     self.__action_title__ = actionTitle
 
-  @shortCut.SET
   @overload(str)
   def _setShortCut(self, shortCut: str) -> None:
     """Setter-function for the shortcut."""
@@ -45,7 +49,6 @@ class ActionParser(AbstractParser):
       return
     self.__action_shortcut__ = keySequence
 
-  @shortCut.SET
   @overload(QKeySequence)
   def _setShortCut(self, shortCut: QKeySequence) -> None:
     """Setter-function for the shortcut."""
@@ -65,44 +68,7 @@ class ActionParser(AbstractParser):
   @icon.GET
   def _getIcon(self, **kwargs) -> QIcon:
     """Getter-function for the icon."""
-    if self.__icon_parser__ is None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      self.__icon_parser__ = IconParser(self.title.lower())
-      return self._getIcon(_recursion=True)
-    if isinstance(self.__icon_parser__, IconParser):
-      return self.__icon_parser__.icon
-    e = typeMsg('iconParser', self.__icon_parser__, IconParser)
-    raise TypeError(e)
-
-  @icon.SET
-  def _setIcon(self, newIcon: Any) -> None:
-    """Setter-function for the icon."""
-    if isinstance(newIcon, str):
-      self.__icon_parser__ = IconParser(newIcon.lower())
-    elif isinstance(newIcon, QPixmap):
-      iconPath = IconParser.getIconPath()
-      iconFileName = '%s.png' % self.title.lower()
-      for item in os.listdir(iconPath):
-        if self.title.lower() in item:
-          digNum = 1
-          while iconFileName[-digNum].isnumeric():
-            if int(iconFileName[-digNum]):
-              digNum += 1
-              continue
-            break
-          num = int(iconFileName[-digNum:]) + 1
-          iconFileName = '%s%s.png' % (self.title.lower(), num)
-          break
-      else:
-        iconFileName = '%s00.png' % self.title.lower()
-      newIcon.save(os.path.join(iconPath, iconFileName))
-      self.__icon_parser__ = IconParser(iconFileName.replace('.png', ''))
-      return
-    if isinstance(newIcon, QIcon):
-      return self._setIcon(newIcon.pixmap(QSize(128, 128)))
-    if isinstance(newIcon, QImage):
-      return self._setIcon(QPixmap.fromImage(newIcon))
+    return IconParser(self.title).getQIcon()
 
   #  __init__ overloads
 

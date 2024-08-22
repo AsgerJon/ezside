@@ -1,0 +1,38 @@
+{
+  "margins": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+  },
+  "borders": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+  },
+  "paddings": {
+    "left": 0,
+    "top": 0,
+    "right": 0,
+    "bottom": 0
+  },
+  "marginsColor": {
+    "red": 0,
+    "green": 0,
+    "blue": 0,
+    "alpha": 0
+  },
+  "bordersColor": {
+    "red": 0,
+    "green": 0,
+    "blue": 0,
+    "alpha": 255
+  },
+  "paddingsColor": {
+    "red": 255,
+    "green": 255,
+    "blue": 255,
+    "alpha": 255
+  }
+}

@@ -21,7 +21,7 @@ class StatusBar(QStatusBar):
   """StatusBar subclasses QStatusBar providing the status bar for the main
   window application."""
 
-  digitalClock = AttriBox[DigitalClock](THIS, )
+  digitalClock = AttriBox[DigitalClock]()
 
   def __init__(self, *args) -> None:
     for arg in args:

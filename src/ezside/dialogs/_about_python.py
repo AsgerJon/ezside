@@ -15,7 +15,7 @@ from worktoy.desc import AttriBox
 from worktoy.text import monoSpace
 
 from ezside.tools import Align
-from ezside.basewidgets import Label, Label
+from ezside.base_widgets import Label, Label
 from moreworktoy import mambaVersion
 
 
@@ -27,7 +27,7 @@ class AboutPythonDialog(QDialog):
   baseLayout = AttriBox[QVBoxLayout]()
   horizontalLayout = AttriBox[QHBoxLayout]()
   horizontalWidget = AttriBox[QWidget]()
-  headerLabel = AttriBox[Label]('Python and Conda')
+  headerLabel = AttriBox[Label]('Python and Conda', styleId='header')
   infoLabel = AttriBox[Label]('')
 
   def __init__(self, *args) -> None:
