@@ -21,10 +21,10 @@ class LayoutWindow(BaseWindow):
   organizing the widget layout of the main window, leaving business logic
   for a further subclass."""
 
-  # baseWidget = AttriBox[VerticalLayout]()
-  # headerLabel = AttriBox[Label](THIS, 'LOL')
-  # welcomeLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
-  # infoLabel = AttriBox[Label](THIS, 'New Layout System!!')
+  baseWidget = AttriBox[VerticalLayout]()
+  headerLabel = AttriBox[Label](THIS, 'LOL')
+  welcomeLabel = AttriBox[Label](THIS, 'Welcome to EZSide')
+  infoLabel = AttriBox[Label](THIS, 'New Layout System!!')
 
   def __init__(self, *args, **kwargs) -> None:
     """Initializes the object"""
@@ -33,10 +33,10 @@ class LayoutWindow(BaseWindow):
 
   def initLayout(self) -> None:
     """This method is responsible for initializing the user interface."""
-    # self.baseWidget.addWidget(self.headerLabel)
-    # self.baseWidget.addWidget(self.welcomeLabel)
-    # self.baseWidget.addWidget(self.infoLabel)
-    # self.setCentralWidget(self.baseWidget)
+    self.baseWidget.addWidget(self.headerLabel)
+    self.baseWidget.addWidget(self.welcomeLabel)
+    self.baseWidget.addWidget(self.infoLabel)
+    self.setCentralWidget(self.baseWidget)
 
   def show(self) -> None:
     """Show the window"""

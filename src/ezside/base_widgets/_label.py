@@ -29,13 +29,6 @@ class Label(BoxWidget):
 
   text = AttriBox[str]()
 
-  # @text.ONSET
-  # def _setTextCallback(self, oldText: str, newText: str) -> None:
-  #   """Callback for the text property."""
-  #   print(f"oldText: {oldText}, newText: {newText}")
-  #   if oldText != newText:
-  #     BoxWidget.update(self)
-
   @fontStyle.GET
   def _getFontStyle(self) -> Any:
     """Getter-function for the fontStyle."""
@@ -60,8 +53,8 @@ class Label(BoxWidget):
     rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
     textRect = self.fontStyle.boundRect(self.text)
     alignedRect = self.align.fitRect(textRect, rect)
-    painter.setPen(self.fontStyle.textPen)
-    painter.drawText(alignedRect, self.fontStyle.asQtAlign, self.text)
+    painter = self.fontStyle @ painter
+    painter.drawText(alignedRect, self.align.qt, self.text)
     return alignedRect, painter, event
 
   def __init__(self, *args, **kwargs) -> None:

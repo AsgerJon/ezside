@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from worktoy.desc import Field
 from worktoy.text import typeMsg
 
-from ezside.tools import BoxStyle
+from ezside.tools import BoxStyle, FontStyle
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
 
@@ -53,7 +53,7 @@ class App(QApplication):
     data = self._loadFile(fid)
     return loads(data)
 
-  def loadFont(self, styleId: str) -> dict:
+  def loadFont(self, styleId: str) -> FontStyle:
     """Loads the font at the given style id."""
     out = {}
     fid = os.path.join(self.fonts, f'{styleId}.json')
@@ -61,7 +61,7 @@ class App(QApplication):
     defaultData = self.defaultFont()
     for key, value in defaultData.items():
       out[key] = data.get(key, value)
-    return out
+    return FontStyle.load(out)
 
   def defaultBox(self, ) -> dict:
     """Returns the default box."""

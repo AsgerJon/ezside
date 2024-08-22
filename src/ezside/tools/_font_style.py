@@ -30,7 +30,6 @@ class FontStyle(AbstractStyle):
   italic = AttriBox[bool](False)
   underline = AttriBox[bool](False)
   strike = AttriBox[bool](False)
-  align = AttriBox[Align](DEFAULT(Align.CENTER))
 
   textRed = AttriBox[int](0)
   textGreen = AttriBox[int](0)
@@ -62,10 +61,11 @@ class FontStyle(AbstractStyle):
   @textColor.GET
   def _getTextColor(self) -> QColor:
     """Getter-function for the textColor."""
-    return QColor(self.textRed,
-                  self.textGreen,
-                  self.textBlue,
-                  self.textAlpha)
+    textColor = QColor(self.textRed,
+                       self.textGreen,
+                       self.textBlue,
+                       self.textAlpha)
+    return textColor
 
   @textColor.SET
   def _setTextColor(self, value: object) -> None:
@@ -87,15 +87,19 @@ class FontStyle(AbstractStyle):
   def load(cls, data: Data) -> FontStyle:
     """Load the style data from the given dictionary into a new instance. """
     newFont = cls()
-    newFont.weight = data.get('weight', FontWeight.NORMAL)
-    newFont.size = data.get('size', 12)
-    newFont.family = data.get('family', FontFamily.COURIER)
-    newFont.cap = data.get('cap', FontCap.MIX)
+    weightKey = data.get('weight', 'normal')
+    newFont.weight = FontWeight(weightKey)
+    sizeKey = data.get('size', '12')
+    newFont.size = int(sizeKey)
+    familyKey = data.get('family', 'courier')
+    newFont.family = FontFamily(familyKey)
+    capKey = data.get('cap', 'mix')
+    newFont.cap = FontCap(capKey)
     newFont.italic = data.get('italic', False)
     newFont.underline = data.get('underline', False)
     newFont.strike = data.get('strike', False)
-    newFont.align = data.get('align', Align.CENTER)
-    newFont.textColor = data.get('textColor', {})
+    colorKey = data.get('textColor', {})
+    newFont.textColor = colorKey
     return newFont
 
   @asQFont.GET
@@ -119,11 +123,6 @@ class FontStyle(AbstractStyle):
     pen.setWidth(1)
     pen.setColor(self.textColor)
     return pen
-
-  @asQtAlign.GET
-  def _getQtAlign(self) -> Qt.AlignmentFlag:
-    """Getter-function for Qt.Alignment"""
-    return self.align.qt
 
   def __matmul__(self, painter: QPainter) -> QPainter:
     """Applies itself to the painter and returns it """

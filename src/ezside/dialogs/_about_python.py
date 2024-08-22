@@ -7,15 +7,14 @@ from __future__ import annotations
 
 import sys
 
-from PySide6.QtCore import QMargins
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QPaintEvent
 from PySide6.QtWidgets import QVBoxLayout, QDialog, QHBoxLayout, QWidget
-from icecream import ic
-from worktoy.desc import AttriBox
+from worktoy.desc import AttriBox, THIS
 from worktoy.text import monoSpace
 
+from ezside.layouts import VerticalLayout
 from ezside.tools import Align
-from ezside.base_widgets import Label, Label
+from ezside.base_widgets import Label
 from moreworktoy import mambaVersion
 
 
@@ -24,9 +23,7 @@ class AboutPythonDialog(QDialog):
   the current version of Python and conda. This includes links to relevant
   websites. """
 
-  baseLayout = AttriBox[QVBoxLayout]()
-  horizontalLayout = AttriBox[QHBoxLayout]()
-  horizontalWidget = AttriBox[QWidget]()
+  verticalLayout = AttriBox[VerticalLayout](THIS)
   headerLabel = AttriBox[Label]('Python and Conda', styleId='header')
   infoLabel = AttriBox[Label]('')
 
@@ -37,8 +34,7 @@ class AboutPythonDialog(QDialog):
         break
     else:
       QDialog.__init__(self)
-    self.headerLabel.paddings = 6, 2
-    self.infoLabel.paddings = 6, 2
+    self.setMinimumSize(320, 240)
 
   def show(self) -> None:
     """Show the dialog. """
@@ -48,17 +44,8 @@ class AboutPythonDialog(QDialog):
     pythonText = 'Python %d.%d.%d' % (major, minor, micro)
     condaText = 'Mamba %s' % mambaVersion()
     self.headerLabel.text = '%s and %s' % (pythonText, condaText)
-    self.headerLabel.font.size = 24
-    self.headerLabel.font.family = 'Montserrat'
-    self.headerLabel.font.align = Align.CENTER
-    self.infoLabel.font.size = 24
-    self.infoLabel.font.family = 'Montserrat'
-    self.infoLabel.font.align = Align.CENTER
-    self.horizontalLayout.addWidget(self.headerLabel)
-    self.horizontalWidget.setLayout(self.horizontalLayout)
-    self.baseLayout.addWidget(self.horizontalWidget)
     self.infoLabel.text = monoSpace("""This instance of Python is running 
       in a virtual mamba environment!""")
-    self.baseLayout.addWidget(self.infoLabel)
-    self.setLayout(self.baseLayout)
+    self.verticalLayout.addWidget(self.headerLabel)
+    self.verticalLayout.addWidget(self.infoLabel)
     QDialog.show(self)

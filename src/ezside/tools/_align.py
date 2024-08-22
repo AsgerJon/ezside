@@ -122,10 +122,10 @@ class Align(KeeNum):
       if other is Align.RIGHT:
         return Align.BOTTOM_RIGHT
 
-  def fitRect(self, movingRect: Rect, targetRect: Rect) -> QRect:
+  def fitRect(self, movingRect: Rect, targetRect: Rect) -> QRectF:
     """This method receives a moving rectangle and aligns it against a
     target rectangle according to the alignment."""
-    return self.fitRect(movingRect, targetRect)
+    return self.fitRectF(movingRect, targetRect)
 
   def fitRectF(self, movingRect: Rect, targetRect: Rect) -> QRectF:
     """This method receives a moving rectangle and aligns it against a

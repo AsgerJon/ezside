@@ -69,6 +69,17 @@ class AbstractStyle(BaseObject):
       else:
         e = """Received invalid color value: %s!"""
         raise ValueError(e % str(arg))
+    if not intArgs:
+      return 0, 0, 0, 0
+    if len(intArgs) == 1:
+      return intArgs[0], intArgs[0], intArgs[0], 255
+    if len(intArgs) == 2:
+      e = """Received 2 color values, which is not supported!"""
+      raise ValueError(e)
+    if len(intArgs) == 3:
+      return intArgs[0], intArgs[1], intArgs[2], 255
+    if len(intArgs) == 4:
+      return intArgs[0], intArgs[1], intArgs[2], intArgs[3]
 
   @classmethod
   def _parseMargins(cls, *args, **kwargs) -> Margins:
