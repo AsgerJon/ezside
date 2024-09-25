@@ -1,0 +1,18 @@
+# Project Root Marker
+
+This file is intended as a marker to indicate the root directory of the
+project. It helps tools and scripts identify the top level of the project's
+hierarchy and should not be removed.
+
+# Purpose:
+- Assist in project navigation.
+- Ensure tools operate within the correct directory context.
+- Prevent the scanning of directories outside the project scope.
+
+Please do not delete or move this file unless you are reorganizing the
+project's structure. If you are unsure about the implications of modifying
+this file, please consult with the project lead or your team.
+
+# Note:
+This file does not contain configuration data or metadata influencing
+project behaviour.

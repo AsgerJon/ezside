@@ -5,4 +5,5 @@ utility package. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from moreworktoy.conf._config import Config
 from ._mamba_info import mambaVersion

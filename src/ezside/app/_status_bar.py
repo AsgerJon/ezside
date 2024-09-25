@@ -37,7 +37,7 @@ class StatusBar(QStatusBar):
         QStatusBar {
           background-color: #AAAAAA;
           color: #FF0000;
-          font-size: 14px;
+          font-size: 20px;
         }  
         """
     )

@@ -19,6 +19,7 @@ from ezside.style import Align
 
 if TYPE_CHECKING:
   from ezside.layouts import AbstractLayout, LayoutItem, LayoutIndex
+  from ezside.app import App
 
 Rect: TypeAlias = Union[QRect, QRectF]
 
@@ -134,7 +135,9 @@ class LayoutWidget(QWidget):
   @mainWindow.GET
   def _getMainWindow(self) -> Optional[QWidget]:
     """Getter-function for the mainWindow."""
-    return self.__main_window__
+    if TYPE_CHECKING:
+      assert isinstance(self.app, App)
+    return self.app.getWindowInstance()
 
   @mainWindow.SET
   def _setMainWindow(self, mainWindow: QMainWindow) -> None:

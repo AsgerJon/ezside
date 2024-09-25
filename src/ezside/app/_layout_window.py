@@ -11,7 +11,6 @@ from worktoy.desc import AttriBox, THIS
 from ezside.app import BaseWindow
 from ezside.layouts import VerticalLayout, AbstractLayout
 from ezside.base_widgets import Label, BaseButton
-from ezside.widgets import ImgEdit
 
 ic.configureOutput(includeContext=True)
 
@@ -22,7 +21,7 @@ class LayoutWindow(BaseWindow):
   for a further subclass."""
 
   baseWidget = AttriBox[VerticalLayout]()
-  welcomeLabel = AttriBox[Label](THIS, 'Welcome to EZSide', styleId='header')
+  welcomeLabel = AttriBox[Label](THIS, 'Welcome Palle', styleId='header')
   infoLabel = AttriBox[Label](THIS, 'New Layout System!!',
                               styleId='paragraph')
   clickMe = AttriBox[BaseButton](THIS, 'Click Me!', styleId='button')
@@ -31,6 +30,7 @@ class LayoutWindow(BaseWindow):
     """Initializes the object"""
     BaseWindow.__init__(self, )
     self.setWindowTitle('-- EZSide --')
+    self.setMouseTracking(True)
 
   def initLayout(self) -> None:
     """This method is responsible for initializing the user interface."""

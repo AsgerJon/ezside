@@ -15,8 +15,8 @@ from PySide6.QtCore import QRect, QRectF
 from PySide6.QtGui import QPainter, QPaintEvent
 from worktoy.desc import Field
 
-from ezside.layouts import HorizontalLayout
-from ezside.base_widgets import BoxWidget, SevenSeg
+from ezside.layouts import HorizontalLayout, BoxWidget
+from ezside.base_widgets import SevenSeg
 
 if TYPE_CHECKING:
   pass

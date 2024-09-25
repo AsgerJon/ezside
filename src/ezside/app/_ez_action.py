@@ -28,7 +28,7 @@ class EZAction(QAction):
   def _getApp(self) -> App:
     """Getter-function for the app."""
     app = QCoreApplication.instance()
-    if getattr(app, '__ezside_app__', None) is None:
+    if getattr(app, '__ezside_app__', None) is None and False:
       e = """%s requires the running instance of QCoreApplication to be an 
       instance of the ezside.app.App class, but received %s!"""
       raise TypeError(monoSpace(e % (self.__class__.__name__, app)))

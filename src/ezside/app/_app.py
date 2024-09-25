@@ -9,13 +9,17 @@ from json import loads, JSONDecodeError
 from typing import Any
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow
+from icecream import ic
 from worktoy.desc import Field
 from worktoy.text import typeMsg, monoSpace
 
 from ezside.style import ControlStyle, BoxStyle, FontStyle
 
 MenuFlag = Qt.ApplicationAttribute.AA_DontUseNativeMenuBar
+
+ic.configureOutput(includeContext=True)
 
 
 class App(QApplication):
@@ -67,21 +71,59 @@ class App(QApplication):
   fonts = Field()
   boxes = Field()
 
+  @classmethod
+  def _parseIconName(cls, name: str, **kwargs) -> str:
+    """Parses the icon name"""
+    for (key, value) in cls.__named_icons__.items():
+      names = [key, value, key.lower(), value.lower(),
+               value.replace('.png', '')]
+      if name.lower() in names:
+        return value
+    else:
+      if kwargs.get('_recursion', False):
+        if kwargs.get('strict', False):
+          e = """Unable to recognize the icon name: %s""" % name
+          raise ValueError(e) from RecursionError(name)
+        return 'risitas.png'
+      if ' ' in name:
+        newName = name.replace(' ', '_').lower()
+        return cls._parseIconName(newName, _recursion=True)
+    if kwargs.get('strict', False):
+      e = """The icon name is not in the named icons!"""
+      raise ValueError(e)
+    ic(name)
+    return 'risitas.png'
+
+  @staticmethod
+  def _validateFile(fid: str, ) -> int:
+    """Validates the file at the given path, which is expected to be an
+    absolute path. """
+    if not os.path.exists(fid):
+      e = """The file is missing: %s"""
+      raise FileNotFoundError(e % fid)
+    if not os.path.isfile(fid):
+      e = """The file is not a file: %s"""
+      raise IsADirectoryError(e % fid)
+    return 0
+
   def getIconFile(self, iconName: str, **kwargs) -> str:
     """Getter-function for the path to the named icon. """
-    if iconName not in self.__named_icons__:
-      if kwargs.get('strict', False):
-        e = """The icon name is not in the named icons!"""
-        raise ValueError(e)
-      return os.path.join(self.icons, 'risitas.png')
-    iconFid = os.path.join(self.icons, self.__named_icons__[iconName])
-    if not os.path.exists(iconFid):
-      e = """The icon file is missing: %s"""
-      raise FileNotFoundError(e % iconFid)
-    if not os.path.isfile(iconFid):
-      e = """The icon file is not a file: %s"""
-      raise IsADirectoryError(e % iconFid)
-    return str(iconFid)
+    fileName = self._parseIconName(iconName, **kwargs)
+    iconFid = os.path.join(self.icons, fileName)
+    if not self._validateFile(str(iconFid)):
+      out = str(iconFid)
+      print(out)
+      return out
+
+  @classmethod
+  def getIconPix(cls, iconName: str) -> QPixmap:
+    """Getter-function for the icon pixmap"""
+    return QPixmap(cls.getIconFile(iconName))
+
+  @classmethod
+  def getIcon(cls, iconName: str) -> QIcon:
+    """Getter-function for the icon"""
+    return QIcon(cls.getIconPix(iconName))
 
   @classmethod
   def _loadFile(cls, filePath: str) -> Any:
@@ -211,13 +253,13 @@ class App(QApplication):
     cls = self._getWindowClass()
     self.__main_window_instance__ = cls()
 
-  def _getWindowInstance(self, **kwargs) -> QMainWindow:
+  def getWindowInstance(self, **kwargs) -> QMainWindow:
     """Returns the main window instance"""
     if self.__main_window_instance__ is None:
       if kwargs.get('_recursion', False):
         raise RecursionError
       self._createWindowInstance()
-      return self._getWindowInstance(_recursion=True)
+      return self.getWindowInstance(_recursion=True)
     cls = self._getWindowClass()
     if isinstance(self.__main_window_instance__, QMainWindow):
       return self.__main_window_instance__
@@ -236,6 +278,6 @@ class App(QApplication):
     print(pythonMsg)
     print(rootMsg)
     print('¨' * n)
-    window = self._getWindowInstance()
+    window = self.getWindowInstance()
     window.show()
-    return QApplication.exec_(self)
+    return QApplication.exec()

@@ -12,7 +12,7 @@ from icecream import ic
 from worktoy.desc import Field
 from worktoy.text import typeMsg
 
-from ezside.base_widgets import LayoutWidget
+from ezside.layouts import LayoutWidget
 from ezside.tools import emptyPen
 from ezside.style import BoxStyle, Align
 

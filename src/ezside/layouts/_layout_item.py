@@ -8,8 +8,7 @@ from worktoy.desc import AttriBox, Field
 from worktoy.meta import BaseObject
 from worktoy.parse import maybeType
 
-from ezside.layouts import LayoutIndex
-from ezside.base_widgets import LayoutWidget
+from ezside.layouts import LayoutWidget, LayoutIndex
 
 
 class LayoutItem(BaseObject):

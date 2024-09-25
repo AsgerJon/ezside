@@ -4,8 +4,7 @@ layout."""
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from ezside.layouts import AbstractLayout
-from ezside.base_widgets import BoxWidget, LayoutWidget
+from ezside.layouts import BoxWidget, LayoutWidget, AbstractLayout
 
 
 class HorizontalLayout(AbstractLayout):

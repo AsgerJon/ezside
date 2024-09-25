@@ -41,7 +41,7 @@ class MainWindow(LayoutWindow):
   def singleClick(self, pointerEvent: QPointerEvent) -> None:
     """Single click event"""
     if isinstance(pointerEvent, QMouseEvent):
-      button = pointerEvent.buttons()
+      button = str(pointerEvent.buttons()).split('.')[-1]
       return self.statusBar().showMessage('Single click: %s' % str(button))
     e = 'The pointerEvent is not a QMouseEvent: %s!'
     raise TypeError(e % str(QEvent.type(pointerEvent)))
@@ -49,7 +49,7 @@ class MainWindow(LayoutWindow):
   def doubleClick(self, pointerEvent: QPointerEvent) -> None:
     """Double click event"""
     if isinstance(pointerEvent, QMouseEvent):
-      button = pointerEvent.buttons()
+      button = str(pointerEvent.buttons()).split('.')[-1]
       return self.statusBar().showMessage('Double click: %s' % str(button))
     e = 'The pointerEvent is not a QMouseEvent: %s!'
     raise TypeError(e % str(QEvent.type(pointerEvent)))
@@ -57,7 +57,7 @@ class MainWindow(LayoutWindow):
   def tripleClick(self, pointerEvent: QPointerEvent) -> None:
     """Triple click event"""
     if isinstance(pointerEvent, QMouseEvent):
-      button = pointerEvent.buttons()
+      button = str(pointerEvent.buttons()).split('.')[-1]
       return self.statusBar().showMessage('Triple click: %s' % str(button))
     e = 'The pointerEvent is not a QMouseEvent: %s!'
     raise TypeError(e % str(QEvent.type(pointerEvent)))
@@ -65,7 +65,7 @@ class MainWindow(LayoutWindow):
   def singleHold(self, pointerEvent: QPointerEvent) -> None:
     """Single hold event"""
     if isinstance(pointerEvent, QMouseEvent):
-      button = pointerEvent.buttons()
+      button = str(pointerEvent.buttons()).split('.')[-1]
       return self.statusBar().showMessage('Single hold: %s' % str(button))
     e = 'The pointerEvent is not a QMouseEvent: %s!'
     raise TypeError(e % str(QEvent.type(pointerEvent)))
@@ -73,7 +73,7 @@ class MainWindow(LayoutWindow):
   def doubleHold(self, pointerEvent: QPointerEvent) -> None:
     """Double hold event"""
     if isinstance(pointerEvent, QMouseEvent):
-      button = pointerEvent.buttons()
+      button = str(pointerEvent.buttons()).split('.')[-1]
       return self.statusBar().showMessage('Double hold: %s' % str(button))
     e = 'The pointerEvent is not a QMouseEvent: %s!'
     raise TypeError(e % str(QEvent.type(pointerEvent)))
@@ -81,7 +81,7 @@ class MainWindow(LayoutWindow):
   def tripleHold(self, pointerEvent: QPointerEvent) -> None:
     """Triple hold event"""
     if isinstance(pointerEvent, QMouseEvent):
-      button = pointerEvent.buttons()
+      button = str(pointerEvent.buttons()).split('.')[-1]
       return self.statusBar().showMessage('Triple hold: %s' % str(button))
     e = 'The pointerEvent is not a QMouseEvent: %s!'
     raise TypeError(e % str(QEvent.type(pointerEvent)))

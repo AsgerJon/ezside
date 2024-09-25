@@ -3,12 +3,11 @@
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
-from abc import abstractmethod
 from typing import TypeAlias, Union
 
-from PySide6.QtCore import QRect, QEvent, QTimer, Slot, QSizeF
+from PySide6.QtCore import QRect, QEvent, QTimer, Slot
 from PySide6.QtGui import (QPointerEvent, QVector2D,
-                           QEventPoint)
+                           QEventPoint, QSinglePointEvent)
 from PySide6.QtCore import QRectF, QPoint, Qt, Signal, QPointF
 from PySide6.QtGui import QMouseEvent
 from icecream import ic
@@ -16,15 +15,15 @@ from worktoy.desc import Field
 from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
-from ezside.base_widgets import LayoutWidget
-from ezside.style import ButtonState, MouseTimer, Align
+from ezside.layouts import BoxWidget
+from ezside.style import ButtonState, MouseTimer
 
 ic.configureOutput(includeContext=True)
 
 Rect: TypeAlias = Union[QRect, QRectF]
 
 
-class AbstractButton(LayoutWidget):
+class AbstractButton(BoxWidget):
   """BaseButton provides button widgets with mouse awareness. """
 
   #  Timer settings from JSON
@@ -51,11 +50,13 @@ class AbstractButton(LayoutWidget):
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   #  Cursor movement
+  __under_mouse__ = None
   __cursor_position__ = None
   __mouse_velocity__ = None
   #  Mouse state-flags
   __is_enabled__ = True
   __mouse_pressed__ = None
+  __pressed_button__ = None
   __press_event__ = None
   __hold_event__ = None
   #  Mouse-limit values
@@ -79,6 +80,7 @@ class AbstractButton(LayoutWidget):
   active = Field()
   mousePressed = Field()
   pressedButton = Field()
+  underMouse = Field()
   #  Button-state
   buttonState = Field()
   controlData = Field()
@@ -330,6 +332,18 @@ class AbstractButton(LayoutWidget):
     """Setter-function for the most recently pressed button"""
     self.__pressed_button__ = mouseButton
 
+  @underMouse.GET
+  def _getUnderMouseFlag(self) -> bool:
+    """Getter-function for the flag indicating if the mouse is over the
+    push button."""
+    return True if self.__under_mouse__ else False
+
+  @underMouse.SET
+  def _setUnderMouseFlag(self, flag: bool) -> None:
+    """Setter-function for the flag indicating if the mouse is over the
+    push button."""
+    self.__under_mouse__ = flag
+
   @active.GET
   def _getActiveFlag(self) -> bool:
     """Getter-function for the flag indicating if the push button is
@@ -398,12 +412,12 @@ class AbstractButton(LayoutWidget):
   def handleMouseMove(self, pointerEvent: QPointerEvent) -> bool:
     """Method handling mouse move events"""
     self.underMouse = True
-    self.update()
     eventPoint = QPointerEvent.point(pointerEvent, 0)
     v = QEventPoint.velocity(eventPoint)
     self.moveSpeed.emit(QVector2D.length(v))
     self.__mouse_velocity__ = v
     self.__cursor_position__ = QEventPoint.position(eventPoint)
+    self.update()
     if self.doubleDelayTimer:
       p0 = self.__cursor_position__
       p1 = QPointerEvent.point(pointerEvent, 0).pressPosition()
@@ -434,6 +448,8 @@ class AbstractButton(LayoutWidget):
   def handleMousePress(self, pointerEvent: QPointerEvent) -> bool:
     """Method handling mouse press events"""
     self.__mouse_pressed__ = True
+    if isinstance(pointerEvent, QSinglePointEvent):
+      self.__pressed_button__ = QSinglePointEvent.button(pointerEvent)
     if isinstance(pointerEvent, QMouseEvent):
       self.pressEvent = QMouseEvent(pointerEvent)
       self.holdEvent = QMouseEvent(pointerEvent)
@@ -455,6 +471,7 @@ class AbstractButton(LayoutWidget):
   def handleMouseRelease(self, pointerEvent: QPointerEvent) -> bool:
     """Method handling mouse release events"""
     self.__mouse_pressed__ = False
+    self.__pressed_button__ = Qt.MouseButton.NoButton
     self.mouseRelease.emit()
     self.singleHoldTimer.stop()
     self.doubleHoldTimer.stop()
@@ -483,12 +500,14 @@ class AbstractButton(LayoutWidget):
 
   def handleLeaveEvent(self, pointerEvent: QPointerEvent) -> bool:
     """Method handling leave events"""
+    self.underMouse = False
     self.mouseLeave.emit()
     self.update()
     return True
 
   def handleEnterEvent(self, pointerEvent: QPointerEvent) -> bool:
     """Method handling enter events"""
+    self.underMouse = True
     self.mouseEnter.emit()
     self.update()
     return True
@@ -533,23 +552,9 @@ class AbstractButton(LayoutWidget):
   #  Constructor
 
   def __init__(self, *args, **kwargs) -> None:
-    LayoutWidget.__init__(self, *args, **kwargs)
+    BoxWidget.__init__(self, *args, **kwargs)
     self.setMouseTracking(True)
+    ic(self.styleId)
     self.__control_data__ = self.app.loadControl(self.styleId)
-
     self.initSignalSlot()
     self.activate()
-
-  @abstractmethod
-  def requiredSize(self) -> QSizeF:
-    """This method informs the parent layout of the size this widget at
-    minimum requires to render. """
-
-  @abstractmethod
-  def getMouseRegion(self) -> QRectF:
-    """This method returns the region of this widget that is sensitive to
-    pointer events. """
-
-  @abstractmethod
-  def getAlignment(self) -> Align:
-    """Getter-function for the alignment setting"""

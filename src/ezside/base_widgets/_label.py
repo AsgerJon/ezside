@@ -11,7 +11,7 @@ from icecream import ic
 from worktoy.desc import Field, AttriBox
 from worktoy.text import typeMsg
 
-from ezside.base_widgets import BoxWidget
+from ezside.layouts import BoxWidget
 from ezside.style import FontStyle
 
 ic.configureOutput(includeContext=True)

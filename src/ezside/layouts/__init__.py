@@ -9,6 +9,8 @@ wasted trying to find out, why your widget is showing up. So GG QLayout. """
 #  Copyright (c) 2024 Asger Jon Vistisen
 from __future__ import annotations
 
+from ._layout_widget import LayoutWidget
+from ._box_widget import BoxWidget
 from ._layout_index import LayoutIndex
 from ._layout_item import LayoutItem
 from ._abstract_layout import AbstractLayout

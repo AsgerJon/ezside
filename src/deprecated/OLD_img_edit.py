@@ -20,14 +20,15 @@ from worktoy.parse import maybe
 from worktoy.text import typeMsg
 
 from ezside.dialogs import NewDialog
-from ezside.base_widgets import BoxWidget
+from ezside.base_widgets import AbstractButton
+from ezside.style import Align
 from ezside.widgets import ImgContextMenu
 
 Rect: TypeAlias = Union[QRect, QRectF]
 ic.configureOutput(includeContext=True)
 
 
-class ImgEdit(BoxWidget):
+class ImgEdit(AbstractButton):
   """ImgEdit shows an image and allows edits. """
 
   __inner_file__ = None
@@ -56,6 +57,14 @@ class ImgEdit(BoxWidget):
   newFid = Signal(str)
   openFid = Signal(str)
   saveFid = Signal(str)
+
+  def getMouseRegion(self) -> QRectF:
+    """This method returns the region of this widget that is sensitive to
+    pointer events. """
+
+  def getAlignment(self) -> Align:
+    """Getter-function for the alignment setting"""
+    return Align.CENTER
 
   @imageTimer.GET
   def _getImageTimer(self, **kwargs) -> QTimer:
@@ -200,25 +209,34 @@ class ImgEdit(BoxWidget):
                   painter: QPainter,
                   event: QPaintEvent) -> Any:
     """Paint the image. """
-    rect, painter, event = BoxWidget.paintMeLike(self, rect, painter, event)
     center = rect.center()
     innerRect = rect - self.allMargins
     innerRect.moveCenter(center)
     self.mouseRegion = innerRect
     painter.drawPixmap(innerRect.topLeft(), self.pix)
-    return innerRect, painter, event
+    return rect, painter, event
 
-  def __init__(self, *args) -> None:
-    BoxWidget.__init__(self, *args)
+  def __init__(self, *args, **kwargs) -> None:
+    AbstractButton.__init__(self, *args, **kwargs)
     self.setMouseTracking(True)
-    self.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
+    # self.setContextMenuPolicy(Qt.ContextMenuPolicy.DefaultContextMenu)
+
+  def initSignalSlot(self) -> None:
+    """Initializes the signal-slot connections. """
+    AbstractButton.initSignalSlot(self)
+    self.mousePress.connect(self._whatButton)
 
   def contextMenuEvent(self, event: QContextMenuEvent) -> None:
     """Right-click should open tool options"""
     self.contextMenu.popup(event.globalPos(), )
 
+  def _whatButton(self, ) -> None:
+    """DEBUG"""
+    ic(self.pressedButton)
+
   def mousePressEvent(self, event: QMouseEvent) -> None:
     """Sets the mouse down flag"""
+    ic('ImgEdit.mousePressEvent')
     if event.buttons() == Qt.MouseButton.LeftButton:
       self.__left_mouse_pressed__ = True
       if not self.imageTimer.isActive():

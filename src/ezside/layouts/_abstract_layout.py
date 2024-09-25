@@ -8,8 +8,7 @@ from PySide6.QtCore import QRectF, QSizeF, QPointF, QEvent
 from PySide6.QtGui import QPaintEvent, QPainter, QPointerEvent
 from worktoy.desc import AttriBox, Field
 
-from ezside.layouts import LayoutItem, LayoutIndex
-from ezside.base_widgets import BoxWidget, LayoutWidget
+from ezside.layouts import BoxWidget, LayoutWidget, LayoutItem, LayoutIndex
 
 try:
   from icecream import ic

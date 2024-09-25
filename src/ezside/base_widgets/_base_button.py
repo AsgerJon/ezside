@@ -157,27 +157,15 @@ class BaseButton(AbstractButton):
     self.setMouseTracking(True)
 
   def paintMeLike(self,
-                  rect: Rect,
+                  r: Rect,
                   painter: QPainter,
                   event: QPaintEvent) -> Any:
     """Paints the BaseButton"""
-    borderRect = rect - self.boxStyle.margins
-    paddedRect = borderRect - self.boxStyle.borders
-    contentRect = paddedRect - self.boxStyle.paddings
-    borderRect.moveCenter(rect.center())
-    paddedRect.moveCenter(rect.center())
-    contentRect.moveCenter(rect.center())
-    #  Paint the box model
-    painter.setPen(emptyPen())
-    painter.setBrush(self.bordersBrush)
-    painter.drawRect(borderRect)
-    painter.setBrush(self.paddingsBrush)
-    painter.drawRect(paddedRect)
-    #  Paint the text
+    r, painter, event = AbstractButton.paintMeLike(self, r, painter, event)
     painter.setPen(self.fontStyle.asQPen)
     painter.setFont(self.fontStyle.asQFont)
     textRect = self.requiredRect()
     alignFlag = self.getAlignment()
-    paintRect = alignFlag.fitRect(textRect, contentRect)
+    paintRect = alignFlag.fitRect(textRect, r)
     painter.drawText(paintRect, alignFlag.qt, self.text)
     return paintRect, painter, event
