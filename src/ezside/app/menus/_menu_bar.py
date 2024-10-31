@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QMenuBar, QWidget
 from icecream import ic
 from worktoy.desc import AttriBox, THIS
 
-from ezside.app import FileMenu, DebugMenu, HelpMenu, EditMenu
+from ezside.app.menus import FileMenu, DebugMenu, HelpMenu, EditMenu
 
 ic.configureOutput(includeContext=True)
 
@@ -21,14 +21,13 @@ class MenuBar(QMenuBar):
   helpMenu = AttriBox[HelpMenu](THIS)
   debugMenu = AttriBox[DebugMenu](THIS)
 
-  def initUi(self) -> None:
+  def initBar(self) -> None:
     """Initializes the menu bar"""
+    self.fileMenu.initMenu()
     self.addMenu(self.fileMenu)
+    self.editMenu.initMenu()
     self.addMenu(self.editMenu)
+    self.helpMenu.initMenu()
     self.addMenu(self.helpMenu)
+    self.debugMenu.initMenu()
     self.addMenu(self.debugMenu)
-
-  def __init__(self, parent: QWidget = None, *args) -> None:
-    """Initializes the menu bar"""
-    QMenuBar.__init__(self, parent)
-    self.initUi()

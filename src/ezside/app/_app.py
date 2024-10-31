@@ -30,6 +30,7 @@ class App(QApplication):
 
   __main_window_class__ = None
   __main_window_instance__ = None
+  __active_theme__ = 'base'
   __style_classes__ = dict(font=FontStyle,
                            box=BoxStyle,
                            control=ControlStyle)
@@ -70,6 +71,28 @@ class App(QApplication):
   styles = Field()
   fonts = Field()
   boxes = Field()
+
+  theme = Field()
+  themeDir = Field()
+  iconDir = Field()
+
+  @classmethod
+  @theme.GET
+  def _getTheme(cls) -> str:
+    """Getter-function for the currently active theme. """
+    return cls.__active_theme__
+
+  @classmethod
+  @themeDir.GET
+  def _getThemeDir(cls) -> str:
+    """Getter-function for the directory of the currently active theme. """
+    return object.__str__(os.path.join(cls.etc, 'themes', cls.theme))
+
+  @classmethod
+  @iconDir.GET
+  def _getIconDir(cls) -> str:
+    """Getter-function for the icon directory. """
+    return os.path.join(cls.themeDir, 'icons')
 
   @classmethod
   def _parseIconName(cls, name: str, **kwargs) -> str:

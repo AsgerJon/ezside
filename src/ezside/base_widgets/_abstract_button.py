@@ -554,7 +554,6 @@ class AbstractButton(BoxWidget):
   def __init__(self, *args, **kwargs) -> None:
     BoxWidget.__init__(self, *args, **kwargs)
     self.setMouseTracking(True)
-    ic(self.styleId)
     self.__control_data__ = self.app.loadControl(self.styleId)
     self.initSignalSlot()
     self.activate()

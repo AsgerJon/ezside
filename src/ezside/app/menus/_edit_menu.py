@@ -6,23 +6,23 @@ from __future__ import annotations
 from worktoy.desc import AttriBox, THIS
 
 from icecream import ic
-from ezside.app import AbstractMenu, EZAction
+from ezside.app.menus import EZMenu, EZAction
 
 ic.configureOutput(includeContext=True)
 
 
-class EditMenu(AbstractMenu):
+class EditMenu(EZMenu):
   """EditMenu class provides the edit menu for the application."""
 
   selectAllAction = AttriBox[EZAction](
-      THIS, 'Select All', 'CTRL+A', 'select_all.png')
-  copyAction = AttriBox[EZAction](THIS, 'Copy', 'CTRL+C', 'copy.png')
-  cutAction = AttriBox[EZAction](THIS, 'Cut', 'CTRL+X', 'cut.png')
-  pasteAction = AttriBox[EZAction](THIS, 'Paste', 'CTRL+V', 'paste.png')
-  undoAction = AttriBox[EZAction](THIS, 'Undo', 'CTRL+Z', 'undo.png')
-  redoAction = AttriBox[EZAction](THIS, 'Redo', 'CTRL+Y', 'redo.png')
+      THIS, 'Select All', 'CTRL+A', 'selectAll')
+  copyAction = AttriBox[EZAction](THIS, 'Copy', 'CTRL+C', 'copy')
+  cutAction = AttriBox[EZAction](THIS, 'Cut', 'CTRL+X', 'cut')
+  pasteAction = AttriBox[EZAction](THIS, 'Paste', 'CTRL+V', 'paste')
+  undoAction = AttriBox[EZAction](THIS, 'Undo', 'CTRL+Z', 'undo')
+  redoAction = AttriBox[EZAction](THIS, 'Redo', 'CTRL+Y', 'redo')
 
-  def initUi(self) -> None:
+  def initMenu(self) -> None:
     """Initializes the menu"""
     self.addAction(self.selectAllAction)
     self.addAction(self.copyAction)
@@ -30,7 +30,3 @@ class EditMenu(AbstractMenu):
     self.addAction(self.pasteAction)
     self.addAction(self.undoAction)
     self.addAction(self.redoAction)
-
-  def __init__(self, parent=None, *args) -> None:
-    AbstractMenu.__init__(self, parent, 'Edit')
-    self.initUi()

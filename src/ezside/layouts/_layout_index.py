@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from icecream import ic
 from worktoy.desc import AttriBox
-from worktoy.meta import BaseObject
+from worktoy.base import BaseObject
 
 
 class LayoutIndex(BaseObject):

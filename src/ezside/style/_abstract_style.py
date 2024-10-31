@@ -8,16 +8,15 @@ from typing import Self, TypeAlias, Union
 
 from PySide6.QtCore import QMargins, QMarginsF
 from PySide6.QtGui import QColor
-from worktoy.ezdata import EZData
 from worktoy.parse import maybe
-from worktoy.meta import BaseObject
+from worktoy.base import BaseObject
 
 Margins: TypeAlias = tuple[float, float, float, float]
 Color: TypeAlias = tuple[int, int, int, int]
 Data: TypeAlias = dict[str, Union[str, dict]]
 
 
-class AbstractStyle(EZData):
+class AbstractStyle(BaseObject):
   """AbstractStyle provides a base class for style settings. """
 
   @classmethod

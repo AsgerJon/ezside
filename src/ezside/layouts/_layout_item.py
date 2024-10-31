@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QSizeF
 from worktoy.desc import AttriBox, Field
-from worktoy.meta import BaseObject
+from worktoy.base import BaseObject
 from worktoy.parse import maybeType
 
 from ezside.layouts import LayoutWidget, LayoutIndex

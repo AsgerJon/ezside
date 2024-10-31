@@ -6,31 +6,24 @@ from __future__ import annotations
 from icecream import ic
 from worktoy.desc import AttriBox, THIS
 
-from ezside.app import EZAction, AbstractMenu
+from ezside.app.menus import EZMenu, EZAction
 
 ic.configureOutput(includeContext=True)
 
 
-class HelpMenu(AbstractMenu):
+class HelpMenu(EZMenu):
   """The 'HelpMenu' class provides the help menu for the application. """
 
-  aboutQtAction = AttriBox[EZAction](THIS, 'About Qt', 'F12', 'about_qt.png')
+  aboutQtAction = AttriBox[EZAction](THIS, 'About Qt', 'F12', 'qt')
   aboutPythonAction = AttriBox[EZAction](
-      THIS, 'About Python', 'F11', 'about_python.png')
+      THIS, 'About Python', 'F11', 'python')
   aboutPySide6Action = AttriBox[EZAction](
-      THIS, 'About PySide6', 'F10', 'about_pyside6.png')
-  docAction = AttriBox[EZAction](THIS,
-                                 'Documentation',
-                                 'F1',
-                                 'documentation.png')
+      THIS, 'About PySide6', 'F10', 'pyside6')
+  docAction = AttriBox[EZAction](THIS, 'Documentation', 'F1', 'doc')
 
-  def initUi(self) -> None:
+  def initMenu(self) -> None:
     """Initializes the menu"""
     self.addAction(self.aboutQtAction)
     self.addAction(self.aboutPythonAction)
     self.addAction(self.aboutPySide6Action)
     self.addAction(self.docAction)
-
-  def __init__(self, parent=None, *args) -> None:
-    AbstractMenu.__init__(self, parent, 'Help')
-    self.initUi()

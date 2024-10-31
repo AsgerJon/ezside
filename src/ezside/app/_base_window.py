@@ -13,7 +13,7 @@ from icecream import ic
 from worktoy.desc import THIS, AttriBox, Field
 from worktoy.text import typeMsg
 
-from ezside.app import StatusBar, MenuBar
+from ezside.app.menus import StatusBar, MenuBar
 from ezside.dialogs import DirectoryDialog, SaveFileDialog, OpenFileDialog, \
   AboutPythonDialog, NewDialog
 
@@ -66,11 +66,6 @@ class BaseWindow(QMainWindow):
       return self.__pulse_timer__
     e = typeMsg('__pulse_timer__', self.__pulse_timer__, QTimer)
     raise TypeError(e)
-
-  def __init__(self, *args) -> None:
-    QMainWindow.__init__(self)
-    self.setMenuBar(self.mainMenuBar)
-    self.setStatusBar(self.mainStatusBar)
 
   @Slot()
   def requestColor(self) -> None:

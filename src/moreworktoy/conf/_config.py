@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from typing import Never, Self
-from worktoy.meta import BaseObject
+from worktoy.base import BaseObject
 
 from moreworktoy.conf import getRoot
 
