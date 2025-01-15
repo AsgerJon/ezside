@@ -1,5 +1,0 @@
-#  Settings for tegning module
-
-#  Geometric tolerance with syntax 0.001, 1e-3 or 1e-03 (recommended)
-#  Default: 1e-10
-tolerance = 1e-10
