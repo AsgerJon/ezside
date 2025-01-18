@@ -1,7 +1,7 @@
 """Rect provides a dataclass representation of a rectangle relative to
 some coordinate system. """
 #  AGPL-3.0 license
-#  Copyright (c) 2024 Asger Jon Vistisen
+#  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import Self, TYPE_CHECKING
@@ -74,11 +74,11 @@ class Rect(BaseObject):
 
   @width.GET
   def _getWidth(self) -> int:
-    return self.right - self.left
+    return int(self.right - self.left)
 
   @height.GET
   def _getHeight(self) -> int:
-    return self.bottom - self.top
+    return int(self.bottom - self.top)
 
   @overload(int, int, int, int)
   def __init__(self, L: int, T: int, R: int, B: int) -> None:
@@ -143,6 +143,13 @@ class Rect(BaseObject):
     self.top = rect.top()
     self.right = rect.right()
     self.bottom = rect.bottom()
+
+  @overload()
+  def __init__(self) -> None:
+    self.left = 0
+    self.top = 0
+    self.right = 0
+    self.bottom = 0
 
   @overload(Point)
   def translate(self, point: Point) -> None:

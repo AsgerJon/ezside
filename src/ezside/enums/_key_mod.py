@@ -5,10 +5,10 @@ modifier keys."""
 from __future__ import annotations
 
 from enum import EnumType
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 
 from PySide6.QtCore import Qt
-from worktoy.keenum import auto, SpaceNum
+from worktoy.keenum import auto
 
 from . import AbstractEnum
 

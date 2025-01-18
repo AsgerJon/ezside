@@ -13,14 +13,10 @@ from worktoy.parse import maybe
 from worktoy.desc import Field
 
 from . import AbstractButton, PushButtonConfig
-from ..core import RGBA, BoxModel, TextModel, Rect, Font
+from ..core import RGBA, BoxModel, TextModel, Rect, Font, LabelField
 from ..enums import MouseButton, Align
 
 PaintJob: TypeAlias = tuple[Rect, QPainter]
-
-
-class _FieldValue:
-  """Data descriptor. """
 
 
 class _ConfigValues:
@@ -45,7 +41,7 @@ class PushButton(AbstractButton):
 
   __text_model__ = None
 
-  label = Field()
+  label = LabelField()
 
   __enabled_fallback__ = True
   __enabled_flag__ = None
@@ -102,46 +98,6 @@ class PushButton(AbstractButton):
   contextMenu = Signal()  # Triggered by right-click
   disabledPressHold = Signal()  # Triggered by long press of any button
   pressHold = Signal()  # Triggered by long press of any button
-
-  def _createLabel(self, *args, **kwargs) -> None:
-    """Creator function for the label attribute. """
-    self.__text_model__ = TextModel(*args, **kwargs)
-
-  @label.GET
-  def _getLabel(self, **kwargs) -> TextModel:
-    """Getter-function for the label attribute. """
-    if self.__text_model__ is None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      self._createLabel()
-      return self._getLabel(_recursion=True)
-    if isinstance(self.__text_model__, TextModel):
-      return self.__text_model__
-    e = typeMsg('__text_model__', self.__text_model__, TextModel)
-    raise TypeError(e)
-
-  @label.SET
-  def _setLabel(self, newText: str, **kwargs) -> None:
-    """The setter function changes the text in the label attribute to the
-    given value. """
-    if self.__text_model__ is None:
-      if kwargs.get('_recursion', False):
-        raise RecursionError
-      self._createLabel()
-      return self._setLabel(newText, _recursion=True)
-    if isinstance(newText, str):
-      self.__text_model__.text = newText
-      return
-    if isinstance(newText, TextModel):
-      if kwargs.get('_recursion2', False):
-        raise RecursionError
-      return self._setLabel(newText.text, _recursion2=True)
-    if isinstance(newText, bytes):
-      if kwargs.get('_recursion3', False):
-        raise RecursionError
-      return self._setLabel(newText.decode(), _recursion3=True)
-    e = typeMsg('newText', newText, str)
-    raise TypeError(e)
 
   def __bool__(self, ) -> bool:
     """Returns the state of the button. """
@@ -241,12 +197,12 @@ class PushButton(AbstractButton):
     painter = self.label.paint(painter, rect)
     return rect, painter
 
-  def __init__(self, *args) -> None:
+  def __init__(self, *args, **kwargs) -> None:
     """Initializes the ButtonWidget. """
     AbstractButton.__init__(self, *args)
     parent = self.parent()
     otherArgs = [arg for arg in args if arg is not parent]
-    self.label = TextModel(*otherArgs)
+    self.label = TextModel(*otherArgs, **kwargs)
     self.setMouseTracking(True)
     self.label.align = Align.CENTER
     self.label.font = Font('MesloLGS NF', 18)

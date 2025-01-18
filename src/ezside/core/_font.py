@@ -1,6 +1,6 @@
 """Font encapsulates font settings. """
 #  AGPL-3.0 license
-#  Copyright (c) 2024 Asger Jon Vistisen
+#  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -44,6 +44,12 @@ class Font(BaseObject):
 
   @Q.GET
   def _getQFont(self) -> QFont:
+    if TYPE_CHECKING:
+      assert isinstance(self.family, FontFamily)
+      assert isinstance(self.ptSize, int)
+      assert isinstance(self.weight, QFont.Weight)
+      assert isinstance(self.italic, bool)
+      assert isinstance(self.underline, bool)
     font = QFont()
     font.setFamily(self.family.name)
     font.setPointSize(self.ptSize)
@@ -124,10 +130,10 @@ class Font(BaseObject):
 
   @overload(int)
   def __init__(self, ptSize: int) -> None:
-    self.family = FontFamily('Courier')
+    self.family = FontFamily('MesloLGS NF')
     self.ptSize = ptSize
 
   @overload()
   def __init__(self) -> None:
-    self.family = FontFamily('Courier')
+    self.family = FontFamily('MesloLGS NF')
     self.ptSize = 12

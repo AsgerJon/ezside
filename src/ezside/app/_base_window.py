@@ -1,6 +1,6 @@
 """BaseWindow subclasses QMainWindow providing the base window functions."""
 #  AGPL-3.0 license
-#  Copyright (c) 2024 Asger Jon Vistisen
+#  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
 
 from abc import abstractmethod
@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QMainWindow, QApplication, QWidget
 from worktoy.text import typeMsg
 from worktoy.desc import AttriBox, THIS
 from . import MenuBar, StatusBar
-from .dialogs import ConfirmationDialog
+from ..dialogs import ConfirmationDialog
 
 
 class _ConfirmExitDialog(ConfirmationDialog):

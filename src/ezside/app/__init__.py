@@ -1,12 +1,8 @@
 """The 'qol.app' module provides the graphical user interface based on the
 pyside6 library."""
 #  AGPL-3.0 license
-#  Copyright (c) 2024 Asger Jon Vistisen
+#  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
-
-from . import core
-from . import enums
-from . import widgets
 
 from ._app import App
 from ._abstract_action import AbstractAction

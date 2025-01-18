@@ -3,7 +3,7 @@
 #  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
 
-from typing import TypeAlias
+from typing import TypeAlias, TYPE_CHECKING
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QPainter, QPaintEvent
@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QWidget
 from worktoy.desc import Field
 from worktoy.text import typeMsg
 
-from ..core import Rect, BoxModel, EmptyPen, EmptyBrush
+from ..core import Rect, BoxModel, EmptyPen, EmptyBrush, Size
 from ..enums import Align
 
 PaintJob: TypeAlias = tuple[Rect, QPainter]
@@ -28,11 +28,18 @@ class AbstractWidget(QWidget):
   __box_model__ = None
   __size_policy__ = None
   __align_policy__ = None
+  __painted_rect__ = None
 
   __mouse_events__ = None
 
   sizePol = Field()
   align = Field()
+
+  #  Properties.
+  width = Field()
+  height = Field()
+  paintedRect = Field()
+  paintedSize = Field()
 
   emptyPen = EmptyPen()
   emptyBrush = EmptyBrush()
@@ -40,6 +47,34 @@ class AbstractWidget(QWidget):
   debug = Signal(str)
   debugType = Signal(str)
   debugPress = Signal(str)
+
+  @paintedRect.GET
+  def _getPaintedRect(self) -> Rect:
+    """Getter-function for the paintedRect property."""
+    if self.__painted_rect__ is None:
+      return Rect()
+    return self.__painted_rect__
+
+  @paintedSize.GET
+  def _getPaintedSize(self) -> Size:
+    """Getter-function for the paintedSize property."""
+    if TYPE_CHECKING:
+      assert isinstance(self.paintedRect, Rect)
+    return self.paintedRect.size
+
+  @width.GET
+  def _getWidth(self) -> int:
+    """Getter-function for the width property."""
+    if TYPE_CHECKING:
+      assert isinstance(self.paintedSize, Size)
+    return self.paintedSize.width
+
+  @height.GET
+  def _getHeight(self) -> int:
+    """Getter-function for the height property."""
+    if TYPE_CHECKING:
+      assert isinstance(self.paintedSize, Size)
+    return self.paintedSize.height
 
   def getBoxModel(self, **kwargs) -> BoxModel:
     """Getter-function for the instance of BoxModel matching current
@@ -85,6 +120,7 @@ class AbstractWidget(QWidget):
     painter.setBrush(box.paddingColor.brush)
     painter.drawRoundedRect(paddingRect.Q, rx, ry)
     viewRect = paddingRect - box.paddingShape
+    self.__painted_rect__ = viewRect
     self.paintContent(viewRect, painter)
     painter.end()
 

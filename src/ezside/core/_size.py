@@ -1,7 +1,7 @@
 """Size provides a dataclass representation of a size given as absolute
 values for width and height. """
 #  AGPL-3.0 license
-#  Copyright (c) 2024 Asger Jon Vistisen
+#  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
 
 from typing import Self, Any
@@ -88,11 +88,13 @@ class Size(BaseObject):
       return cls(int(self.width * other), int(self.height * other))
     return NotImplemented
 
+  def __rmul__(self, other: Any) -> Self:
+    return self * other
+
   def __truediv__(self, other: Any) -> Self:
     if not isinstance(other, (int, float)):
       return NotImplemented
     if other:
-      cls = type(self)
       return self * (1 / other)
     e = """Division by zero!"""
     raise ZeroDivisionError(e)

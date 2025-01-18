@@ -63,6 +63,8 @@ class AbstractButton(AbstractWidget):
   shadowMargin = AttriBox[Margin](8, 1, 8, 1)
 
   #  - Signals
+  press = Signal(Qt.MouseButton, QPoint)  # Emitted on any press
+  release = Signal(Qt.MouseButton, QPoint)  # Emitted on any release
   singleClick = Signal(Qt.MouseButton, QPoint)
   singlePressHold = Signal(Qt.MouseButton, QPoint)
   doubleClick = Signal(Qt.MouseButton, QPoint)
@@ -263,6 +265,7 @@ class AbstractButton(AbstractWidget):
     self.__mouse_press_x__ = event.x()
     self.__mouse_press_y__ = event.y()
     self.__mouse_btn__ = event.button()
+    self.press.emit(self.btn, self.pressPos)
     self.pressReleaseTimer.start()
     self.pressHoldTimer.start()
     self.update()
@@ -277,6 +280,7 @@ class AbstractButton(AbstractWidget):
     self.__under_mouse__ = True
     self.__is_pressed__ = False
     self.__mouse_btn__ = event.button()
+    self.release.emit(self.btn, self.pressPos)
     if self.pressHoldTimer.isActive():
       self.pressHoldTimer.stop()
     if self.pressReleaseTimer.isActive():

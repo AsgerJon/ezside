@@ -11,7 +11,7 @@ from PySide6.QtCore import QSize
 from worktoy.desc import AttriBox, THIS, Field
 
 from . import BaseWindow
-from .widgets import TextWidget, Layout, PushButton
+from ..widgets import Layout, TextWidget, PushButton, PressHoldButton
 
 
 class LayoutWindow(BaseWindow):
@@ -19,9 +19,10 @@ class LayoutWindow(BaseWindow):
   of the main application window. """
 
   grid = AttriBox[Layout](THIS)
-  welcomeBanner = AttriBox[TextWidget](THIS, 'LOL!', 'montserrat', 40, 24)
-  label = AttriBox[TextWidget](THIS, 'Button: ', 'montserrat', 20, 24)
+  welcomeBanner = AttriBox[TextWidget](THIS, 'LOL!', 'MesloLGS', 40, 24)
+  label = AttriBox[TextWidget](THIS, 'Button: ', 'MesloLGS', 20, 24)
   button = AttriBox[PushButton](THIS, 'CLICK ME!', )
+  pressHoldButton = AttriBox[PressHoldButton](THIS, 'Hold Me!', )
   minWidth = AttriBox[int](480)
   minHeight = AttriBox[int](360)
   minSize = Field()
@@ -39,6 +40,7 @@ class LayoutWindow(BaseWindow):
     self.grid.addWidget(self.welcomeBanner, 0, 0, 1, 2)
     self.grid.addWidget(self.label, 1, 0)
     self.grid.addWidget(self.button, 1, 1)
+    self.grid.addWidget(self.pressHoldButton, 2, 0, 1, 2)
     self.setCentralWidget(self.grid.baseWidget)
 
   @abstractmethod

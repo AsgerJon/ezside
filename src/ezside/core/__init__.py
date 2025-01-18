@@ -1,7 +1,7 @@
 """The 'qol.app.core' module provides core dataclasses shared by the
 application."""
 #  AGPL-3.0 license
-#  Copyright (c) 2024 Asger Jon Vistisen
+#  Copyright (c) 2024-2025 Asger Jon Vistisen
 from __future__ import annotations
 
 from ._empty_pen import EmptyPen
@@ -18,6 +18,7 @@ from ._font_family import FontFamily
 from ._font import Font
 
 from ._text_model import TextModel
+from ._label_field import LabelField
 
 __all__ = [
     'EmptyPen',
@@ -32,4 +33,5 @@ __all__ = [
     'FontFamily',
     'Font',
     'TextModel',
+    'LabelField',
 ]
